@@ -95,7 +95,7 @@ export default async function JobPage({ params }: Props) {
 
       {/* PATHSYNC BANNER */}
       <a
-        href="https://pathsyncai.com"
+        href="https://pathsync-ai.vercel.app"
         target="_blank"
         rel="noopener noreferrer"
         className="flex items-center justify-between bg-green-50 border border-green-200 rounded-xl px-6 py-4 hover:bg-green-100 transition-colors"

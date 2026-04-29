@@ -103,7 +103,7 @@ python scraper.py
 
 ## 🤖 PathSync AI
 
-This project is proudly integrated with **[PathSync AI](https://pathsyncai.com)** — an AI-powered platform that matches Nigerian students to the perfect scholarships based on their profile.
+This project is proudly integrated with **[PathSync AI](https://pathsync-ai.vercel.app)** — an AI-powered platform that matches Nigerian students to the perfect scholarships based on their profile.
 
 ---
 

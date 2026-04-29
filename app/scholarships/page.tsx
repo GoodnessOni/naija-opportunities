@@ -33,7 +33,7 @@ export default async function ScholarshipsPage() {
 
       {/* PATHSYNC BANNER */}
       <a
-        href="https://pathsyncai.com"
+        href="https://pathsync-ai.vercel.app"
         target="_blank"
         className="flex items-center justify-between bg-green-50 border border-green-200 rounded-xl px-6 py-4 mb-8 hover:bg-green-100 transition-colors"
       >

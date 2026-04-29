@@ -20,7 +20,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <div className="flex gap-6 text-sm font-medium">
               <a href="/jobs" className="hover:text-green-700 transition-colors">Jobs</a>
               <a href="/scholarships" className="hover:text-green-700 transition-colors">Scholarships</a>
-              <a href="https://pathsyncai.com" target="_blank"
+              <a href="https://pathsync-ai.vercel.app" target="_blank"
                 className="bg-green-700 text-white px-3 py-1 rounded-full hover:bg-green-800 transition-colors">
                 PathSync AI ✨
               </a>
@@ -39,7 +39,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <p className="text-sm text-gray-500">
               © 2026 NaijaOpportunities. Updated daily.
             </p>
-            <a href="https://pathsyncai.com" target="_blank"
+            <a href="https://pathsync-ai.vercel.app" target="_blank"
               className="text-sm bg-green-50 border border-green-200 text-green-700 px-4 py-2 rounded-full hover:bg-green-100 transition-colors">
               🤖 Let PathSync AI match you to the perfect scholarship
             </a>
