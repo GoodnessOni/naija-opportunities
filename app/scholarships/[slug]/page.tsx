@@ -53,12 +53,13 @@ Extract and return this exact JSON:
 If information is not available for a field, make a reasonable guess based on the title.
 `
     const response = await ai.models.generateContent({
-      model: 'gemini-2.0-flash',
-      contents: prompt,
+      model: 'gemini-2.0-flash-lite',
+      contents: [{ role: 'user', parts: [{ text: prompt }] }],
     })
 
-    const text = response.text?.replace(/```json|```/g, '').trim() || ''
-    const data = JSON.parse(text)
+    const text = response.candidates?.[0]?.content?.parts?.[0]?.text || ''
+    const cleaned = text.replace(/```json|```/g, '').trim()
+    const data = JSON.parse(cleaned)
 
     // save back to Supabase so next visitor gets it instantly
     await supabase
