@@ -52,11 +52,11 @@ If information is not available for a field, make a reasonable guess based on th
 `
     const { GoogleGenerativeAI } = require('@google/generative-ai')
     const ai = new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
-    const model = ai.getGenerativeModel({ model: 'gemini-1.5-flash' })
+    const model = ai.getGenerativeModel({ model: 'gemini-2.0-flash-exp' })
     const result = await model.generateContent(prompt)
     const text = result.response.text().replace(/```json|```/g, '').trim()
     const data = JSON.parse(text)
-    
+
     // save back to Supabase so next visitor gets it instantly
     await supabase
       .from('scholarships')
