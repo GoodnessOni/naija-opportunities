@@ -1,5 +1,6 @@
 import { supabase } from '../../lib/supabase'
 import Link from 'next/link'
+import Groq from 'groq-sdk'
 
 interface Scholarship {
   id: string
@@ -24,12 +25,13 @@ interface Props {
 }
 
 async function enrichScholarship(scholarship: Scholarship): Promise<Scholarship> {
-  // only enrich if data is missing
   if (scholarship.eligibility && scholarship.benefits && scholarship.how_to_apply) {
     return scholarship
   }
 
- try {
+  try {
+    const groq = new Groq({ apiKey: process.env.GROQ_API_KEY })
+
     const prompt = `
 You are extracting scholarship information.
 Return ONLY a valid JSON object with no markdown, no backticks, no explanation.
@@ -50,14 +52,19 @@ Extract and return this exact JSON:
 
 If information is not available for a field, make a reasonable guess based on the title.
 `
-    const { GoogleGenerativeAI } = require('@google/generative-ai')
-    const ai = new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
-    const model = ai.getGenerativeModel({ model: 'gemini-2.0-flash-exp' })
-    const result = await model.generateContent(prompt)
-    const text = result.response.text().replace(/```json|```/g, '').trim()
-    const data = JSON.parse(text)
 
-    // save back to Supabase so next visitor gets it instantly
+    const completion = await groq.chat.completions.create({
+      model: 'llama-3.3-70b-versatile',
+      messages: [{ role: 'user', content: prompt }],
+    })
+
+    const text = completion.choices[0]?.message?.content || ''
+    const cleaned = text
+  .replace(/```json|```/g, '')
+  .replace(/[\x00-\x1F\x7F]/g, ' ')
+  .trim()
+const data = JSON.parse(cleaned)
+
     await supabase
       .from('scholarships')
       .update({
@@ -73,7 +80,7 @@ If information is not available for a field, make a reasonable guess based on th
 
     return { ...scholarship, ...data }
   } catch (e) {
-    console.error('Gemini error:', e)
+    console.error('Groq error:', e)
     return scholarship
   }
 }
@@ -120,7 +127,6 @@ export default async function ScholarshipPage({ params }: Props) {
         ← Back to all scholarships
       </Link>
 
-      {/* MAIN CARD */}
       <div className="bg-white border border-gray-200 rounded-2xl p-8 mb-6">
         <div className="flex items-center justify-between mb-4">
           <span className="text-xs text-blue-600 font-semibold uppercase">{s.source}</span>
@@ -129,7 +135,6 @@ export default async function ScholarshipPage({ params }: Props) {
 
         <h1 className="text-2xl font-bold mb-4">{s.title}</h1>
 
-        {/* QUICK INFO */}
         <div className="space-y-2 mb-6">
           {s.amount && <p className="text-gray-700">💰 Amount: <span className="font-medium">{s.amount}</span></p>}
           {s.duration && <p className="text-gray-700">📅 Duration: <span className="font-medium">{s.duration}</span></p>}
@@ -137,7 +142,6 @@ export default async function ScholarshipPage({ params }: Props) {
           {s.deadline && <p className="text-red-500">⏰ Deadline: <span className="font-medium">{s.deadline}</span></p>}
         </div>
 
-        {/* DESCRIPTION */}
         {s.description && (
           <div className="mb-6">
             <h2 className="font-bold text-gray-900 mb-2">About this Scholarship</h2>
@@ -145,7 +149,6 @@ export default async function ScholarshipPage({ params }: Props) {
           </div>
         )}
 
-        {/* ELIGIBILITY */}
         {s.eligibility && (
           <div className="bg-blue-50 rounded-xl p-4 mb-4">
             <h2 className="font-bold text-blue-900 mb-2">✅ Eligibility Criteria</h2>
@@ -153,7 +156,6 @@ export default async function ScholarshipPage({ params }: Props) {
           </div>
         )}
 
-        {/* BENEFITS */}
         {s.benefits && (
           <div className="bg-green-50 rounded-xl p-4 mb-4">
             <h2 className="font-bold text-green-900 mb-2">🎁 What You Get</h2>
@@ -161,7 +163,6 @@ export default async function ScholarshipPage({ params }: Props) {
           </div>
         )}
 
-        {/* HOW TO APPLY */}
         {s.how_to_apply && (
           <div className="bg-gray-50 rounded-xl p-4 mb-4">
             <h2 className="font-bold text-gray-900 mb-2">📋 How to Apply</h2>
@@ -169,7 +170,6 @@ export default async function ScholarshipPage({ params }: Props) {
           </div>
         )}
 
-        {/* DOCUMENTS */}
         {s.documents_needed && (
           <div className="bg-amber-50 rounded-xl p-4 mb-6">
             <h2 className="font-bold text-amber-900 mb-2">📁 Documents Needed</h2>
@@ -177,7 +177,6 @@ export default async function ScholarshipPage({ params }: Props) {
           </div>
         )}
 
-        {/* APPLY BUTTON */}
         <a
           href={s.apply_url}
           target="_blank"
@@ -188,7 +187,6 @@ export default async function ScholarshipPage({ params }: Props) {
         </a>
       </div>
 
-      {/* PATHSYNC BANNER */}
       <a
         href="https://pathsync-ai.vercel.app"
         target="_blank"
