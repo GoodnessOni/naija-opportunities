@@ -1,6 +1,5 @@
 import { supabase } from '../../lib/supabase'
 import Link from 'next/link'
-import { GoogleGenAI } from '@google/genai'
 
 interface Scholarship {
   id: string
@@ -30,8 +29,7 @@ async function enrichScholarship(scholarship: Scholarship): Promise<Scholarship>
     return scholarship
   }
 
-  try {
-    const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! })
+ try {
     const prompt = `
 You are extracting scholarship information.
 Return ONLY a valid JSON object with no markdown, no backticks, no explanation.
@@ -52,15 +50,13 @@ Extract and return this exact JSON:
 
 If information is not available for a field, make a reasonable guess based on the title.
 `
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.0-flash-lite',
-      contents: [{ role: 'user', parts: [{ text: prompt }] }],
-    })
-
-    const text = response.candidates?.[0]?.content?.parts?.[0]?.text || ''
-    const cleaned = text.replace(/```json|```/g, '').trim()
-    const data = JSON.parse(cleaned)
-
+    const { GoogleGenerativeAI } = require('@google/generative-ai')
+    const ai = new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
+    const model = ai.getGenerativeModel({ model: 'gemini-1.5-flash' })
+    const result = await model.generateContent(prompt)
+    const text = result.response.text().replace(/```json|```/g, '').trim()
+    const data = JSON.parse(text)
+    
     // save back to Supabase so next visitor gets it instantly
     await supabase
       .from('scholarships')
