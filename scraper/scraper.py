@@ -20,8 +20,16 @@ supabase = create_client(
 )
 
 HEADERS = {
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36'
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+    'Accept-Language': 'en-US,en;q=0.5',
+    'Accept-Encoding': 'gzip, deflate, br',
+    'Connection': 'keep-alive',
+    'Upgrade-Insecure-Requests': '1',
 }
+
+session = requests.Session()
+session.headers.update(HEADERS)
 
 # ─── DESCRIPTION FETCHER ─────────────────────────────────────
 
@@ -194,7 +202,7 @@ def scrape_jobs_googlenews():
 
         for query in queries:
             url = f'https://news.google.com/rss/search?q={query}&hl=en-NG&gl=NG&ceid=NG:en'
-            res = requests.get(url, headers=HEADERS, timeout=10)
+            res = session.get(url, headers=HEADERS, timeout=10)
             soup = BeautifulSoup(res.text, 'html.parser')
             items = soup.find_all('item')[:5]
 
@@ -230,30 +238,80 @@ def scrape_jobs_googlenews():
 
 # ─── SCHOLARSHIP SCRAPERS ─────────────────────────────────────
 
-def scrape_afterschoolafrica():
-    print('Scraping AfterSchoolAfrica...')
+# ─── SCHOLARSHIP SCRAPERS ─────────────────────────────────────
+
+def scrape_scholarshipregion():
+    print('Scraping ScholarshipRegion...')
     scholarships = []
     try:
-        url = 'https://www.afterschoolafrica.com/category/scholarships/'
+        pages = [
+            'https://www.scholarshipregion.com/category/africa-scholarships/',
+            'https://www.scholarshipregion.com/category/nigerian-scholarships/',
+            'https://www.scholarshipregion.com/',
+        ]
+        seen = set()
+        for page_url in pages:
+            res = requests.get(page_url, headers=HEADERS, timeout=10)
+            soup = BeautifulSoup(res.text, 'html.parser')
+            titles = soup.select('h2 a, h3 a, .entry-title a')[:10]
+
+            for title_el in titles:
+                title = title_el.text.strip()
+                link = title_el.get('href', '')
+                if not link or link in seen or len(title) < 10:
+                    continue
+                seen.add(link)
+
+                print(f'  Fetching: {title[:60]}')
+                el = None
+                try:
+                    r = session.get(link, headers=HEADERS, timeout=10)
+                    s = BeautifulSoup(r.text, 'html.parser')
+                    el = s.select_one('.entry-content') or s.select_one('.post-content') or s.select_one('article')
+                except:
+                    pass
+                description = el.get_text(separator=' ', strip=True)[:500] if el else ''
+                time.sleep(0.5)
+
+                scholarships.append({
+                    'title': title,
+                    'provider': 'Various',
+                    'country': 'International',
+                    'level': 'various',
+                    'description': description,
+                    'apply_url': link,
+                    'source': 'scholarshipregion',
+                    'deadline': None
+                })
+    except Exception as e:
+        print(f'ScholarshipRegion error: {e}')
+    return scholarships
+
+
+def scrape_ngscholars():
+    print('Scraping NGScholars...')
+    scholarships = []
+    try:
+        url = 'https://www.ngscholars.net/'
         res = requests.get(url, headers=HEADERS, timeout=10)
         soup = BeautifulSoup(res.text, 'html.parser')
-        listings = soup.select('article')[:15]
+        titles = soup.select('h2 a, h3 a, .entry-title a')[:15]
 
-        for item in listings:
-            title_el = item.select_one('h2 a, h3 a, .entry-title a')
-            if not title_el:
-                continue
-
+        for title_el in titles:
             title = title_el.text.strip()
             link = title_el.get('href', '')
+            if not link or len(title) < 10:
+                continue
 
-            print(f'  Fetching description: {title}')
-            description = fetch_description(link, [
-                '.entry-content',
-                'article .content',
-                '.post-content',
-                'div[class*="content"]',
-            ])
+            print(f'  Fetching: {title[:60]}')
+            el = None
+            try:
+                r = session.get(link, headers=HEADERS, timeout=10)
+                s = BeautifulSoup(r.text, 'html.parser')
+                el = s.select_one('.entry-content') or s.select_one('.post-content') or s.select_one('article')
+            except:
+                pass
+            description = el.get_text(separator=' ', strip=True)[:500] if el else ''
             time.sleep(0.5)
 
             scholarships.append({
@@ -263,56 +321,67 @@ def scrape_afterschoolafrica():
                 'level': 'various',
                 'description': description,
                 'apply_url': link,
-                'source': 'afterschoolafrica',
+                'source': 'ngscholars',
                 'deadline': None
             })
-
     except Exception as e:
-        print(f'AfterSchoolAfrica error: {e}')
+        print(f'NGScholars error: {e}')
     return scholarships
 
 
-def scrape_opportunitydesk():
-    print('Scraping OpportunityDesk...')
+def scrape_scholarshipregion_rss():
+    print('Scraping ScholarshipRegion RSS...')
     scholarships = []
     try:
-        url = 'https://opportunitydesk.org/category/scholarships/'
-        res = requests.get(url, headers=HEADERS, timeout=10)
-        soup = BeautifulSoup(res.text, 'html.parser')
-        listings = soup.select('article')[:15]
+        feeds = [
+            'https://www.scholarshipregion.com/feed/',
+            'https://www.scholarshipregion.com/category/nigerian-scholarships/feed/',
+            'https://www.scholarshipregion.com/category/africa-scholarships/feed/',
+        ]
 
-        for item in listings:
-            title_el = item.select_one('h2 a, h3 a, .entry-title a')
-            if not title_el:
-                continue
+        seen = set()
+        for feed_url in feeds:
+            res = session.get(feed_url, timeout=10)
+            soup = BeautifulSoup(res.text, 'html.parser')
+            items = soup.find_all('item')[:10]
+            print(f'  Found {len(items)} items in {feed_url}')
 
-            title = title_el.text.strip()
-            link = title_el.get('href', '')
+            for item in items:
+                title = item.find('title')
+                link = item.find('link')
+                if not title:
+                    continue
 
-            print(f'  Fetching description: {title}')
-            description = fetch_description(link, [
-                '.entry-content',
-                '.post-content',
-                'article .content',
-                'div[class*="content"]',
-            ])
-            time.sleep(0.5)
+                link_url = str(link.next_sibling or '').strip() if link else ''
+                if not link_url or link_url in seen:
+                    continue
+                seen.add(link_url)
 
-            scholarships.append({
-                'title': title,
-                'provider': 'Various',
-                'country': 'International',
-                'level': 'various',
-                'description': description,
-                'apply_url': link,
-                'source': 'opportunitydesk',
-                'deadline': None
-            })
+                print(f'  Fetching: {title.get_text()[:60]}')
+                el = None
+                try:
+                    r = session.get(link_url, timeout=10)
+                    s = BeautifulSoup(r.text, 'html.parser')
+                    el = s.select_one('.entry-content') or s.select_one('.post-content') or s.select_one('article')
+                except:
+                    pass
+                description = el.get_text(separator=' ', strip=True)[:500] if el else ''
+                time.sleep(0.5)
+
+                scholarships.append({
+                    'title': title.get_text().strip(),
+                    'provider': 'Various',
+                    'country': 'International',
+                    'level': 'various',
+                    'description': description,
+                    'apply_url': link_url,
+                    'source': 'scholarshipregion',
+                    'deadline': None
+                })
 
     except Exception as e:
-        print(f'OpportunityDesk error: {e}')
+        print(f'ScholarshipRegion RSS error: {e}')
     return scholarships
-
 
 def scrape_scholarships_googlenews():
     print('Scraping scholarships via Google News...')
@@ -320,29 +389,26 @@ def scrape_scholarships_googlenews():
     try:
         queries = [
             'scholarships+for+Nigerian+students+2026',
-            'international+scholarships+Africa+2026',
             'fully+funded+scholarships+Nigeria+2026',
             'PTDF+NNPC+scholarship+2026',
             'Commonwealth+scholarship+Nigeria+2026',
+            'MTN+scholarship+Nigeria+2026',
         ]
 
         for query in queries:
             url = f'https://news.google.com/rss/search?q={query}&hl=en-NG&gl=NG&ceid=NG:en'
-            res = requests.get(url, headers=HEADERS, timeout=10)
+            res = session.get(url, timeout=10)
             soup = BeautifulSoup(res.text, 'html.parser')
             items = soup.find_all('item')[:5]
 
             for item in items:
                 title = item.find('title')
                 link = item.find('link')
-
                 if not title:
                     continue
-
                 link_url = ''
                 if link:
                     link_url = link.get_text() or str(link.next_sibling or '').strip()
-
                 if not link_url:
                     continue
 
@@ -358,7 +424,7 @@ def scrape_scholarships_googlenews():
                 })
 
     except Exception as e:
-        print(f'Google News Scholarships error: {e}')
+        print(f'Google News error: {e}')
     return scholarships
 
 
@@ -410,16 +476,16 @@ if __name__ == '__main__':
     print(f'\nTotal jobs collected: {len(all_jobs)}')
     save_jobs(all_jobs)
 
-    # ── SCHOLARSHIPS ──
-    print('\n' + '=' * 50)
-    print('SCRAPING SCHOLARSHIPS')
-    print('=' * 50)
-    all_scholarships = (
-        scrape_afterschoolafrica() +
-        scrape_opportunitydesk() +
-        scrape_scholarships_googlenews()
-    )
-    print(f'\nTotal scholarships collected: {len(all_scholarships)}')
-    save_scholarships(all_scholarships)
+# ── SCHOLARSHIPS ──
+print('\n' + '=' * 50)
+print('SCRAPING SCHOLARSHIPS')
+print('=' * 50)
+all_scholarships = (
+    scrape_scholarshipregion() +
+    scrape_scholarshipregion_rss()  +
+    scrape_scholarships_googlenews()
+)
+print(f'\nTotal scholarships collected: {len(all_scholarships)}')
+save_scholarships(all_scholarships)
 
-    print(f'\n✅ Done at {datetime.now()}')
+print(f'\n✅ Done at {datetime.now()}')
