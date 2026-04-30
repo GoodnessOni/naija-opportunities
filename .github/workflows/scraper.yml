@@ -21,7 +21,7 @@ jobs:
       - name: Install dependencies
         run: |
           cd scraper
-          pip install requests beautifulsoup4 supabase python-dotenv google-generativeai groq-sdk lxml
+          pip install requests beautifulsoup4 supabase python-dotenv google-generativeai groq lxml
 
       - name: Run scraper
         env:
