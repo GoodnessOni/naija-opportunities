@@ -29,8 +29,8 @@ interface Props {
 function parseBullets(text: string | null): string[] {
   if (!text) return []
   return text
-    .replace(/^(bullet points?|list of documents?|steps?|requirements?)[:\s]*/i, '')
-    .split(/\n|\*|•|–|-(?=\s)/)
+    .replace(/^(bullet points?|list of documents?)[:\s]*/i, '')
+    .split(/\||\n|\*|•/)
     .map(line => line.trim())
     .filter(line => line.length > 3)
 }
