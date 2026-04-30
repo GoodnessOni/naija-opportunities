@@ -177,11 +177,11 @@ def scrape_jobs_googlenews():
     jobs = []
     try:
         queries = [
-            'Nigeria+job+vacancies+2026',
-            'Nigerian+companies+hiring+2026',
-            'graduate+trainee+Nigeria+2026',
-            'NNPC+CBN+job+recruitment+2026',
-        ]
+             'site:jobberman.com+job+vacancy+2026',
+             'graduate+trainee+application+Nigeria+2026',
+            'job+recruitment+apply+now+Nigeria+2026',
+            '"we+are+hiring"+Nigeria+2026',
+            ]
 
         for query in queries:
             url = f'https://news.google.com/rss/search?q={query}&hl=en-NG&gl=NG&ceid=NG:en'
