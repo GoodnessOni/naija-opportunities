@@ -45,13 +45,14 @@ export default async function ScholarshipsPage() {
   }) ?? []
 
   return (
-    <div>
+  <div>
       {/* HEADER */}
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold mb-2">Scholarships for Nigerians 🎓</h1>
-        <p className="text-gray-500">International and local scholarships — updated daily.</p>
-      </div>
-
+     <div className="mb-6">
+      <h1 className="text-3xl md:text-4xl font-extrabold mb-2" style={{ color: 'var(--foreground)' }}>
+      Scholarships for Nigerians 🎓
+      </h1>
+    <p className="text-sm" style={{ color: 'var(--muted-text)' }}>International and local scholarships — updated daily.</p>
+   </div>
       {/* STATS ROW */}
       <div className="flex flex-wrap gap-3 mb-6">
         <div className="bg-blue-50 border border-blue-100 rounded-xl px-4 py-2.5 flex items-center gap-2">
@@ -80,38 +81,29 @@ export default async function ScholarshipsPage() {
       </div>
 
       {/* PATHSYNC AI BANNER — BIG and unmissable */}
-      <a
-        href="https://pathsync-ai.vercel.app"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="block mb-8"
-      >
-        <div className="bg-gradient-to-r from-green-600 to-emerald-500 rounded-2xl p-6 text-white shadow-lg hover:shadow-xl transition-shadow">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div className="flex-1">
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-2xl">🤖</span>
-                <span className="font-bold text-lg">Don&apos;t know which scholarship fits you?</span>
-              </div>
-              <p className="text-green-100 text-sm mb-3 leading-relaxed">
-                PathSync AI has a conversation with you, finds your hidden achievements, 
-                and matches you to scholarships you actually qualify for — then writes 
-                your application letter and CV automatically.
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {['🎯 Smart matching', '✉️ Application letter', '📄 CV generator', '📅 Deadline tracker'].map(f => (
-                  <span key={f} className="bg-white/20 text-white text-xs px-3 py-1 rounded-full font-medium">{f}</span>
-                ))}
-              </div>
-            </div>
-            <div className="flex-shrink-0">
-              <div className="inline-flex items-center gap-2 bg-white text-green-700 font-bold px-6 py-3 rounded-xl text-sm hover:bg-green-50 transition-colors whitespace-nowrap">
-                Try PathSync AI free →
-              </div>
-            </div>
-          </div>
-        </div>
-      </a>
+      <a href="https://pathsync-ai.vercel.app" target="_blank" rel="noopener noreferrer"
+  className="block mb-8 rounded-3xl overflow-hidden"
+  style={{ background: 'linear-gradient(135deg, #064e3b, #065f46)' }}>
+  <div className="p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="flex-1">
+      <div className="flex items-center gap-2 mb-1">
+        <span className="text-2xl">🤖</span>
+        <span className="font-bold text-white text-lg">Don't know which scholarship fits you?</span>
+      </div>
+      <p className="text-green-200 text-sm mb-3">PathSync AI matches you to scholarships you qualify for — then writes your application letter and CV.</p>
+      <div className="flex flex-wrap gap-2">
+        {['🎯 Smart matching', '✉️ Application letter', '📄 CV generator', '📅 Deadline tracker'].map(f => (
+          <span key={f} className="bg-white/20 text-white text-xs px-3 py-1 rounded-full font-medium">{f}</span>
+        ))}
+      </div>
+    </div>
+    <div className="flex-shrink-0">
+      <span className="inline-block bg-white text-green-800 font-bold px-6 py-3 rounded-2xl text-sm whitespace-nowrap">
+        Try PathSync AI free →
+      </span>
+    </div>
+  </div>
+</a>
 
       {/* URGENT DEADLINES SECTION */}
       {urgent.length > 0 && (
