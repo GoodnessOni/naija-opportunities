@@ -182,7 +182,7 @@ export default async function ScholarshipPage({ params }: Props) {
       </Link>
 
       {/* Main card */}
-      <div className="bg-white border border-gray-200 rounded-2xl p-8 mb-5 shadow-sm">
+      <div className="card border border-gray-200 rounded-2xl p-8 mb-5 shadow-sm">
 
         {/* Header badges */}
         <div className="flex items-center justify-between mb-4">

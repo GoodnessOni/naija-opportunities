@@ -155,7 +155,7 @@ export default async function JobPage({ params }: Props) {
         ← Back to all jobs
       </Link>
 
-      <div className="bg-white border border-gray-200 rounded-2xl p-8 mb-5 shadow-sm">
+      <div className="card border border-gray-200 rounded-2xl p-8 mb-5 shadow-sm">
         <div className="flex items-center justify-between mb-4">
           <span className="text-xs text-green-700 font-semibold uppercase tracking-wide">{job.source}</span>
           {job.type && <span className="text-xs bg-green-50 text-green-700 px-3 py-1 rounded-full font-medium">{job.type}</span>}
@@ -227,7 +227,7 @@ export default async function JobPage({ params }: Props) {
 
         {job.how_to_apply && (
           <div className="bg-gray-50 border border-gray-100 rounded-xl p-5 mb-4">
-            <h2 className="font-bold style={{ color: 'var(--foreground)' }} mb-3">📋 How to Apply</h2>
+            <h2 className="font-bold text-gray-900 mb-3">📋 How to Apply</h2>
             <ol className="space-y-2 list-none">
               {parseBullets(job.how_to_apply).map((item, i) => (
                 <li key={i} className="flex items-start gap-3 text-gray-700 text-sm">
@@ -292,7 +292,7 @@ export default async function JobPage({ params }: Props) {
           <div className="flex flex-col gap-3">
             {similar.map((sim) => (
               <Link key={sim.id} href={`/jobs/${makeSlug(sim.title, sim.id)}`}
-                className="flex items-center justify-between bg-white border border-gray-200 rounded-xl px-5 py-4 hover:border-green-300 hover:shadow-sm transition-all group">
+                className="flex items-center justify-between card border border-gray-200 rounded-xl px-5 py-4 hover:border-green-800 hover:shadow-sm transition-all group">
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold style={{ color: 'var(--foreground)' }} group-hover:text-green-700 truncate">{sim.title}</p>
                   <p className="text-xs text-gray-400 mt-1">{sim.company} · {sim.location}</p>
