@@ -13,7 +13,7 @@ export default async function Home() {
     <div>
       {/* HERO */}
       <div className="relative overflow-hidden rounded-3xl mb-8 p-8 md:p-12"
-        style={{ background: 'linear-gradient(135deg, #064e3b 0%, #15803d 60%, #16a34a 100%)' }}>
+        style={{ background: 'linear-gradient(135deg, #15803d 0%, #16a34a 50%, #22c55e 100%)' }}>
         <div className="absolute top-0 right-0 w-64 h-64 rounded-full opacity-10"
           style={{ background: 'white', transform: 'translate(30%, -30%)' }} />
         <div className="absolute bottom-0 left-0 w-48 h-48 rounded-full opacity-10"

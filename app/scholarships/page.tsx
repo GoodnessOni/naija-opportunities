@@ -51,7 +51,7 @@ export default async function ScholarshipsPage() {
       <h1 className="text-3xl md:text-4xl font-extrabold mb-2" style={{ color: 'var(--foreground)' }}>
       Scholarships for Nigerians 🎓
       </h1>
-    <p className="text-sm" style={{ color: 'var(--muted-text)' }}>International and local scholarships — updated daily.</p>
+    <p className="text-sm" style={{ color: 'var(--muted-text)' }}>International and local scholarships updated daily.</p>
    </div>
       {/* STATS ROW */}
       <div className="flex flex-wrap gap-3 mb-6">
@@ -74,8 +74,8 @@ export default async function ScholarshipsPage() {
         <div className="card border border-green-100 rounded-xl px-4 py-2.5 flex items-center gap-2">
           <span className="text-xl">🔄</span>
           <div>
-            <div className="text-xs text-green-600 font-medium">Updated</div>
-            <div className="text-sm font-bold text-green-900">Daily</div>
+            <div className="text-xs text-green-400 font-medium">Updated</div>
+            <div className="text-sm font-bold text-green-400">Daily</div>
           </div>
         </div>
       </div>
@@ -105,8 +105,7 @@ export default async function ScholarshipsPage() {
           </div>
           <div className="flex-shrink-0">
             <span
-              className="inline-block text-green-800 font-bold px-6 py-3 rounded-2xl text-sm whitespace-nowrap"
-              style={{ background: 'linear-gradient(135deg, #064e3b 0%, #15803d 60%, #16a34a 100%)' }}
+              className="inline-block font-bold px-6 py-3 rounded-2xl text-sm whitespace-nowrap bg-white text-green-800"
             >
               Try PathSync AI free →
             </span>
@@ -228,7 +227,7 @@ export default async function ScholarshipsPage() {
           <div>
             <div className="font-bold text-white mb-1">🤖 Let PathSync AI find your perfect match</div>
             <div className="text-sm text-green-200">
-              Tell it your course, CGPA, and what you do outside class — it finds scholarships you actually qualify for.
+              Tell it your course, CGPA, and what you do outside class - it finds scholarships you actually qualify for.
             </div>
           </div>
           <div className="text-white font-semibold text-sm whitespace-nowrap ml-6 bg-white/20 px-4 py-2 rounded-lg flex-shrink-0">
