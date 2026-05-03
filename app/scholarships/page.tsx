@@ -225,12 +225,13 @@ export default async function ScholarshipsPage() {
           className="flex items-center justify-between card border border-green-200 rounded-xl px-6 py-5 hover:bg-green-100 transition-colors"
         >
           <div>
-            <div className="font-bold text-white mb-1">🤖 Let PathSync AI find your perfect match</div>
-            <div className="text-sm text-green-200">
+            <div className="font-bold card mb-1">🤖 Let PathSync AI find your perfect match</div>
+          
+            <div className="text-sm text-green-600">
               Tell it your course, CGPA, and what you do outside class - it finds scholarships you actually qualify for.
             </div>
           </div>
-          <div className="text-white font-semibold text-sm whitespace-nowrap ml-6 bg-white/20 px-4 py-2 rounded-lg flex-shrink-0">
+          <div className="card font-semibold text-sm whitespace-nowrap ml-6 bg-white/20 px-4 py-2 rounded-lg flex-shrink-0">
             Try free →
           </div>
         </a>
