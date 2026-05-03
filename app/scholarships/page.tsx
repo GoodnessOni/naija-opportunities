@@ -93,12 +93,12 @@ export default async function ScholarshipsPage() {
       <p className="text-green-200 text-sm mb-3">PathSync AI matches you to scholarships you qualify for — then writes your application letter and CV.</p>
       <div className="flex flex-wrap gap-2">
         {['🎯 Smart matching', '✉️ Application letter', '📄 CV generator', '📅 Deadline tracker'].map(f => (
-          <span key={f} className="bg-white/20 text-white text-xs px-3 py-1 rounded-full font-medium">{f}</span>
+          <span key={f} className="card/20 text-white text-xs px-3 py-1 rounded-full font-medium">{f}</span>
         ))}
       </div>
     </div>
     <div className="flex-shrink-0">
-      <span className="inline-block bg-white text-green-800 font-bold px-6 py-3 rounded-2xl text-sm whitespace-nowrap">
+      <span className="inline-block card text-green-800 font-bold px-6 py-3 rounded-2xl text-sm whitespace-nowrap">
         Try PathSync AI free →
       </span>
     </div>
@@ -153,7 +153,7 @@ export default async function ScholarshipsPage() {
             <Link
               key={s.id}
               href={`/scholarships/${slug}`}
-              className="bg-white border border-gray-200 rounded-xl p-5 hover:shadow-md hover:border-blue-300 transition-all group flex flex-col"
+              className="card border border-gray-200 rounded-xl p-5 hover:shadow-md hover:border-blue-300 transition-all group flex flex-col"
             >
               {/* Source + Level */}
               <div className="flex items-center justify-between mb-3">
