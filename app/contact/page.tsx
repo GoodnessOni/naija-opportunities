@@ -2,7 +2,7 @@ export default function ContactPage() {
   return (
     <div className="max-w-xl mx-auto py-8">
       <h1 className="text-3xl font-bold mb-2">Contact Us</h1>
-      <p className="text-gray-500 mb-8">We'd love to hear from you — suggestions, bug reports, or partnership enquiries.</p>
+      <p className="style={{ color: 'var(--muted-text)' }} mb-8">We'd love to hear from you — suggestions, bug reports, or partnership enquiries.</p>
 
       <div className="space-y-4">
         <div className="bg-white border border-gray-200 rounded-2xl p-6 space-y-4">
@@ -40,12 +40,12 @@ export default function ContactPage() {
         <div className="grid grid-cols-2 gap-4">
           <div className="bg-green-50 border border-green-100 rounded-2xl p-5 text-center">
             <div className="text-2xl mb-2">🐦</div>
-            <div className="text-sm font-semibold text-gray-900 mb-1">Twitter / X</div>
+            <div className="text-sm font-semibold style={{ color: 'var(--foreground)' }} mb-1">Twitter / X</div>
             <a href="https://x.com" target="_blank" className="text-xs text-green-700 hover:underline">@naijaopps</a>
           </div>
           <div className="bg-blue-50 border border-blue-100 rounded-2xl p-5 text-center">
             <div className="text-2xl mb-2">📧</div>
-            <div className="text-sm font-semibold text-gray-900 mb-1">Email</div>
+            <div className="text-sm font-semibold style={{ color: 'var(--foreground)' }} mb-1">Email</div>
             <a href="mailto:hello@naijaopportunities.live" className="text-xs text-green-700 hover:underline">hello@naijaopportunities.live</a>
           </div>
         </div>

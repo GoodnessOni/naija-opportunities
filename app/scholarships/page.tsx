@@ -82,33 +82,42 @@ export default async function ScholarshipsPage() {
 
       {/* PATHSYNC AI BANNER — BIG and unmissable */}
       <a href="https://pathsync-ai.vercel.app" target="_blank" rel="noopener noreferrer"
-  className="block mb-8 rounded-3xl overflow-hidden"
-  style={{ background: 'linear-gradient(135deg, #064e3b, #065f46)' }}>
-  <div className="p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
-    <div className="flex-1">
-      <div className="flex items-center gap-2 mb-1">
-        <span className="text-2xl">🤖</span>
-        <span className="font-bold text-white text-lg">Don't know which scholarship fits you?</span>
-      </div>
-      <p className="text-green-200 text-sm mb-3">PathSync AI matches you to scholarships you qualify for — then writes your application letter and CV.</p>
-      <div className="flex flex-wrap gap-2">
-        {['🎯 Smart matching', '✉️ Application letter', '📄 CV generator', '📅 Deadline tracker'].map(f => (
-          <span key={f} className="card/20 text-white text-xs px-3 py-1 rounded-full font-medium">{f}</span>
-        ))}
-      </div>
-    </div>
-    <div className="flex-shrink-0">
-      <span className="inline-block card text-green-800 font-bold px-6 py-3 rounded-2xl text-sm whitespace-nowrap">
-        Try PathSync AI free →
-      </span>
-    </div>
-  </div>
-</a>
+        className="block mb-8 rounded-3xl overflow-hidden"
+        style={{ background: 'linear-gradient(135deg, #064e3b, #065f46)' }}>
+        <div className="p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-2xl">🤖</span>
+              <span className="font-bold text-white text-lg">Don't know which scholarship fits you?</span>
+            </div>
+            <p className="text-green-200 text-sm mb-3">PathSync AI matches you to scholarships you qualify for — then writes your application letter and CV.</p>
+            <div className="flex flex-wrap gap-2">
+              {['🎯 Smart matching', '✉️ Application letter', '📄 CV generator', '📅 Deadline tracker'].map(f => (
+                <span
+                  key={f}
+                  style={{ background: 'linear-gradient(135deg, #064e3b 0%, #15803d 60%, #16a34a 100%)' }}
+                  className="text-white text-xs px-3 py-1 rounded-full font-medium"
+                >
+                  {f}
+                </span>
+              ))}
+            </div>
+          </div>
+          <div className="flex-shrink-0">
+            <span
+              className="inline-block text-green-800 font-bold px-6 py-3 rounded-2xl text-sm whitespace-nowrap"
+              style={{ background: 'linear-gradient(135deg, #064e3b 0%, #15803d 60%, #16a34a 100%)' }}
+            >
+              Try PathSync AI free →
+            </span>
+          </div>
+        </div>
+      </a>
 
       {/* URGENT DEADLINES SECTION */}
       {urgent.length > 0 && (
         <div className="mb-8">
-          <h2 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
+          <h2 className="text-lg font-bold mb-3 flex items-center gap-2" style={{ color: 'var(--foreground)' }}>
             <span>⏰</span> Closing Soon — Apply Before It&apos;s Too Late
           </h2>
           <div className="flex flex-col gap-3">
@@ -122,7 +131,7 @@ export default async function ScholarshipsPage() {
                   className="flex items-center justify-between bg-red-50 border border-red-200 rounded-xl px-5 py-4 hover:border-red-400 hover:shadow-sm transition-all group"
                 >
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-gray-900 group-hover:text-red-700 truncate transition-colors">{s.title}</p>
+                    <p className="text-sm font-semibold group-hover:text-red-700 truncate transition-colors" style={{ color: 'var(--foreground)' }}>{s.title}</p>
                     <div className="flex items-center gap-2 mt-1">
                       {s.amount && <span className="text-xs text-yellow-700 font-medium">💰 {s.amount}</span>}
                       <span className="text-xs text-gray-400">• {s.country}</span>
@@ -141,8 +150,8 @@ export default async function ScholarshipsPage() {
 
       {/* ALL SCHOLARSHIPS GRID */}
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-lg font-bold text-gray-900">All Scholarships</h2>
-        <span className="text-sm text-gray-500">{total} listings</span>
+        <h2 className="text-lg font-bold" style={{ color: 'var(--foreground)' }}>All Scholarships</h2>
+        <span className="text-sm" style={{ color: 'var(--muted-text)' }}>{total} listings</span>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -153,7 +162,8 @@ export default async function ScholarshipsPage() {
             <Link
               key={s.id}
               href={`/scholarships/${slug}`}
-              className="card border border-gray-200 rounded-xl p-5 hover:shadow-md hover:border-blue-300 transition-all group flex flex-col"
+              className="border border-gray-200 rounded-xl p-5 hover:shadow-md hover:border-blue-300 transition-all group flex flex-col"
+              style={{ background: 'linear-gradient(135deg, #064e3b 0%, #15803d 60%, #16a34a 100%)' }}
             >
               {/* Source + Level */}
               <div className="flex items-center justify-between mb-3">
@@ -164,7 +174,7 @@ export default async function ScholarshipsPage() {
               </div>
 
               {/* Title */}
-              <h2 className="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors leading-snug text-sm">
+              <h2 className="font-semibold mb-2 line-clamp-2 group-hover:text-blue-400 transition-colors leading-snug text-sm" style={{ color: 'var(--foreground)' }}>
                 {s.title}
               </h2>
 
@@ -173,7 +183,7 @@ export default async function ScholarshipsPage() {
 
               {/* Description */}
               {s.description && (
-                <p className="text-xs text-gray-500 line-clamp-2 mb-3 leading-relaxed flex-1">{s.description}</p>
+                <p className="text-xs line-clamp-2 mb-3 leading-relaxed flex-1" style={{ color: 'var(--muted-text)' }}>{s.description}</p>
               )}
 
               {/* Amount */}
@@ -187,8 +197,8 @@ export default async function ScholarshipsPage() {
               {s.deadline && (
                 <p className={`text-xs font-medium mb-3 ${
                   urgency === 'urgent' ? 'text-red-600' :
-                  urgency === 'soon' ? 'text-orange-500' : 'text-gray-500'
-                }`}>
+                  urgency === 'soon' ? 'text-orange-500' : ''
+                }`} style={urgency === 'open' ? { color: 'var(--muted-text)' } : undefined}>
                   {urgency === 'urgent' ? '🔴' : urgency === 'soon' ? '🟡' : '📅'} Deadline: {s.deadline}
                 </p>
               )}

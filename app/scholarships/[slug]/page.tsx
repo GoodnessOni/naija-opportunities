@@ -177,7 +177,7 @@ export default async function ScholarshipPage({ params }: Props) {
   return (
     <div className="max-w-2xl mx-auto">
       {/* Back link */}
-      <Link href="/scholarships" className="text-sm text-gray-500 hover:text-blue-600 mb-6 inline-block">
+      <Link href="/scholarships" className="text-sm style={{ color: 'var(--muted-text)' }} hover:text-blue-600 mb-6 inline-block">
         ← Back to all scholarships
       </Link>
 
@@ -191,7 +191,7 @@ export default async function ScholarshipPage({ params }: Props) {
         </div>
 
         {/* Title */}
-        <h1 className="text-2xl font-bold mb-5 text-gray-900 leading-tight">{s.title}</h1>
+        <h1 className="text-2xl font-bold mb-5 style={{ color: 'var(--foreground)' }} leading-tight">{s.title}</h1>
 
         {/* Key info pills */}
         <div className="flex flex-wrap gap-3 mb-6">
@@ -224,8 +224,8 @@ export default async function ScholarshipPage({ params }: Props) {
         {/* Description */}
         {s.description && (
           <div className="mb-6">
-            <h2 className="font-bold text-gray-900 mb-2 text-base">About this Scholarship</h2>
-            <p className="text-gray-600 text-sm leading-relaxed">{s.description}</p>
+            <h2 className="font-bold style={{ color: 'var(--foreground)' }} mb-2 text-base">About this Scholarship</h2>
+            <p className="style={{ color: 'var(--muted-text)' }} text-sm leading-relaxed">{s.description}</p>
           </div>
         )}
 
@@ -262,7 +262,7 @@ export default async function ScholarshipPage({ params }: Props) {
         {/* How to apply */}
         {s.how_to_apply && (
           <div className="bg-gray-50 border border-gray-100 rounded-xl p-5 mb-4">
-            <h2 className="font-bold text-gray-900 mb-3 text-base">📋 How to Apply</h2>
+            <h2 className="font-bold style={{ color: 'var(--foreground)' }} mb-3 text-base">📋 How to Apply</h2>
             <ol className="space-y-2 list-none">
               {parseBullets(s.how_to_apply).map((item, i) => (
                 <li key={i} className="flex items-start gap-3 text-gray-700 text-sm">
@@ -346,7 +346,7 @@ export default async function ScholarshipPage({ params }: Props) {
       {/* Similar Scholarships */}
       {similar && similar.length > 0 && (
         <div className="mb-8">
-          <h2 className="text-lg font-bold text-gray-900 mb-4">Similar Scholarships</h2>
+          <h2 className="text-lg font-bold style={{ color: 'var(--foreground)' }} mb-4">Similar Scholarships</h2>
           <div className="flex flex-col gap-3">
             {similar.map((sim) => {
               const simSlug = sim.slug || makeSlug(sim.title, sim.id)
@@ -357,7 +357,7 @@ export default async function ScholarshipPage({ params }: Props) {
                   className="flex items-center justify-between bg-white border border-gray-200 rounded-xl px-5 py-4 hover:border-blue-300 hover:shadow-sm transition-all group"
                 >
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-gray-900 group-hover:text-blue-600 truncate transition-colors">{sim.title}</p>
+                    <p className="text-sm font-semibold style={{ color: 'var(--foreground)' }} group-hover:text-blue-600 truncate transition-colors">{sim.title}</p>
                     <div className="flex items-center gap-2 mt-1">
                       {sim.amount && <span className="text-xs text-yellow-700 font-medium">💰 {sim.amount}</span>}
                       {sim.country && <span className="text-xs text-gray-400">• {sim.country}</span>}

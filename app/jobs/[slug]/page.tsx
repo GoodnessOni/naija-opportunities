@@ -151,7 +151,7 @@ export default async function JobPage({ params }: Props) {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <Link href="/jobs" className="text-sm text-gray-500 hover:text-green-700 mb-6 inline-block">
+      <Link href="/jobs" className="text-sm style={{ color: 'var(--muted-text)' }} hover:text-green-700 mb-6 inline-block">
         ← Back to all jobs
       </Link>
 
@@ -161,7 +161,7 @@ export default async function JobPage({ params }: Props) {
           {job.type && <span className="text-xs bg-green-50 text-green-700 px-3 py-1 rounded-full font-medium">{job.type}</span>}
         </div>
 
-        <h1 className="text-2xl font-bold mb-5 text-gray-900 leading-tight">{job.title}</h1>
+        <h1 className="text-2xl font-bold mb-5 style={{ color: 'var(--foreground)' }} leading-tight">{job.title}</h1>
 
         <div className="flex flex-wrap gap-3 mb-6">
           {job.salary && (
@@ -192,8 +192,8 @@ export default async function JobPage({ params }: Props) {
 
         {job.description && (
           <div className="mb-6">
-            <h2 className="font-bold text-gray-900 mb-2">About this Role</h2>
-            <p className="text-gray-600 text-sm leading-relaxed">{job.description}</p>
+            <h2 className="font-bold style={{ color: 'var(--foreground)' }} mb-2">About this Role</h2>
+            <p className="style={{ color: 'var(--muted-text)' }} text-sm leading-relaxed">{job.description}</p>
           </div>
         )}
 
@@ -227,7 +227,7 @@ export default async function JobPage({ params }: Props) {
 
         {job.how_to_apply && (
           <div className="bg-gray-50 border border-gray-100 rounded-xl p-5 mb-4">
-            <h2 className="font-bold text-gray-900 mb-3">📋 How to Apply</h2>
+            <h2 className="font-bold style={{ color: 'var(--foreground)' }} mb-3">📋 How to Apply</h2>
             <ol className="space-y-2 list-none">
               {parseBullets(job.how_to_apply).map((item, i) => (
                 <li key={i} className="flex items-start gap-3 text-gray-700 text-sm">
@@ -288,13 +288,13 @@ export default async function JobPage({ params }: Props) {
 
       {similar && similar.length > 0 && (
         <div className="mb-8">
-          <h2 className="text-lg font-bold text-gray-900 mb-4">Similar Jobs</h2>
+          <h2 className="text-lg font-bold style={{ color: 'var(--foreground)' }} mb-4">Similar Jobs</h2>
           <div className="flex flex-col gap-3">
             {similar.map((sim) => (
               <Link key={sim.id} href={`/jobs/${makeSlug(sim.title, sim.id)}`}
                 className="flex items-center justify-between bg-white border border-gray-200 rounded-xl px-5 py-4 hover:border-green-300 hover:shadow-sm transition-all group">
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-gray-900 group-hover:text-green-700 truncate">{sim.title}</p>
+                  <p className="text-sm font-semibold style={{ color: 'var(--foreground)' }} group-hover:text-green-700 truncate">{sim.title}</p>
                   <p className="text-xs text-gray-400 mt-1">{sim.company} · {sim.location}</p>
                 </div>
                 <span className="text-green-400 ml-4 group-hover:translate-x-1 transition-transform">→</span>

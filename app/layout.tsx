@@ -32,19 +32,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <nav style={{ background: 'var(--card)', borderBottom: '1px solid var(--card-border)' }}
           className="sticky top-0 z-50">
           <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-            <a href="/" className="flex items-center gap-2">
+            <a href="/" className="flex items-center gap-2 flex-shrink-0">
               <div className="w-7 h-7 rounded-lg bg-green-600 flex items-center justify-center">
-                <span className="text-white text-xs font-black">N</span>
+              <span className="text-white text-xs font-black">N</span>
               </div>
-              <span className="font-bold text-base" style={{ color: 'var(--foreground)' }}>
-                Naija<span className="text-green-600">Opportunities</span>
-              </span>
-            </a>
+              <span className="font-bold text-sm md:text-base" style={{ color: 'var(--foreground)' }}>
+               Naija<span className="text-green-600">Opps</span>
+                </span>
+</a>
             <div className="flex items-center gap-3 md:gap-6">
-              <a href="/jobs" className="text-xs md:text-sm font-medium transition-colors hover:text-green-600"
-                style={{ color: 'var(--muted-text)' }}>Jobs</a>
-              <a href="/scholarships" className="text-xs md:text-sm font-medium transition-colors hover:text-green-600"
-                style={{ color: 'var(--muted-text)' }}>Scholarships</a>
+             <a href="/jobs" className="hidden sm:block text-xs md:text-sm font-medium hover:text-green-600"
+  style={{ color: 'var(--muted-text)' }}>Jobs</a>
+<a href="/scholarships" className="hidden sm:block text-xs md:text-sm font-medium hover:text-green-600"
+  style={{ color: 'var(--muted-text)' }}>Scholarships</a>
               <a href="https://pathsync-ai.vercel.app" target="_blank"
                 className="bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded-full text-xs font-semibold transition-colors whitespace-nowrap">
                 PathSync AI ✨
