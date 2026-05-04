@@ -11,6 +11,7 @@ interface Job {
   deadline: string | null
   description: string | null
   salary: string | null
+  image_url: string | null
 }
 
 function makeSlug(title: string, id: string) {
@@ -72,37 +73,50 @@ export default async function JobsPage() {
         {jobs?.map((job: Job) => {
           const slug = makeSlug(job.title, job.id)
           return (
-            <Link key={job.id} href={`/jobs/${slug}`}
-              className="card p-5 flex flex-col group"
-              style={{ borderLeft: '3px solid #16a34a' }}>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-bold text-green-600 uppercase tracking-wide">{job.source}</span>
-                {job.type && <span className="text-xs px-2 py-0.5 rounded-full font-medium"
-                  style={{ background: 'var(--green-light)', color: 'var(--green)' }}>{job.type}</span>}
-              </div>
-              <h2 className="font-bold text-sm mb-2 line-clamp-2 group-hover:text-green-600 transition-colors leading-snug">
-                {job.title}
-              </h2>
-              <p className="text-xs mb-2" style={{ color: 'var(--muted-text)' }}>🏢 {job.company} · 📍 {job.location}</p>
-              {job.description && (
-                <p className="text-xs line-clamp-2 mb-3 leading-relaxed flex-1" style={{ color: 'var(--muted-text)' }}>
-                  {job.description}
-                </p>
-              )}
-              {job.salary && (
-                <span className="text-xs font-bold text-yellow-700 bg-yellow-50 px-2 py-1 rounded-lg mb-2 inline-block w-fit">
-                  💰 {job.salary}
-                </span>
-              )}
-              {job.deadline && <p className="text-xs text-red-500 mb-2">⏰ Deadline: {job.deadline}</p>}
-              <div className="mt-auto pt-3 border-t flex items-center justify-between"
-                style={{ borderColor: 'var(--card-border)' }}>
-                <span className="text-xs font-bold text-green-600 group-hover:translate-x-1 transition-transform inline-block">
-                  View & Apply →
-                </span>
-                <span className="text-xs" style={{ color: 'var(--muted-text)' }}>🤖 AI assist</span>
-              </div>
-            </Link>
+            <Link
+  key={job.id}
+  href={`/jobs/${slug}`}
+  className="card flex flex-col group"
+  style={{ borderLeft: '3px solid #16a34a' }}
+>
+  {/* IMAGE */}
+  {job.image_url ? (
+    <div className="w-full aspect-video overflow-hidden rounded-t-xl">
+      <img src={job.image_url} alt={job.title}
+        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+    </div>
+  ) : (
+    <div className="w-full h-36 rounded-t-xl flex items-center justify-center text-4xl"
+      style={{ background: 'linear-gradient(135deg, #052e16, #16a34a22)' }}>
+      💼
+    </div>
+  )}
+
+  {/* CONTENT */}
+  <div className="p-5 flex flex-col flex-1">
+    <div className="flex items-center justify-between mb-2">
+      <span className="text-xs font-bold text-green-500 uppercase tracking-wide">{job.source}</span>
+      {job.type && <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-green-500/20 text-green-400">{job.type}</span>}
+    </div>
+    <h2 className="font-bold text-sm mb-2 line-clamp-2 group-hover:text-green-400 transition-colors leading-snug"
+      style={{ color: 'var(--foreground)' }}>
+      {job.title}
+    </h2>
+    <p className="text-xs mb-2" style={{ color: 'var(--muted-text)' }}>🏢 {job.company} · 📍 {job.location}</p>
+    {job.salary && (
+      <span className="text-xs font-bold text-yellow-600 bg-yellow-500/10 px-2 py-1 rounded-lg mb-2 inline-block w-fit">
+        💰 {job.salary}
+      </span>
+    )}
+    <div className="mt-auto pt-3 border-t flex items-center justify-between"
+      style={{ borderColor: 'var(--card-border)' }}>
+      <span className="text-xs font-bold text-green-500 group-hover:translate-x-1 transition-transform inline-block">
+        View & Apply →
+      </span>
+      <span className="text-xs" style={{ color: 'var(--muted-text)' }}>🤖 AI assist</span>
+    </div>
+  </div>
+</Link>
           )
         })}
       </div>

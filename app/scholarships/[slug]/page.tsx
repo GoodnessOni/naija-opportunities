@@ -19,6 +19,7 @@ interface Scholarship {
   amount: string | null
   duration: string | null
   slug: string | null
+  image_url: string | null
 }
 
 interface Props {
@@ -163,7 +164,7 @@ export default async function ScholarshipPage({ params }: Props) {
   // Fetch similar scholarships (same country or level, exclude current)
   const { data: similar } = await supabase
     .from('scholarships')
-    .select('id, title, amount, country, level, source, slug')
+    .select('id, title, amount, country, level, source, image_url, amount, slug')
     .neq('id', s.id)
     .eq('country', s.country)
     .limit(3)
@@ -184,6 +185,11 @@ export default async function ScholarshipPage({ params }: Props) {
       {/* Main card */}
       <div className="card border border-gray-200 rounded-2xl p-8 mb-5 shadow-sm">
 
+      {s.image_url && (
+        <div className="w-full aspect-video overflow-hidden rounded-xl mb-6">
+      <img src={s.image_url} alt={s.title} className="w-full h-full object-cover" />
+      </div>
+      )}
         {/* Header badges */}
         <div className="flex items-center justify-between mb-4">
           <span className="text-xs text-blue-600 font-semibold uppercase tracking-wide">{s.source}</span>
@@ -262,7 +268,7 @@ export default async function ScholarshipPage({ params }: Props) {
         {/* How to apply */}
         {s.how_to_apply && (
           <div className="bg-gray-50 border border-gray-100 rounded-xl p-5 mb-4">
-            <h2 className="font-bold style={{ color: 'var(--foreground)' }} mb-3 text-base">📋 How to Apply</h2>
+            <h2 className="font-bold text-gray-900 mb-3 text-base">📋 How to Apply</h2>
             <ol className="space-y-2 list-none">
               {parseBullets(s.how_to_apply).map((item, i) => (
                 <li key={i} className="flex items-start gap-3 text-gray-700 text-sm">
@@ -344,37 +350,31 @@ export default async function ScholarshipPage({ params }: Props) {
       </a>
 
       {/* Similar Scholarships */}
-      {similar && similar.length > 0 && (
-        <div className="mb-8">
-          <h2 className="text-lg font-bold style={{ color: 'var(--foreground)' }} mb-4">Similar Scholarships</h2>
-          <div className="flex flex-col gap-3">
-            {similar.map((sim) => {
-              const simSlug = sim.slug || makeSlug(sim.title, sim.id)
-              return (
-                <Link
-                  key={sim.id}
-                  href={`/scholarships/${simSlug}`}
-                  className="flex items-center justify-between bg-white border border-gray-200 rounded-xl px-5 py-4 hover:border-blue-300 hover:shadow-sm transition-all group"
-                >
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold style={{ color: 'var(--foreground)' }} group-hover:text-blue-600 truncate transition-colors">{sim.title}</p>
-                    <div className="flex items-center gap-2 mt-1">
-                      {sim.amount && <span className="text-xs text-yellow-700 font-medium">💰 {sim.amount}</span>}
-                      {sim.country && <span className="text-xs text-gray-400">• {sim.country}</span>}
-                    </div>
-                  </div>
-                  <span className="text-blue-400 text-sm font-medium ml-4 flex-shrink-0 group-hover:translate-x-1 transition-transform">→</span>
-                </Link>
-              )
-            })}
+     {similar && similar.length > 0 && (
+  <div className="mb-8">
+    <h2 className="text-lg font-bold mb-4" style={{ color: 'var(--foreground)' }}>Similar Scholarships</h2>
+    <div className="flex flex-col gap-3">
+      {similar.map((sim) => (
+        <Link key={sim.id} href={`/scholarships/${makeSlug(sim.title, sim.id)}`}
+          className="card flex flex-col group overflow-hidden">
+          {sim.image_url && (
+            <div className="w-full aspect-video overflow-hidden">
+              <img src={sim.image_url} alt={sim.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+            </div>
+          )}
+          <div className="p-4 flex items-center justify-between">
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold truncate group-hover:text-blue-400 transition-colors" style={{ color: 'var(--foreground)' }}>{sim.title}</p>
+              <div className="flex items-center gap-2 mt-1">
+                {sim.amount && <span className="text-xs text-yellow-600">💰 {sim.amount}</span>}
+                <span className="text-xs" style={{ color: 'var(--muted-text)' }}>• {sim.country}</span>
+              </div>
+            </div>
+            <span className="text-blue-500 ml-4 group-hover:translate-x-1 transition-transform flex-shrink-0">→</span>
           </div>
-          <div className="mt-4 text-center">
-            <Link href="/scholarships" className="text-sm text-blue-600 hover:underline font-medium">
-              View all scholarships →
-            </Link>
-          </div>
-        </div>
-      )}
+        </Link>
+      ))}
     </div>
-  )
-}
+  </div>
+)}
+</div>)}

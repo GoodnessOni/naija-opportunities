@@ -2,7 +2,6 @@
 import React from 'react'
 import { supabase } from '../lib/supabase'
 import Link from 'next/link'
-
 interface Scholarship {
   id: string
   title: string
@@ -15,6 +14,7 @@ interface Scholarship {
   description: string
   amount: string | null
   slug: string | null
+  image_url: string | null
 }
 
 function makeSlug(title: string, id: string): string {
@@ -159,59 +159,57 @@ export default async function ScholarshipsPage() {
           const urgency = getDeadlineUrgency(s.deadline)
           return (
             <Link
-              key={s.id}
-              href={`/scholarships/${slug}`}
-             className="card p-5 flex flex-col group"
-                style={{ borderLeft: '3px solid #2563eb' }}
-            >
-              {/* Source + Level */}
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-xs text-blue-600 font-semibold uppercase tracking-wide">{s.source}</span>
-                {s.level && (
-                  <span className="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full font-medium">{s.level}</span>
-                )}
-              </div>
+  key={s.id}
+  href={`/scholarships/${slug}`}
+  className="card flex flex-col group"
+  style={{ borderLeft: '3px solid #2563eb' }}
+>
+  {/* IMAGE */}
+  {s.image_url ? (
+    <div className="w-full aspect-video overflow-hidden rounded-t-xl">
+      <img src={s.image_url} alt={s.title}
+        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+    </div>
+  ) : (
+    <div className="w-full h-36 rounded-t-xl flex items-center justify-center text-4xl"
+      style={{ background: 'linear-gradient(135deg, #1e3a5f, #2563eb22)' }}>
+      🎓
+    </div>
+  )}
 
-              {/* Title */}
-              <h2 className="font-semibold mb-2 line-clamp-2 group-hover:text-blue-400 transition-colors leading-snug text-sm" style={{ color: 'var(--foreground)' }}>
-                {s.title}
-              </h2>
-
-              {/* Country */}
-              <p className="text-xs text-gray-400 mb-2">🌍 {s.country}</p>
-
-              {/* Description */}
-              {s.description && (
-                <p className="text-xs line-clamp-2 mb-3 leading-relaxed flex-1" style={{ color: 'var(--muted-text)' }}>{s.description}</p>
-              )}
-
-              {/* Amount */}
-              {s.amount && (
-                <div className="text-xs font-semibold text-yellow-700 bg-yellow-50 px-2 py-1 rounded-lg mb-2 inline-block w-fit">
-                  💰 {s.amount}
-                </div>
-              )}
-
-              {/* Deadline */}
-              {s.deadline && (
-                <p className={`text-xs font-medium mb-3 ${
-                  urgency === 'urgent' ? 'text-red-600' :
-                  urgency === 'soon' ? 'text-orange-500' : ''
-                }`} style={urgency === 'open' ? { color: 'var(--muted-text)' } : undefined}>
-                  {urgency === 'urgent' ? '🔴' : urgency === 'soon' ? '🟡' : '📅'} Deadline: {s.deadline}
-                </p>
-              )}
-
-              {/* CTA */}
-              <div className="mt-auto pt-2 border-t border-gray-100 flex items-center justify-between">
-                <span className="text-xs font-semibold text-blue-600 group-hover:translate-x-1 transition-transform inline-block">
-                  View & Apply →
-                </span>
-                <span className="text-xs text-gray-300 group-hover:text-green-500 transition-colors">
-                  🤖 AI match
-                </span>
-              </div>
-            </Link>
+  {/* CONTENT */}
+  <div className="p-5 flex flex-col flex-1">
+    <div className="flex items-center justify-between mb-3">
+      <span className="text-xs font-bold text-blue-500 uppercase tracking-wide">{s.source}</span>
+      {s.level && <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-blue-500/20 text-blue-400">{s.level}</span>}
+    </div>
+    <h2 className="font-bold text-sm mb-2 line-clamp-2 group-hover:text-blue-400 transition-colors leading-snug"
+      style={{ color: 'var(--foreground)' }}>
+      {s.title}
+    </h2>
+    <p className="text-xs mb-2" style={{ color: 'var(--muted-text)' }}>🌍 {s.country}</p>
+    {s.amount && (
+      <span className="text-xs font-bold text-yellow-600 bg-yellow-500/10 px-2 py-1 rounded-lg mb-2 inline-block w-fit">
+        💰 {s.amount}
+      </span>
+    )}
+    {s.deadline && (
+      <p className={`text-xs font-medium mb-3 ${
+        urgency === 'urgent' ? 'text-red-500' :
+        urgency === 'soon' ? 'text-orange-400' : ''
+      }`} style={urgency === 'open' ? { color: 'var(--muted-text)' } : undefined}>
+        {urgency === 'urgent' ? '🔴' : urgency === 'soon' ? '🟡' : '📅'} Deadline: {s.deadline}
+      </p>
+    )}
+    <div className="mt-auto pt-3 border-t flex items-center justify-between"
+      style={{ borderColor: 'var(--card-border)' }}>
+      <span className="text-xs font-bold text-blue-500 group-hover:translate-x-1 transition-transform inline-block">
+        View & Apply →
+      </span>
+      <span className="text-xs" style={{ color: 'var(--muted-text)' }}>🤖 AI match</span>
+    </div>
+  </div>
+</Link>
           )
         })}
       </div>
@@ -220,21 +218,21 @@ export default async function ScholarshipsPage() {
       <div className="mt-12 mb-4">
         <a
           href="https://pathsync-ai.vercel.app"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center justify-between card border border-green-200 rounded-xl px-6 py-5 hover:bg-green-100 transition-colors"
-        >
-          <div>
-            <div className="font-bold card mb-1">🤖 Let PathSync AI find your perfect match</div>
-          
-            <div className="text-sm text-green-600">
-              Tell it your course, CGPA, and what you do outside class - it finds scholarships you actually qualify for.
-            </div>
-          </div>
-          <div className="card font-semibold text-sm whitespace-nowrap ml-6 bg-white/20 px-4 py-2 rounded-lg flex-shrink-0">
-            Try free →
-          </div>
-        </a>
+  target="_blank"
+  rel="noopener noreferrer"
+  className="block rounded-2xl px-6 py-5 transition-colors mt-12 mb-4"
+  style={{ background: 'linear-gradient(135deg, #064e3b, #065f46)' }}
+>
+  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+    <div>
+      <div className="font-bold text-white mb-1">🤖 PathSync AI finds your match</div>
+      <div className="text-sm text-green-100">Tell it your CGPA and course — it finds scholarships you qualify for.</div>
+    </div>
+    <div className="text-white font-semibold text-sm whitespace-nowrap bg-white/20 px-4 py-2 rounded-lg self-start sm:self-auto flex-shrink-0">
+      Try free →
+    </div>
+  </div>
+</a>
       </div>
     </div>
   )

@@ -18,6 +18,7 @@ interface Job {
   documents_needed: string | null
   salary: string | null
   experience: string | null
+  image_url: string | null
 }
 
 interface Props {
@@ -140,7 +141,7 @@ export default async function JobPage({ params }: Props) {
 
   const { data: similar } = await supabase
     .from('jobs')
-    .select('id, title, company, location, source')
+    .select('id, title, company, location, source, image_url')
     .neq('id', job.id)
     .limit(3)
 
@@ -156,6 +157,13 @@ export default async function JobPage({ params }: Props) {
       </Link>
 
       <div className="card border border-gray-200 rounded-2xl p-8 mb-5 shadow-sm">
+        
+        {job.image_url && (
+       <div className="w-full aspect-video overflow-hidden rounded-xl mb-6">
+        <img src={job.image_url} alt={job.title} className="w-full h-full object-cover" />
+        </div>
+          )}
+        
         <div className="flex items-center justify-between mb-4">
           <span className="text-xs text-green-700 font-semibold uppercase tracking-wide">{job.source}</span>
           {job.type && <span className="text-xs bg-green-50 text-green-700 px-3 py-1 rounded-full font-medium">{job.type}</span>}
@@ -290,16 +298,31 @@ export default async function JobPage({ params }: Props) {
         <div className="mb-8">
           <h2 className="text-lg font-bold style={{ color: 'var(--foreground)' }} mb-4">Similar Jobs</h2>
           <div className="flex flex-col gap-3">
-            {similar.map((sim) => (
-              <Link key={sim.id} href={`/jobs/${makeSlug(sim.title, sim.id)}`}
-                className="flex items-center justify-between card border border-gray-200 rounded-xl px-5 py-4 hover:border-green-800 hover:shadow-sm transition-all group">
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold style={{ color: 'var(--foreground)' }} group-hover:text-green-700 truncate">{sim.title}</p>
-                  <p className="text-xs text-gray-400 mt-1">{sim.company} · {sim.location}</p>
-                </div>
-                <span className="text-green-400 ml-4 group-hover:translate-x-1 transition-transform">→</span>
-              </Link>
-            ))}
+
+            
+
+      
+              
+              
+              
+              {similar.map((sim) => (
+  <Link key={sim.id} href={`/jobs/${makeSlug(sim.title, sim.id)}`}
+    className="card flex flex-col group overflow-hidden">
+    {sim.image_url && (
+      <div className="w-full h-60 overflow-hidden">
+        <img src={sim.image_url} alt={sim.title} className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300" />
+      </div>
+    )}
+    <div className="p-4 flex items-center justify-between">
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-semibold truncate group-hover:text-green-500 transition-colors" style={{ color: 'var(--foreground)' }}>{sim.title}</p>
+        <p className="text-xs mt-1" style={{ color: 'var(--muted-text)' }}>{sim.company} · {sim.location}</p>
+      </div>
+      <span className="text-green-500 ml-4 group-hover:translate-x-1 transition-transform flex-shrink-0">→</span>
+    </div>
+  </Link>
+))}
+            
           </div>
         </div>
       )}
