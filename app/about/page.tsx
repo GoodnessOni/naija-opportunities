@@ -3,12 +3,12 @@ export default function AboutPage() {
     <div className="max-w-2xl mx-auto py-8">
       <h1 className="text-3xl font-bold mb-6">About NaijaOpportunities</h1>
       
-      <div className="prose style={{ color: 'var(--muted-text)' }} space-y-6">
+      <div className="prose text-gray-500 space-y-6">
         <p className="text-lg">NaijaOpportunities is a free platform built by a Nigerian student, for Nigerian students and job seekers.</p>
         
-        <div className="bg-green-50 border border-green-100 rounded-2xl p-6">
+        <div className="bg-green-50 border border-green-100s rounded-2xl p-6">
           <h2 className="text-xl font-bold style={{ color: 'var(--foreground)' }} mb-3">Our Mission</h2>
-          <p>To make sure no Nigerian student misses a life-changing scholarship or job opportunity because they didn't know it existed. We aggregate opportunities from across the web and update them daily — completely free.</p>
+          <p>To make sure no Nigerian student misses a life-changing scholarship or job opportunity because they didn't know it existed. We aggregate opportunities from across the web and update them daily.</p>
         </div>
 
         <div>
@@ -20,7 +20,7 @@ export default function AboutPage() {
               '🤖 Partner with PathSync AI to help students find opportunities they qualify for',
               '🔄 Auto-update listings every 6 hours so you never miss a deadline',
             ].map(item => (
-              <li key={item} className="flex items-start gap-2 style={{ color: 'var(--muted-text)' }}">{item}</li>
+              <li key={item} className="flex items-start gap-2 text-gray-600">{item}</li>
             ))}
           </ul>
         </div>
@@ -31,7 +31,7 @@ export default function AboutPage() {
         </div>
 
         <div className="bg-blue-50 border border-blue-100 rounded-2xl p-6">
-          <h2 className="text-xl font-bold style={{ color: 'var(--foreground)' }} mb-3">Our Partner — PathSync AI</h2>
+          <h2 className="text-xl font-bold style={{ color: 'var(--foreground)' }} mb-3">Our Partner - PathSync AI</h2>
           <p className="mb-3">We partner with <a href="https://pathsync-ai.vercel.app" className="text-green-700 font-semibold hover:underline">PathSync AI</a> — an AI platform that analyses your profile and matches you to scholarships and jobs you actually qualify for, then writes your application letter automatically.</p>
           <a href="https://pathsync-ai.vercel.app" target="_blank" className="inline-block bg-green-700 text-white px-5 py-2 rounded-xl text-sm font-semibold hover:bg-green-800 transition-colors">Try PathSync AI free →</a>
         </div>

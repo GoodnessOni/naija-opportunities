@@ -7,14 +7,14 @@ export default function PrivacyPage() {
       <div className="space-y-8 style={{ color: 'var(--muted-text)' }}">
         <div>
           <h2 className="text-xl font-bold style={{ color: 'var(--foreground)' }} mb-3">1. Who We Are</h2>
-          <p>NaijaOpportunities (<strong>naijaopportunities.live</strong>) is a free platform that aggregates jobs and scholarships for Nigerian students and job seekers. We are based in Nigeria.</p>
+          <p>NaijaOpportunities (<strong>ogverse17@gmail.com</strong>) is a free platform that aggregates jobs and scholarships for Nigerian students and job seekers. We are based in Nigeria.</p>
         </div>
 
         <div>
           <h2 className="text-xl font-bold style={{ color: 'var(--foreground)' }} mb-3">2. Information We Collect</h2>
           <p className="mb-3">We collect minimal information to operate this service:</p>
           <ul className="space-y-2 list-disc list-inside">
-            <li><strong>Usage data:</strong> Pages visited, time spent, device type — collected anonymously via Google Analytics</li>
+            <li><strong>Usage data:</strong> Pages visited, time spent, device type - collected anonymously via Google Analytics</li>
             <li><strong>Contact form:</strong> If you contact us, we collect your name and email address only</li>
             <li>We do NOT collect passwords, payment info, or sensitive personal data</li>
           </ul>
