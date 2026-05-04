@@ -324,9 +324,10 @@ export default async function ScholarshipPage({ params }: Props) {
         rel="noopener noreferrer"
         className="block mb-5"
       >
-        <div className="bg-gradient-to-r from-green-600 to-emerald-500 rounded-2xl p-6 text-white shadow-lg hover:shadow-xl transition-shadow">
+        <div className="bg-gradient-to-r from-green-600 to-emerald-500 rounded-2xl p-6 text-white  shadow-lg hover:shadow-xl transition-shadow">
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1">
+              <div className="text-card">
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-2xl">🤖</span>
                 <span className="font-bold text-lg">Not sure if you qualify?</span>
@@ -343,6 +344,7 @@ export default async function ScholarshipPage({ params }: Props) {
               </div>
               <div className="inline-flex items-center gap-2 bg-white text-green-700 font-bold px-5 py-2.5 rounded-xl text-sm hover:bg-green-50 transition-colors">
                 Check if I qualify — it&apos;s free →
+              </div>
               </div>
             </div>
           </div>

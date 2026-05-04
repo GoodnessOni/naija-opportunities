@@ -279,6 +279,7 @@ export default async function JobPage({ params }: Props) {
         <div className="bg-gradient-to-r from-green-600 to-emerald-500 rounded-2xl p-6 text-white shadow-lg hover:shadow-xl transition-shadow">
           <div className="flex items-start gap-4">
             <div className="flex-1">
+              <div className="text-card"> 
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-2xl">🤖</span>
                 <span className="font-bold text-lg">Want AI to write your CV & cover letter?</span>
@@ -288,6 +289,7 @@ export default async function JobPage({ params }: Props) {
               </p>
               <div className="inline-flex items-center gap-2 bg-white text-green-700 font-bold px-5 py-2.5 rounded-xl text-sm">
                 Try PathSync AI free →
+              </div>
               </div>
             </div>
           </div>
