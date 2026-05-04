@@ -83,7 +83,7 @@ export default async function JobsPage() {
   {job.image_url ? (
     <div className="w-full aspect-video overflow-hidden rounded-t-xl">
       <img src={job.image_url} alt={job.title}
-        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"  />
     </div>
   ) : (
     <div className="w-full h-36 rounded-t-xl flex items-center justify-center text-4xl"

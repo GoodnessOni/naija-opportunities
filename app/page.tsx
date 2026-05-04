@@ -87,23 +87,31 @@ export default async function Home() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-10">
         {jobs?.map((job) => (
           <Link key={job.id} href={`/jobs/${makeSlug(job.title, job.id)}`}
-            className="card p-5 flex flex-col group"
+            className="card flex flex-col group"
             style={{ borderLeft: '3px solid #16a34a' }}>
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-bold text-green-600 uppercase tracking-wide">{job.source}</span>
-              {job.type && <span className="text-xs px-2 py-0.5 rounded-full font-medium"
-                style={{ background: 'var(--green-light)', color: 'var(--green)' }}>{job.type}</span>}
-            </div>
-            <h3 className="font-bold text-sm mb-2 line-clamp-2 group-hover:text-green-600 transition-colors leading-snug">
-              {job.title}
-            </h3>
-            <p className="text-xs mb-3" style={{ color: 'var(--muted-text)' }}>🏢 {job.company} · 📍 {job.location}</p>
-            <div className="mt-auto pt-3 border-t flex items-center justify-between"
-              style={{ borderColor: 'var(--card-border)' }}>
-              <span className="text-xs font-bold text-green-600 group-hover:translate-x-1 transition-transform inline-block">
-                View & Apply →
-              </span>
-              <span className="text-xs" style={{ color: 'var(--muted-text)' }}>🤖 AI assist</span>
+            {job.image_url && (
+              <div className="w-full aspect-video overflow-hidden rounded-t-xl">
+                <img src={job.image_url} alt={job.title}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+              </div>
+            )}
+            <div className="p-5 flex flex-col flex-1">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-bold text-green-600 uppercase tracking-wide">{job.source}</span>
+                {job.type && <span className="text-xs px-2 py-0.5 rounded-full font-medium"
+                  style={{ background: 'var(--green-light)', color: 'var(--green)' }}>{job.type}</span>}
+              </div>
+              <h3 className="font-bold text-sm mb-2 line-clamp-2 group-hover:text-green-600 transition-colors leading-snug">
+                {job.title}
+              </h3>
+              <p className="text-xs mb-3" style={{ color: 'var(--muted-text)' }}>🏢 {job.company} · 📍 {job.location}</p>
+              <div className="mt-auto pt-3 border-t flex items-center justify-between"
+                style={{ borderColor: 'var(--card-border)' }}>
+                <span className="text-xs font-bold text-green-600 group-hover:translate-x-1 transition-transform inline-block">
+                  View & Apply →
+                </span>
+                <span className="text-xs" style={{ color: 'var(--muted-text)' }}>🤖 AI assist</span>
+              </div>
             </div>
           </Link>
         ))}
@@ -117,27 +125,35 @@ export default async function Home() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {scholarships?.map((s) => (
           <Link key={s.id} href={`/scholarships/${makeSlug(s.title, s.id)}`}
-            className="card p-5 flex flex-col group"
+            className="card flex flex-col group"
             style={{ borderLeft: '3px solid #2563eb' }}>
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-bold text-blue-600 uppercase tracking-wide">{s.source}</span>
-              {s.level && <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-blue-50 text-blue-700">{s.level}</span>}
-            </div>
-            <h3 className="font-bold text-sm mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors leading-snug">
-              {s.title}
-            </h3>
-            <p className="text-xs mb-2" style={{ color: 'var(--muted-text)' }}>🌍 {s.country}</p>
-            {s.amount && (
-              <span className="text-xs font-bold text-yellow-700 bg-yellow-50 px-2 py-1 rounded-lg mb-2 inline-block w-fit">
-                💰 {s.amount}
-              </span>
+            {s.image_url && (
+              <div className="w-full aspect-video overflow-hidden rounded-t-xl">
+                <img src={s.image_url} alt={s.title}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+              </div>
             )}
-            <div className="mt-auto pt-3 border-t flex items-center justify-between"
-              style={{ borderColor: 'var(--card-border)' }}>
-              <span className="text-xs font-bold text-blue-600 group-hover:translate-x-1 transition-transform inline-block">
-                View & Apply →
-              </span>
-              <span className="text-xs" style={{ color: 'var(--muted-text)' }}>🤖 AI match</span>
+            <div className="p-5 flex flex-col flex-1">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-bold text-blue-600 uppercase tracking-wide">{s.source}</span>
+                {s.level && <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-blue-50 text-blue-700">{s.level}</span>}
+              </div>
+              <h3 className="font-bold text-sm mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors leading-snug">
+                {s.title}
+              </h3>
+              <p className="text-xs mb-2" style={{ color: 'var(--muted-text)' }}>🌍 {s.country}</p>
+              {s.amount && (
+                <span className="text-xs font-bold text-yellow-700 bg-yellow-50 px-2 py-1 rounded-lg mb-2 inline-block w-fit">
+                  💰 {s.amount}
+                </span>
+              )}
+              <div className="mt-auto pt-3 border-t flex items-center justify-between"
+                style={{ borderColor: 'var(--card-border)' }}>
+                <span className="text-xs font-bold text-blue-600 group-hover:translate-x-1 transition-transform inline-block">
+                  View & Apply →
+                </span>
+                <span className="text-xs" style={{ color: 'var(--muted-text)' }}>🤖 AI match</span>
+              </div>
             </div>
           </Link>
         ))}

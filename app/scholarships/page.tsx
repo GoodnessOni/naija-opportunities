@@ -168,7 +168,7 @@ export default async function ScholarshipsPage() {
   {s.image_url ? (
     <div className="w-full aspect-video overflow-hidden rounded-t-xl">
       <img src={s.image_url} alt={s.title}
-        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"  />
     </div>
   ) : (
     <div className="w-full h-36 rounded-t-xl flex items-center justify-center text-4xl"

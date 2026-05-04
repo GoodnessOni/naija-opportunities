@@ -361,7 +361,7 @@ export default async function ScholarshipPage({ params }: Props) {
           className="card flex flex-col group overflow-hidden">
           {sim.image_url && (
             <div className="w-full aspect-video overflow-hidden">
-              <img src={sim.image_url} alt={sim.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+              <img src={sim.image_url} alt={sim.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"  />
             </div>
           )}
           <div className="p-4 flex items-center justify-between">
