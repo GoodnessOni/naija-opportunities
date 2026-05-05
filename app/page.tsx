@@ -1,3 +1,5 @@
+import SafeImage from './components/SafeImage'
+import { getGradient } from './components/getGradient'
 import { supabase } from './lib/supabase'
 import Link from 'next/link'
 
@@ -89,12 +91,7 @@ export default async function Home() {
           <Link key={job.id} href={`/jobs/${makeSlug(job.title, job.id)}`}
             className="card flex flex-col group"
             style={{ borderLeft: '3px solid #16a34a' }}>
-            {job.image_url && (
-              <div className="w-full aspect-video overflow-hidden rounded-t-xl">
-                <img src={job.image_url} alt={job.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-              </div>
-            )}
+            <div className="w-full aspect-video overflow-hidden rounded-t-xl relative" style={{ background: getGradient(job.source) }}>{job.image_url && (<SafeImage src={job.image_url} alt={job.title} className="w-full h-full object-cover absolute inset-0 group-hover:scale-105 transition-transform duration-300" />)}<div className="absolute inset-0 flex items-end p-3"><span className="text-xs font-bold text-white/60 uppercase tracking-wider">{job.source}</span></div></div>
             <div className="p-5 flex flex-col flex-1">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-bold text-green-600 uppercase tracking-wide">{job.source}</span>
@@ -127,12 +124,7 @@ export default async function Home() {
           <Link key={s.id} href={`/scholarships/${makeSlug(s.title, s.id)}`}
             className="card flex flex-col group"
             style={{ borderLeft: '3px solid #2563eb' }}>
-            {s.image_url && (
-              <div className="w-full aspect-video overflow-hidden rounded-t-xl">
-                <img src={s.image_url} alt={s.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-              </div>
-            )}
+            <div className="w-full aspect-video overflow-hidden rounded-t-xl relative" style={{ background: getGradient(s.source) }}>{s.image_url && (<SafeImage src={s.image_url} alt={s.title} className="w-full h-full object-cover absolute inset-0 group-hover:scale-105 transition-transform duration-300" />)}<div className="absolute inset-0 flex items-end p-3"><span className="text-xs font-bold text-white/60 uppercase tracking-wider">{s.source}</span></div></div>
             <div className="p-5 flex flex-col flex-1">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-bold text-blue-600 uppercase tracking-wide">{s.source}</span>
