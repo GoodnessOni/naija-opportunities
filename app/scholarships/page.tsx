@@ -167,7 +167,7 @@ export default async function ScholarshipsPage() {
   style={{ borderLeft: '3px solid #2563eb' }}
 >
   {/* IMAGE */}
-  <div className="w-full aspect-video overflow-hidden rounded-t-xl relative" style={{ background: getGradient(s.source) }}>{s.image_url && (<SafeImage src={s.image_url} alt={s.title} className="w-full h-full object-cover absolute inset-0 group-hover:scale-105 transition-transform duration-300" />)}<div className="absolute inset-0 flex items-end p-3"><span className="text-xs font-bold text-white/60 uppercase tracking-wider">{s.source}</span></div></div>
+  {s.image_url ? (<div className="w-full aspect-video overflow-hidden rounded-t-xl"><SafeImage src={s.image_url} alt={s.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" /></div>) : (<div className="w-full aspect-video overflow-hidden rounded-t-xl"><img src="/placeholder-scholarship.svg" alt="Scholarship" className="w-full h-full object-cover" /></div>)}
 
   {/* CONTENT */}
   <div className="p-5 flex flex-col flex-1">
@@ -229,4 +229,5 @@ export default async function ScholarshipsPage() {
     </div>
   )
 }
+
 

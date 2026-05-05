@@ -2,6 +2,12 @@ import React from 'react'
 import './globals.css'
 
 export const metadata = {
+
+  icons: {
+    icon: '/favicon.svg',
+    apple: '/favicon.svg',
+  },
+  
   title: {
     default: 'NaijaOpportunities — Jobs & Scholarships for Nigerians',
     template: '%s | NaijaOpportunities',

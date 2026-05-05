@@ -4,7 +4,8 @@ import { supabase } from './lib/supabase'
 import Link from 'next/link'
 
 function makeSlug(title: string, id: string) {
-  return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') + '-' + id
+  const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '').slice(0, 40)
+  return slug + '-' + id.slice(0, 8)
 }
 
 export default async function Home() {
@@ -91,7 +92,7 @@ export default async function Home() {
           <Link key={job.id} href={`/jobs/${makeSlug(job.title, job.id)}`}
             className="card flex flex-col group"
             style={{ borderLeft: '3px solid #16a34a' }}>
-            <div className="w-full aspect-video overflow-hidden rounded-t-xl relative" style={{ background: getGradient(job.source) }}>{job.image_url && (<SafeImage src={job.image_url} alt={job.title} className="w-full h-full object-cover absolute inset-0 group-hover:scale-105 transition-transform duration-300" />)}<div className="absolute inset-0 flex items-end p-3"><span className="text-xs font-bold text-white/60 uppercase tracking-wider">{job.source}</span></div></div>
+            {job.image_url ? (<div className="w-full aspect-video overflow-hidden rounded-t-xl"><SafeImage src={job.image_url} alt={job.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" /></div>) : (<div className="w-full aspect-video overflow-hidden rounded-t-xl"><img src="/placeholder-job.svg" alt="Job" className="w-full h-full object-cover" /></div>)}
             <div className="p-5 flex flex-col flex-1">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-bold text-green-600 uppercase tracking-wide">{job.source}</span>
@@ -124,7 +125,7 @@ export default async function Home() {
           <Link key={s.id} href={`/scholarships/${makeSlug(s.title, s.id)}`}
             className="card flex flex-col group"
             style={{ borderLeft: '3px solid #2563eb' }}>
-            <div className="w-full aspect-video overflow-hidden rounded-t-xl relative" style={{ background: getGradient(s.source) }}>{s.image_url && (<SafeImage src={s.image_url} alt={s.title} className="w-full h-full object-cover absolute inset-0 group-hover:scale-105 transition-transform duration-300" />)}<div className="absolute inset-0 flex items-end p-3"><span className="text-xs font-bold text-white/60 uppercase tracking-wider">{s.source}</span></div></div>
+            {s.image_url ? (<div className="w-full aspect-video overflow-hidden rounded-t-xl"><SafeImage src={s.image_url} alt={s.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" /></div>) : (<div className="w-full aspect-video overflow-hidden rounded-t-xl"><img src="/placeholder-scholarship.svg" alt="Scholarship" className="w-full h-full object-cover" /></div>)}
             <div className="p-5 flex flex-col flex-1">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-bold text-blue-600 uppercase tracking-wide">{s.source}</span>
@@ -153,3 +154,4 @@ export default async function Home() {
     </div>
   )
 }
+

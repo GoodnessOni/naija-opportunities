@@ -17,7 +17,8 @@ interface Job {
 }
 
 function makeSlug(title: string, id: string) {
-  return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') + '-' + id
+  const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '').slice(0, 40)
+  return slug + '-' + id.slice(0, 8)
 }
 
 export default async function JobsPage() {
@@ -82,7 +83,7 @@ export default async function JobsPage() {
   style={{ borderLeft: '3px solid #16a34a' }}
 >
   {/* IMAGE */}
-  <div className="w-full aspect-video overflow-hidden rounded-t-xl relative" style={{ background: getGradient(job.source) }}>{job.image_url && (<SafeImage src={job.image_url} alt={job.title} className="w-full h-full object-cover absolute inset-0 group-hover:scale-105 transition-transform duration-300" />)}<div className="absolute inset-0 flex items-end p-3"><span className="text-xs font-bold text-white/60 uppercase tracking-wider">{job.source}</span></div></div>
+  {job.image_url ? (<div className="w-full aspect-video overflow-hidden rounded-t-xl"><SafeImage src={job.image_url} alt={job.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" /></div>) : (<div className="w-full aspect-video overflow-hidden rounded-t-xl"><img src="/placeholder-job.svg" alt="Job" className="w-full h-full object-cover" /></div>)}
 
   {/* CONTENT */}
   <div className="p-5 flex flex-col flex-1">
@@ -128,3 +129,4 @@ export default async function JobsPage() {
     </div>
   )
 }
+
