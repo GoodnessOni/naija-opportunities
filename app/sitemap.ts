@@ -1,7 +1,7 @@
 import { supabase } from './lib/supabase'
 
 export default async function sitemap() {
-  const baseUrl = 'https://naija-opportunities.vercel.app'
+  const baseUrl = 'https://www.naijaopportunities.live'
 
   const { data: jobs } = await supabase.from('jobs').select('id, title, created_at')
   const { data: scholarships } = await supabase.from('scholarships').select('id, title, created_at')
