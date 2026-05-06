@@ -126,8 +126,15 @@ export async function generateMetadata({ params }: Props) {
 export default async function JobPage({ params }: Props) {
   const { slug } = await params
   const shortId = slug.split('-').pop()
+  
+  console.log('SLUG:', slug)
+console.log('EXTRACTED SHORT_ID:', shortId)
 
-  const { data: raw } = await supabase.from('jobs').select('*').eq('short_id', shortId).single()
+const { data: raw, error } = await supabase.from('jobs').select('*').eq('short_id', shortId).single()
+console.log('DB RESULT:', raw)
+console.log('DB ERROR:', error)
+
+
 
   if (!raw) {
     return (

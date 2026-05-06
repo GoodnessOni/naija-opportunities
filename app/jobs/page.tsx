@@ -5,6 +5,7 @@ import Link from 'next/link'
 
 interface Job {
   id: string
+  short_id: number 
   title: string
   company: string
   location: string
@@ -16,11 +17,9 @@ interface Job {
   image_url: string | null
 }
 
-function makeSlug(title: string, id: string) {
-  const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '').slice(0, 40)
-  return slug + '-' + id.slice(0, 8)
+function makeSlug(title: string, shortId: number) {
+  return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '').slice(0, 40) + '-' + shortId
 }
-
 export default async function JobsPage() {
   const { data: jobs } = await supabase.from('jobs').select('*').order('created_at', { ascending: false })
   const total = jobs?.length ?? 0
@@ -74,7 +73,7 @@ export default async function JobsPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {jobs?.map((job: Job) => {
-          const slug = makeSlug(job.title, job.id)
+          const slug = makeSlug(job.title, job.short_id)
           return (
             <Link
   key={job.id}
