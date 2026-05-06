@@ -132,7 +132,7 @@ RULES:
 
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params
-  const id = slug.slice(-36)
+  const id = slug.split('-').pop()
   const { data: s } = await supabase.from('scholarships').select('*').eq('id', id).single()
   return {
     title: s ? `${s.title} | NaijaOpportunities` : 'Scholarship | NaijaOpportunities',
@@ -146,7 +146,7 @@ export async function generateMetadata({ params }: Props) {
 
 export default async function ScholarshipPage({ params }: Props) {
   const { slug } = await params
-  const id = slug.slice(-36)
+  const id = slug.split('-').pop()
 
   const { data: raw } = await supabase.from('scholarships').select('*').eq('id', id).single()
 

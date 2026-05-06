@@ -4,6 +4,7 @@ import Groq from 'groq-sdk'
 
 interface Job {
   id: string
+  short_id: number
   title: string
   company: string
   location: string
@@ -34,8 +35,8 @@ function parseBullets(text: string | null): string[] {
     .filter(line => line.length > 3)
 }
 
-function makeSlug(title: string, id: string): string {
-  return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') + '-' + id
+function makeSlug(title: string, shortId: number): string {
+  return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') + '-' + shortId
 }
 
 async function enrichJob(job: Job): Promise<Job> {
@@ -114,8 +115,8 @@ RULES:
 
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params
-  const id = slug.slice(-36)
-  const { data: job } = await supabase.from('jobs').select('*').eq('id', id).single()
+  const shortId = slug.split('-').pop()
+  const { data: job } = await supabase.from('jobs').select('*').eq('short_id', shortId).single()
   return {
     title: job ? `${job.title} | NaijaOpportunities` : 'Job | NaijaOpportunities',
     description: job ? `Apply for ${job.title} at ${job.company} in ${job.location}.` : '',
@@ -124,9 +125,9 @@ export async function generateMetadata({ params }: Props) {
 
 export default async function JobPage({ params }: Props) {
   const { slug } = await params
-  const id = slug.slice(-36)
+  const shortId = slug.split('-').pop()
 
-  const { data: raw } = await supabase.from('jobs').select('*').eq('id', id).single()
+  const { data: raw } = await supabase.from('jobs').select('*').eq('short_id', shortId).single()
 
   if (!raw) {
     return (
@@ -141,7 +142,7 @@ export default async function JobPage({ params }: Props) {
 
   const { data: similar } = await supabase
     .from('jobs')
-    .select('id, title, company, location, source, image_url')
+    .select('id, short_id, title, company, location, source, image_url')
     .neq('id', job.id)
     .limit(3)
 
@@ -159,10 +160,10 @@ export default async function JobPage({ params }: Props) {
       <div className="card border border-gray-200 rounded-2xl p-8 mb-5 shadow-sm">
         
         {job.image_url && (
-       <div className="w-full aspect-video overflow-hidden rounded-xl mb-6">
-        <img src={job.image_url} alt={job.title} className="w-full h-full object-cover" />
-        </div>
-          )}
+          <div className="w-full aspect-video overflow-hidden rounded-xl mb-6">
+            <img src={job.image_url} alt={job.title} className="w-full h-full object-cover" />
+          </div>
+        )}
         
         <div className="flex items-center justify-between mb-4">
           <span className="text-xs text-green-700 font-semibold uppercase tracking-wide">{job.source}</span>
@@ -300,31 +301,23 @@ export default async function JobPage({ params }: Props) {
         <div className="mb-8">
           <h2 className="text-lg font-bold style={{ color: 'var(--foreground)' }} mb-4">Similar Jobs</h2>
           <div className="flex flex-col gap-3">
-
-            
-
-      
-              
-              
-              
-              {similar.map((sim) => (
-  <Link key={sim.id} href={`/jobs/${makeSlug(sim.title, sim.id)}`}
-    className="card flex flex-col group overflow-hidden">
-    {sim.image_url && (
-      <div className="w-full h-60 overflow-hidden">
-        <img src={sim.image_url} alt={sim.title} className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300" />
-      </div>
-    )}
-    <div className="p-4 flex items-center justify-between">
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-semibold truncate group-hover:text-green-500 transition-colors" style={{ color: 'var(--foreground)' }}>{sim.title}</p>
-        <p className="text-xs mt-1" style={{ color: 'var(--muted-text)' }}>{sim.company} · {sim.location}</p>
-      </div>
-      <span className="text-green-500 ml-4 group-hover:translate-x-1 transition-transform flex-shrink-0">→</span>
-    </div>
-  </Link>
-))}
-            
+            {similar.map((sim) => (
+              <Link key={sim.id} href={`/jobs/${makeSlug(sim.title, sim.short_id)}`}
+                className="card flex flex-col group overflow-hidden">
+                {sim.image_url && (
+                  <div className="w-full h-60 overflow-hidden">
+                    <img src={sim.image_url} alt={sim.title} className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300" />
+                  </div>
+                )}
+                <div className="p-4 flex items-center justify-between">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold truncate group-hover:text-green-500 transition-colors" style={{ color: 'var(--foreground)' }}>{sim.title}</p>
+                    <p className="text-xs mt-1" style={{ color: 'var(--muted-text)' }}>{sim.company} · {sim.location}</p>
+                  </div>
+                  <span className="text-green-500 ml-4 group-hover:translate-x-1 transition-transform flex-shrink-0">→</span>
+                </div>
+              </Link>
+            ))}
           </div>
         </div>
       )}
