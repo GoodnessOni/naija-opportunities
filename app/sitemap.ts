@@ -3,22 +3,22 @@ import { supabase } from './lib/supabase'
 export default async function sitemap() {
   const baseUrl = 'https://www.naijaopportunities.live'
 
-  const { data: jobs } = await supabase.from('jobs').select('id, title, created_at')
-  const { data: scholarships } = await supabase.from('scholarships').select('id, title, created_at')
+  const { data: jobs } = await supabase.from('jobs').select('short_id, title, created_at')
+  const { data: scholarships } = await supabase.from('scholarships').select('short_id, title, created_at')
 
-  function makeSlug(title: string, id: string) {
-    return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') + '-' + id
+  function makeSlug(title: string, shortId: number) {
+    return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '').slice(0, 40) + '-' + shortId
   }
 
   const jobUrls = (jobs || []).map(job => ({
-    url: `${baseUrl}/jobs/${makeSlug(job.title, job.id)}`,
+    url: `${baseUrl}/jobs/${makeSlug(job.title, job.short_id)}`,
     lastModified: job.created_at,
     changeFrequency: 'daily' as const,
     priority: 0.8,
   }))
 
   const scholarshipUrls = (scholarships || []).map(s => ({
-    url: `${baseUrl}/scholarships/${makeSlug(s.title, s.id)}`,
+    url: `${baseUrl}/scholarships/${makeSlug(s.title, s.short_id)}`,
     lastModified: s.created_at,
     changeFrequency: 'daily' as const,
     priority: 0.8,

@@ -1,6 +1,30 @@
 'use client'
-export default function SafeImage({ src, alt, className }: { src: string, alt: string, className?: string }) {
+import { useState } from 'react'
+import ScholarshipPlaceholder from './ScholarshipPlaceholder'
+import JobPlaceholder from './JobPlaceholder'
+
+export default function SafeImage({ 
+  src, alt, className, type = 'job', title = ''
+}: { 
+  src: string
+  alt: string
+  className?: string
+  type?: 'job' | 'scholarship'
+  title?: string
+}) {
+  const [failed, setFailed] = useState(false)
+
+  if (failed || !src || src === 'EMPTY' || src === 'NULL') {
+    if (type === 'scholarship') return <ScholarshipPlaceholder title={title || alt} />
+    return <JobPlaceholder title={title || alt} />
+  }
+
   return (
-    <img src={src} alt={alt} className={className} onError={(e) => { e.currentTarget.parentElement!.style.display = 'none' }} />
+    <img
+      src={`/api/image-proxy?url=${encodeURIComponent(src)}`}
+      alt={alt}
+      className={className}
+      onError={() => setFailed(true)}
+    />
   )
 }

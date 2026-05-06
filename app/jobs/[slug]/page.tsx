@@ -1,3 +1,4 @@
+import SafeImage from '../../components/SafeImage'
 import { supabase } from '../../lib/supabase'
 import Link from 'next/link'
 import Groq from 'groq-sdk'
@@ -166,11 +167,16 @@ console.log('DB ERROR:', error)
 
       <div className="card border border-gray-200 rounded-2xl p-8 mb-5 shadow-sm">
         
-        {job.image_url && (
-          <div className="w-full aspect-video overflow-hidden rounded-xl mb-6">
-            <img src={job.image_url} alt={job.title} className="w-full h-full object-cover" />
-          </div>
-        )}
+        
+        <div className="w-full aspect-video overflow-hidden rounded-xl mb-6">
+  <SafeImage
+    src={job.image_url || ''}
+    alt={job.title}
+    className="w-full h-full object-cover"
+    type="job"
+    title={job.title}
+  />
+</div>
         
         <div className="flex items-center justify-between mb-4">
           <span className="text-xs text-green-700 font-semibold uppercase tracking-wide">{job.source}</span>
@@ -311,11 +317,15 @@ console.log('DB ERROR:', error)
             {similar.map((sim) => (
               <Link key={sim.id} href={`/jobs/${makeSlug(sim.title, sim.short_id)}`}
                 className="card flex flex-col group overflow-hidden">
-                {sim.image_url && (
-                  <div className="w-full h-60 overflow-hidden">
-                    <img src={sim.image_url} alt={sim.title} className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300" />
-                  </div>
-                )}
+                <div className="w-full h-60 overflow-hidden">
+  <SafeImage
+    src={sim.image_url || ''}
+    alt={sim.title}
+    className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
+    type="job"
+    title={sim.title}
+  />
+</div>
                 <div className="p-4 flex items-center justify-between">
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold truncate group-hover:text-green-500 transition-colors" style={{ color: 'var(--foreground)' }}>{sim.title}</p>

@@ -1,9 +1,11 @@
+import SafeImage from '../../components/SafeImage'
 import { supabase } from '../../lib/supabase'
 import Link from 'next/link'
 import Groq from 'groq-sdk'
 
 interface Scholarship {
   id: string
+  short_id: number
   title: string
   provider: string
   country: string
@@ -38,8 +40,9 @@ function parseBullets(text: string | null): string[] {
 
 // ── Format slug from title + id ─────────────────────────────────────────────
 function makeSlug(title: string, id: string): string {
-  return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') + '-' + id
+   return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '').slice(0, 40) + '-' + id
 }
+
 
 async function enrichScholarship(scholarship: Scholarship): Promise<Scholarship> {
   if (scholarship.eligibility && scholarship.benefits && scholarship.how_to_apply) {
@@ -132,8 +135,8 @@ RULES:
 
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params
-  const id = slug.split('-').pop()
-  const { data: s } = await supabase.from('scholarships').select('*').eq('id', id).single()
+  const shortId = slug.split('-').pop()
+const { data: s } = await supabase.from('scholarships').select('*').eq('short_id', shortId).single()
   return {
     title: s ? `${s.title} | NaijaOpportunities` : 'Scholarship | NaijaOpportunities',
     description: s ? `Apply for ${s.title}. ${s.description?.slice(0, 120)}` : '',
@@ -146,9 +149,9 @@ export async function generateMetadata({ params }: Props) {
 
 export default async function ScholarshipPage({ params }: Props) {
   const { slug } = await params
-  const id = slug.split('-').pop()
+  const shortId = slug.split('-').pop()
 
-  const { data: raw } = await supabase.from('scholarships').select('*').eq('id', id).single()
+  const { data: raw } = await supabase.from('scholarships').select('*').eq('short_id', shortId).single()
 
   if (!raw) {
     return (
@@ -162,12 +165,11 @@ export default async function ScholarshipPage({ params }: Props) {
   const s = await enrichScholarship(raw as Scholarship)
 
   // Fetch similar scholarships (same country or level, exclude current)
-  const { data: similar } = await supabase
-    .from('scholarships')
-    .select('id, title, amount, country, level, source, image_url, amount, slug')
-    .neq('id', s.id)
-    .eq('country', s.country)
-    .limit(3)
+ const { data: similar } = await supabase
+  .from('scholarships')
+  .select('id, short_id, title, amount, country, level, source, image_url')
+  .neq('id', s.id)
+  .limit(3)
 
   // WhatsApp share text
   const shareText = encodeURIComponent(
@@ -352,18 +354,22 @@ export default async function ScholarshipPage({ params }: Props) {
       </a>
 
       {/* Similar Scholarships */}
-     {similar && similar.length > 0 && (
+  {similar && similar.length > 0 && (
   <div className="mb-8">
     <h2 className="text-lg font-bold mb-4" style={{ color: 'var(--foreground)' }}>Similar Scholarships</h2>
     <div className="flex flex-col gap-3">
       {similar.map((sim) => (
-        <Link key={sim.id} href={`/scholarships/${makeSlug(sim.title, sim.id)}`}
+        <Link key={sim.id} href={`/scholarships/${makeSlug(sim.title, sim.short_id)}`}
           className="card flex flex-col group overflow-hidden">
-          {sim.image_url && (
-            <div className="w-full aspect-video overflow-hidden">
-              <img src={sim.image_url} alt={sim.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"  />
-            </div>
-          )}
+          <div className="w-full aspect-video overflow-hidden">
+            <SafeImage
+              src={sim.image_url || ''}
+              alt={sim.title}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              type="scholarship"
+              title={sim.title}
+            />
+          </div>
           <div className="p-4 flex items-center justify-between">
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold truncate group-hover:text-blue-400 transition-colors" style={{ color: 'var(--foreground)' }}>{sim.title}</p>

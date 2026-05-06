@@ -1,3 +1,4 @@
+import ScholarshipPlaceholder from '../components/ScholarshipPlaceholder'
 import SafeImage from '../components/SafeImage'
 import { getGradient } from '../components/getGradient'
 /// <reference types="react" />
@@ -6,6 +7,7 @@ import { supabase } from '../lib/supabase'
 import Link from 'next/link'
 interface Scholarship {
   id: string
+  short_id: number 
   title: string
   provider: string
   country: string
@@ -19,9 +21,10 @@ interface Scholarship {
   image_url: string | null
 }
 
-function makeSlug(title: string, id: string): string {
-  return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') + '-' + id
+function makeSlug(title: string, id: string | number): string {
+   return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '').slice(0, 40) + '-' + id
 }
+
 
 function getDeadlineUrgency(deadline: string | null): 'urgent' | 'soon' | 'open' | null {
   if (!deadline) return null
@@ -40,7 +43,7 @@ export default async function ScholarshipsPage() {
   const total = scholarships?.length ?? 0
 
   // Separate urgent deadlines
-  const urgent = scholarships?.filter(s => {
+  const urgent = (scholarships as Scholarship[])?.filter(s => {
     if (!s.deadline) return false
     const days = Math.ceil((new Date(s.deadline).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
     return days <= 30 && days > 0
@@ -123,7 +126,7 @@ export default async function ScholarshipsPage() {
           </h2>
           <div className="flex flex-col gap-3">
             {urgent.slice(0, 3).map((s: Scholarship) => {
-              const slug = s.slug || makeSlug(s.title, s.id)
+              const slug = makeSlug(s.title, s.short_id)
               const days = Math.ceil((new Date(s.deadline!).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
               return (
                 <Link
@@ -157,7 +160,7 @@ export default async function ScholarshipsPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {scholarships?.map((s: Scholarship) => {
-          const slug = s.slug || makeSlug(s.title, s.id)
+          const slug = makeSlug(s.title, s.short_id)
           const urgency = getDeadlineUrgency(s.deadline)
           return (
             <Link
@@ -167,7 +170,17 @@ export default async function ScholarshipsPage() {
   style={{ borderLeft: '3px solid #2563eb' }}
 >
   {/* IMAGE */}
-  {s.image_url ? (<div className="w-full aspect-video overflow-hidden rounded-t-xl"><SafeImage src={s.image_url} alt={s.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" /></div>) : (<div className="w-full aspect-video overflow-hidden rounded-t-xl"><img src="/placeholder-scholarship.svg" alt="Scholarship" className="w-full h-full object-cover" /></div>)}
+{s.image_url ? (
+  <div className="w-full aspect-video overflow-hidden rounded-t-xl">
+    <SafeImage src={s.image_url} alt={s.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+    type="scholarship"
+  title={s.title} />
+  </div>
+) : (
+  <div className="w-full aspect-video overflow-hidden rounded-t-xl">
+    <ScholarshipPlaceholder title={s.title} />
+  </div>
+)}
 
   {/* CONTENT */}
   <div className="p-5 flex flex-col flex-1">

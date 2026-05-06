@@ -82,7 +82,15 @@ export default async function JobsPage() {
   style={{ borderLeft: '3px solid #16a34a' }}
 >
   {/* IMAGE */}
-  {job.image_url ? (<div className="w-full aspect-video overflow-hidden rounded-t-xl"><SafeImage src={job.image_url} alt={job.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" /></div>) : (<div className="w-full aspect-video overflow-hidden rounded-t-xl"><img src="/placeholder-job.svg" alt="Job" className="w-full h-full object-cover" /></div>)}
+  <div className="w-full aspect-video overflow-hidden rounded-t-xl">
+  <SafeImage 
+    src={job.image_url || ''} 
+    alt={job.title} 
+    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+    type="job"
+    title={job.title}
+  />
+</div>
 
   {/* CONTENT */}
   <div className="p-5 flex flex-col flex-1">
