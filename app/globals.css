@@ -34,6 +34,8 @@ body {
   color: var(--foreground);
   font-family: 'Plus Jakarta Sans', sans-serif;
   -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  margin: 0;
 }
 
 .card {

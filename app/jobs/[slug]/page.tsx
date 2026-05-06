@@ -87,6 +87,8 @@ RULES:
     const jsonMatch = cleaned.match(/\{[\s\S]*\}/)
     if (!jsonMatch) throw new Error('No JSON found')
     cleaned = jsonMatch[0]
+    
+    // Ensure formatting is robust
     cleaned = cleaned.replace(
       /"([^"]*)":\s*"([^"]*)"/g,
       (_match: string, key: string, value: string) => {
@@ -117,10 +119,23 @@ RULES:
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params
   const shortId = slug.split('-').pop()
-  const { data: job } = await supabase.from('jobs').select('*').eq('short_id', shortId).single()
+  
+  const { data: job } = await supabase
+    .from('jobs')
+    .select('*')
+    .eq('short_id', shortId)
+    .single()
+
+  const ogImage = job?.image_url || 'https://www.naijaopportunities.live/og-job-placeholder.png'
+
   return {
-    title: job ? `${job.title} | NaijaOpportunities` : 'Job | NaijaOpportunities',
-    description: job ? `Apply for ${job.title} at ${job.company} in ${job.location}.` : '',
+    title: job ? `${job.title} at ${job.company} | NaijaOpportunities` : 'Job Opening',
+    description: job ? `Apply for ${job.title} at ${job.company}. ${job.location}` : '',
+    openGraph: {
+      title: job?.title,
+      description: `Hiring at ${job?.company} in ${job?.location}. View details and apply.`,
+      images: [{ url: ogImage, width: 1200, height: 630 }],
+    },
   }
 }
 
@@ -128,14 +143,7 @@ export default async function JobPage({ params }: Props) {
   const { slug } = await params
   const shortId = slug.split('-').pop()
   
-  console.log('SLUG:', slug)
-console.log('EXTRACTED SHORT_ID:', shortId)
-
-const { data: raw, error } = await supabase.from('jobs').select('*').eq('short_id', shortId).single()
-console.log('DB RESULT:', raw)
-console.log('DB ERROR:', error)
-
-
+  const { data: raw } = await supabase.from('jobs').select('*').eq('short_id', shortId).single()
 
   if (!raw) {
     return (
@@ -155,7 +163,7 @@ console.log('DB ERROR:', error)
     .limit(3)
 
   const shareText = encodeURIComponent(
-    `💼 ${job.title}\n\n${job.description?.slice(0, 100)}...\n\n${job.salary ? `💰 ${job.salary}\n` : ''}${job.location ? `📍 ${job.location}\n` : ''}\nView & Apply 👇\nhttps://naija-opportunities.vercel.app/jobs/${slug}\n\n🤖 Let PathSync AI write your CV: https://pathsync-ai.vercel.app`
+    `💼 ${job.title}\n\n${job.description?.slice(0, 100)}...\n\n${job.salary ? `💰 ${job.salary}\n` : ''}${job.location ? `📍 ${job.location}\n` : ''}\nView & Apply 👇\nhttps://www.naijaopportunities.live/jobs/${slug}\n\n🤖 Let PathSync AI write your CV: https://pathsync-ai.vercel.app`
   )
   const whatsappUrl = `https://wa.me/?text=${shareText}`
 
@@ -166,24 +174,22 @@ console.log('DB ERROR:', error)
       </Link>
 
       <div className="card border border-gray-200 rounded-2xl p-8 mb-5 shadow-sm">
-        
-        
         <div className="w-full aspect-video overflow-hidden rounded-xl mb-6">
-  <SafeImage
-    src={job.image_url || ''}
-    alt={job.title}
-    className="w-full h-full object-cover"
-    type="job"
-    title={job.title}
-  />
-</div>
+          <SafeImage
+            src={job.image_url || ''}
+            alt={job.title}
+            className="w-full h-full object-cover"
+            type="job"
+            title={job.title}
+          />
+        </div>
         
         <div className="flex items-center justify-between mb-4">
           <span className="text-xs text-green-700 font-semibold uppercase tracking-wide">{job.source}</span>
           {job.type && <span className="text-xs bg-green-50 text-green-700 px-3 py-1 rounded-full font-medium">{job.type}</span>}
         </div>
 
-        <h1 className="text-2xl font-bold mb-5 style={{ color: 'var(--foreground)' }} leading-tight">{job.title}</h1>
+        <h1 className="text-2xl font-bold mb-5 leading-tight" style={{ color: 'var(--foreground)' }}>{job.title}</h1>
 
         <div className="flex flex-wrap gap-3 mb-6">
           {job.salary && (
@@ -214,8 +220,8 @@ console.log('DB ERROR:', error)
 
         {job.description && (
           <div className="mb-6">
-            <h2 className="font-bold style={{ color: 'var(--foreground)' }} mb-2">About this Role</h2>
-            <p className="style={{ color: 'var(--muted-text)' }} text-sm leading-relaxed">{job.description}</p>
+            <h2 className="font-bold mb-2" style={{ color: 'var(--foreground)' }}>About this Role</h2>
+            <p className="text-sm leading-relaxed" style={{ color: 'var(--muted-text)' }}>{job.description}</p>
           </div>
         )}
 
@@ -288,12 +294,10 @@ console.log('DB ERROR:', error)
         </div>
       </div>
 
-      {/* PATHSYNC BANNER */}
       <a href="https://pathsync-ai.vercel.app" target="_blank" rel="noopener noreferrer" className="block mb-5">
         <div className="bg-gradient-to-r from-green-600 to-emerald-500 rounded-2xl p-6 text-white shadow-lg hover:shadow-xl transition-shadow">
           <div className="flex items-start gap-4">
             <div className="flex-1">
-              <div className="text-card"> 
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-2xl">🤖</span>
                 <span className="font-bold text-lg">Want AI to write your CV & cover letter?</span>
@@ -304,7 +308,6 @@ console.log('DB ERROR:', error)
               <div className="inline-flex items-center gap-2 bg-white text-green-700 font-bold px-5 py-2.5 rounded-xl text-sm">
                 Try PathSync AI free →
               </div>
-              </div>
             </div>
           </div>
         </div>
@@ -312,20 +315,20 @@ console.log('DB ERROR:', error)
 
       {similar && similar.length > 0 && (
         <div className="mb-8">
-          <h2 className="text-lg font-bold style={{ color: 'var(--foreground)' }} mb-4">Similar Jobs</h2>
+          <h2 className="text-lg font-bold mb-4" style={{ color: 'var(--foreground)' }}>Similar Jobs</h2>
           <div className="flex flex-col gap-3">
             {similar.map((sim) => (
               <Link key={sim.id} href={`/jobs/${makeSlug(sim.title, sim.short_id)}`}
                 className="card flex flex-col group overflow-hidden">
                 <div className="w-full h-60 overflow-hidden">
-  <SafeImage
-    src={sim.image_url || ''}
-    alt={sim.title}
-    className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
-    type="job"
-    title={sim.title}
-  />
-</div>
+                  <SafeImage
+                    src={sim.image_url || ''}
+                    alt={sim.title}
+                    className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                    type="job"
+                    title={sim.title}
+                  />
+                </div>
                 <div className="p-4 flex items-center justify-between">
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold truncate group-hover:text-green-500 transition-colors" style={{ color: 'var(--foreground)' }}>{sim.title}</p>

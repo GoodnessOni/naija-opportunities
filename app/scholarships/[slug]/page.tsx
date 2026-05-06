@@ -39,7 +39,7 @@ function parseBullets(text: string | null): string[] {
 }
 
 // ── Format slug from title + id ─────────────────────────────────────────────
-function makeSlug(title: string, id: string): string {
+function makeSlug(title: string, id: string | number): string {
    return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '').slice(0, 40) + '-' + id
 }
 
@@ -136,13 +136,25 @@ RULES:
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params
   const shortId = slug.split('-').pop()
-const { data: s } = await supabase.from('scholarships').select('*').eq('short_id', shortId).single()
+  const { data: s } = await supabase.from('scholarships').select('*').eq('short_id', shortId).single()
+  
+  // Create a backup image URL if s.image_url is null
+  // You can use a static placeholder or an API route that generates the green box
+  const ogImage = s?.image_url || 'https://www.naijaopportunities.live/og-placeholder.png' 
+
   return {
     title: s ? `${s.title} | NaijaOpportunities` : 'Scholarship | NaijaOpportunities',
     description: s ? `Apply for ${s.title}. ${s.description?.slice(0, 120)}` : '',
     openGraph: {
       title: s?.title,
       description: s?.description?.slice(0, 120),
+      images: [
+        {
+          url: ogImage,
+          width: 1200,
+          height: 630,
+        },
+      ],
     },
   }
 }
@@ -173,7 +185,7 @@ export default async function ScholarshipPage({ params }: Props) {
 
   // WhatsApp share text
   const shareText = encodeURIComponent(
-    `🎓 ${s.title}\n\n${s.description?.slice(0, 100)}...\n\n${s.amount ? `💰 ${s.amount}\n` : ''}${s.deadline ? `⏰ Deadline: ${s.deadline}\n` : ''}\nApply & check if you qualify 👇\nhttps://naija-opportunities.vercel.app/scholarships/${slug}\n\n🤖 Let PathSync AI write your application letter free: https://pathsync-ai.vercel.app`
+    `🎓 ${s.title}\n\n${s.description?.slice(0, 100)}...\n\n${s.amount ? `💰 ${s.amount}\n` : ''}${s.deadline ? `⏰ Deadline: ${s.deadline}\n` : ''}\nApply & check if you qualify 👇\nhttps://www.naijaopportunities.live/scholarships/${slug}\n\n🤖 Let PathSync AI write your application letter free: https://pathsync-ai.vercel.app`
   )
   const whatsappUrl = `https://wa.me/?text=${shareText}`
 
@@ -187,11 +199,15 @@ export default async function ScholarshipPage({ params }: Props) {
       {/* Main card */}
       <div className="card border border-gray-200 rounded-2xl p-8 mb-5 shadow-sm">
 
-      {s.image_url && (
-        <div className="w-full aspect-video overflow-hidden rounded-xl mb-6">
-      <img src={s.image_url} alt={s.title} className="w-full h-full object-cover" />
-      </div>
-      )}
+      <div className="w-full aspect-video overflow-hidden rounded-xl mb-6">
+  <SafeImage 
+    src={s.image_url || ''} 
+    alt={s.title} 
+    className="w-full h-full object-cover" 
+    type="scholarship"
+    title={s.title}
+  />
+</div>
         {/* Header badges */}
         <div className="flex items-center justify-between mb-4">
           <span className="text-xs text-blue-600 font-semibold uppercase tracking-wide">{s.source}</span>

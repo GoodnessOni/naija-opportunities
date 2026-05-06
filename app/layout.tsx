@@ -2,12 +2,10 @@ import React from 'react'
 import './globals.css'
 
 export const metadata = {
-
   icons: {
     icon: '/favicon.svg',
     apple: '/favicon.svg',
   },
-  
   title: {
     default: 'NaijaOpportunities — Jobs & Scholarships for Nigerians',
     template: '%s | NaijaOpportunities',
@@ -17,7 +15,7 @@ export const metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_NG',
-    url: 'https://naija-opportunities.vercel.app',
+    url: 'https://www.naijaopportunities.live',
     title: 'NaijaOpportunities — Jobs & Scholarships for Nigerians',
     description: 'Find the latest jobs and scholarships for Nigerian students. Updated daily.',
     siteName: 'NaijaOpportunities',
@@ -31,8 +29,9 @@ export const metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body style={{ background: 'var(--background)', color: 'var(--foreground)', minHeight: '100vh' }}>
+    // Added suppressHydrationWarning here to prevent errors from extensions/dark mode
+    <html lang="en" suppressHydrationWarning>
+      <body>
 
         {/* NAVBAR */}
         <nav style={{ background: 'var(--card)', borderBottom: '1px solid var(--card-border)' }}
@@ -40,12 +39,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
             <a href="/" className="flex items-center gap-2 flex-shrink-0">
               <div className="w-7 h-7 rounded-lg bg-green-600 flex items-center justify-center">
-              <span className="text-white text-xs font-black">N</span>
+                <span className="text-white text-xs font-black">N</span>
               </div>
               <span className="font-bold text-sm md:text-base" style={{ color: 'var(--foreground)' }}>
                Naija<span className="text-green-600">Opps</span>
                 </span>
-</a>
+            </a>
             <div className="flex items-center gap-3 md:gap-6">
              <a href="/jobs" className="hidden sm:block text-xs md:text-sm font-medium hover:text-green-600"
   style={{ color: 'var(--muted-text)' }}>Jobs</a>

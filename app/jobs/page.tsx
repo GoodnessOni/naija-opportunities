@@ -121,16 +121,27 @@ export default async function JobsPage() {
         })}
       </div>
 
-      <div className="mt-12">
-        <a href="https://pathsync-ai.vercel.app" target="_blank" rel="noopener noreferrer"
-          className="flex items-center justify-between card border border-green-200 rounded-xl px-6 py-5 hover:bg-green-100 transition-colors">
-          <div>
-            <div className="font-bold card mb-1" >🤖 Let PathSync AI find your perfect job </div>
-            <div className="text-sm text-green-600">Tell it your skills - it finds jobs you qualify for.</div>
+      <div className="mt-12 mb-4">
+        <a
+          href="https://pathsync-ai.vercel.app"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block rounded-2xl px-6 py-5 transition-transform hover:scale-[1.01] mt-12 mb-4"
+          style={{ background: 'linear-gradient(135deg, #064e3b, #065f46)' }}
+        >
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div>
+              <div className="font-bold text-white mb-1 flex items-center gap-2">
+                <span>🤖</span> PathSync AI finds your match
+              </div>
+              <div className="text-sm text-green-100">
+                Tell it your skills — it finds jobs you qualify for.
+              </div>
+            </div>
+            <div className="text-white font-semibold text-sm whitespace-nowrap bg-white/20 px-4 py-2 rounded-lg self-start sm:self-auto flex-shrink-0">
+              Try free →
+            </div>
           </div>
-          <span className="card font-semibold text-sm whitespace-nowrap ml-6 bg-white/20 px-4 py-2 rounded-lg flex-shrink-0">
-            Try free →
-          </span>
         </a>
       </div>
     </div>
