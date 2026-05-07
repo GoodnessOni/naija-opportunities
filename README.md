@@ -2,7 +2,7 @@
 
 > **The #1 platform for Nigerian students and job seekers** — fresh jobs and scholarships, updated daily, all in one place.
 
-🔗 **Live Site:** [naija-opportunities.vercel.app](https://naija-opportunities.vercel.app)
+🔗 **Live Site:** [naija-opportunities.vercel.app](https://www.naijaopportunities.live)
 
 ---
 
