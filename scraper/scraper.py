@@ -68,6 +68,70 @@ def get_rss_link(item) -> str:
     return link.get_text().strip() or str(link.next_sibling or '').strip()
 
 
+# ─── AI ENRICHMENT ───────────────────────────────────────────
+
+def enrich_scholarship_with_ai(url: str, title: str) -> dict:
+    """Fetch page and use AI to extract structured scholarship details"""
+    try:
+        soup = fetch_page(url)
+        if not soup:
+            return {}
+        
+        page_text = get_page_text(soup)
+        if len(page_text) < 100:
+            return {}
+        
+        prompt = f"""Extract scholarship details from this webpage. Return ONLY valid JSON.
+
+Title: {title}
+
+Content: {page_text[:3000]}
+
+IMPORTANT: For deadline, return ONLY a date in YYYY-MM-DD format (e.g. "2026-12-31") or null if not found.
+
+Return this exact JSON structure:
+{{
+  "description": "Rich 200-300 word description including purpose, target students, field of study, and impact",
+  "eligibility": "Detailed eligibility: Academic (CGPA, field), Level (undergraduate/masters), Citizenship, Age, Demographics",
+  "benefits": "All benefits: Amount, duration, mentorship, internships, networking, career support",
+  "how_to_apply": "Step-by-step application process",
+  "documents_needed": "List all required documents",
+  "amount": "Scholarship amount (e.g. ₦200,000 or $5,000 or Full tuition)",
+  "duration": "Duration (e.g. 1 year, 4 years, renewable)",
+  "deadline": null
+}}
+
+CRITICAL: Set deadline to null (not a string). Do not use "Not specified" or any text."""
+
+        response = groq_client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.3,
+            max_tokens=1500,
+        )
+        
+        result = response.choices[0].message.content.strip()
+        if '```json' in result:
+            result = result.split('```json')[1].split('```')[0].strip()
+        elif '```' in result:
+            result = result.split('```')[1].split('```')[0].strip()
+        
+        data = json.loads(result)
+        
+        # Clean deadline - convert invalid values to None
+        if 'deadline' in data:
+            deadline = data['deadline']
+            if not deadline or deadline in ['Not specified', 'Not available', 'Varies', 'null']:
+                data['deadline'] = None
+            elif isinstance(deadline, str) and len(deadline) != 10:  # Not YYYY-MM-DD format
+                data['deadline'] = None
+        
+        return data
+    except Exception as e:
+        print(f'  AI enrichment error: {e}')
+        return {}
+
+
 # ─── JOB SCRAPERS ────────────────────────────────────────────
 
 def scrape_jobberman() -> list:
@@ -190,7 +254,7 @@ def scrape_jobs_googlenews() -> list:
     return jobs
 
 
-# ─── SCHOLARSHIP SCRAPERS ─────────────────────────────────────
+# ─── SCHOLARSHIP SCRAPERS WITH AI ENRICHMENT ─────────────────
 
 def scrape_scholarshipregion() -> list:
     print('Scraping ScholarshipRegion...')
@@ -198,7 +262,6 @@ def scrape_scholarshipregion() -> list:
     pages = [
         'https://www.scholarshipregion.com/category/nigerian-scholarships/',
         'https://www.scholarshipregion.com/category/africa-scholarships/',
-        'https://www.scholarshipregion.com/',
     ]
     seen = set()
     try:
@@ -206,22 +269,37 @@ def scrape_scholarshipregion() -> list:
             soup = fetch_page(page_url)
             if not soup:
                 continue
-            titles = soup.select('h2 a, h3 a, .entry-title a')[:10]
+            titles = soup.select('h2 a, h3 a, .entry-title a')[:5]  # Reduced to 5 per page
             for t in titles:
                 title = t.text.strip()
                 link = t.get('href', '')
                 if not link or link in seen or len(title) < 10:
                     continue
                 seen.add(link)
+                
+                print(f'  Enriching: {title[:60]}...')
+                enriched = enrich_scholarship_with_ai(link, title)
+                
                 detail = fetch_page(link)
                 image_url = get_og_image(detail) if detail else None
-                time.sleep(0.8)
+                time.sleep(2)  # Increased delay for AI calls
+                
                 scholarships.append({
-                    'title': title, 'provider': 'Various', 'country': 'International',
-                    'level': 'various', 'apply_url': link, 'source': 'scholarshipregion',
-                    'description': '', 'image_url': image_url,
-                    'eligibility': None, 'benefits': None, 'how_to_apply': None,
-                    'documents_needed': None, 'amount': None, 'duration': None, 'deadline': None,
+                    'title': title,
+                    'provider': 'Various',
+                    'country': 'International',
+                    'level': 'various',
+                    'apply_url': link,
+                    'source': 'scholarshipregion',
+                    'image_url': image_url,
+                    'description': enriched.get('description', ''),
+                    'eligibility': enriched.get('eligibility'),
+                    'benefits': enriched.get('benefits'),
+                    'how_to_apply': enriched.get('how_to_apply'),
+                    'documents_needed': enriched.get('documents_needed'),
+                    'amount': enriched.get('amount'),
+                    'duration': enriched.get('duration'),
+                    'deadline': enriched.get('deadline'),
                 })
     except Exception as e:
         print(f'ScholarshipRegion error: {e}')
@@ -233,13 +311,12 @@ def scrape_scholars4dev() -> list:
     scholarships = []
     feeds = [
         'https://www.scholars4dev.com/category/scholarships-for-africans/feed/',
-        'https://www.scholars4dev.com/feed/',
     ]
     seen = set()
     try:
         for feed in feeds:
             items = parse_rss(feed)
-            for item in items[:10]:
+            for item in items[:5]:  # Reduced to 5
                 title = item.find('title')
                 if not title:
                     continue
@@ -247,16 +324,30 @@ def scrape_scholars4dev() -> list:
                 if not url or url in seen:
                     continue
                 seen.add(url)
+                
+                print(f'  Enriching: {title.get_text().strip()[:60]}...')
+                enriched = enrich_scholarship_with_ai(url, title.get_text().strip())
+                
                 detail = fetch_page(url)
                 image_url = get_og_image(detail) if detail else None
-                time.sleep(0.8)
+                time.sleep(2)
+                
                 scholarships.append({
                     'title': title.get_text().strip(),
-                    'provider': 'Various', 'country': 'International',
-                    'level': 'various', 'apply_url': url, 'source': 'scholars4dev',
-                    'description': '', 'image_url': image_url,
-                    'eligibility': None, 'benefits': None, 'how_to_apply': None,
-                    'documents_needed': None, 'amount': None, 'duration': None, 'deadline': None,
+                    'provider': 'Various',
+                    'country': 'International',
+                    'level': 'various',
+                    'apply_url': url,
+                    'source': 'scholars4dev',
+                    'image_url': image_url,
+                    'description': enriched.get('description', ''),
+                    'eligibility': enriched.get('eligibility'),
+                    'benefits': enriched.get('benefits'),
+                    'how_to_apply': enriched.get('how_to_apply'),
+                    'documents_needed': enriched.get('documents_needed'),
+                    'amount': enriched.get('amount'),
+                    'duration': enriched.get('duration'),
+                    'deadline': enriched.get('deadline'),
                 })
     except Exception as e:
         print(f'Scholars4Dev error: {e}')
@@ -269,7 +360,7 @@ def scrape_opportunitydesk() -> list:
     try:
         items = parse_rss('https://opportunitydesk.org/category/scholarships/feed/')
         seen = set()
-        for item in items[:15]:
+        for item in items[:5]:  # Reduced to 5
             title = item.find('title')
             if not title:
                 continue
@@ -277,16 +368,30 @@ def scrape_opportunitydesk() -> list:
             if not url or url in seen:
                 continue
             seen.add(url)
+            
+            print(f'  Enriching: {title.get_text().strip()[:60]}...')
+            enriched = enrich_scholarship_with_ai(url, title.get_text().strip())
+            
             detail = fetch_page(url)
             image_url = get_og_image(detail) if detail else None
-            time.sleep(0.8)
+            time.sleep(2)
+            
             scholarships.append({
                 'title': title.get_text().strip(),
-                'provider': 'Various', 'country': 'International',
-                'level': 'various', 'apply_url': url, 'source': 'opportunitydesk',
-                'description': '', 'image_url': image_url,
-                'eligibility': None, 'benefits': None, 'how_to_apply': None,
-                'documents_needed': None, 'amount': None, 'duration': None, 'deadline': None,
+                'provider': 'Various',
+                'country': 'International',
+                'level': 'various',
+                'apply_url': url,
+                'source': 'opportunitydesk',
+                'image_url': image_url,
+                'description': enriched.get('description', ''),
+                'eligibility': enriched.get('eligibility'),
+                'benefits': enriched.get('benefits'),
+                'how_to_apply': enriched.get('how_to_apply'),
+                'documents_needed': enriched.get('documents_needed'),
+                'amount': enriched.get('amount'),
+                'duration': enriched.get('duration'),
+                'deadline': enriched.get('deadline'),
             })
     except Exception as e:
         print(f'OpportunityDesk error: {e}')
@@ -299,7 +404,7 @@ def scrape_afterschoolafrica() -> list:
     try:
         items = parse_rss('https://www.afterschoolafrica.com/feed/')
         seen = set()
-        for item in items[:15]:
+        for item in items[:5]:  # Reduced to 5
             title = item.find('title')
             if not title:
                 continue
@@ -307,16 +412,30 @@ def scrape_afterschoolafrica() -> list:
             if not url or url in seen:
                 continue
             seen.add(url)
+            
+            print(f'  Enriching: {title.get_text().strip()[:60]}...')
+            enriched = enrich_scholarship_with_ai(url, title.get_text().strip())
+            
             detail = fetch_page(url)
             image_url = get_og_image(detail) if detail else None
-            time.sleep(0.8)
+            time.sleep(2)
+            
             scholarships.append({
                 'title': title.get_text().strip(),
-                'provider': 'Various', 'country': 'International',
-                'level': 'various', 'apply_url': url, 'source': 'afterschoolafrica',
-                'description': '', 'image_url': image_url,
-                'eligibility': None, 'benefits': None, 'how_to_apply': None,
-                'documents_needed': None, 'amount': None, 'duration': None, 'deadline': None,
+                'provider': 'Various',
+                'country': 'International',
+                'level': 'various',
+                'apply_url': url,
+                'source': 'afterschoolafrica',
+                'image_url': image_url,
+                'description': enriched.get('description', ''),
+                'eligibility': enriched.get('eligibility'),
+                'benefits': enriched.get('benefits'),
+                'how_to_apply': enriched.get('how_to_apply'),
+                'documents_needed': enriched.get('documents_needed'),
+                'amount': enriched.get('amount'),
+                'duration': enriched.get('duration'),
+                'deadline': enriched.get('deadline'),
             })
     except Exception as e:
         print(f'AfterSchoolAfrica error: {e}')
@@ -328,28 +447,39 @@ def scrape_scholarships_googlenews() -> list:
     scholarships = []
     queries = [
         'fully+funded+scholarships+Nigeria+2026',
-        'PTDF+NNPC+scholarship+2026',
-        'Commonwealth+Chevening+scholarship+Nigeria+2026',
         'MTN+scholarship+Nigeria+2026',
-        'international+scholarships+Africa+masters+PhD+2026',
     ]
     try:
         for query in queries:
             items = parse_rss(f'https://news.google.com/rss/search?q={query}&hl=en-NG&gl=NG&ceid=NG:en')
-            for item in items[:4]:
+            for item in items[:3]:  # Reduced to 3
                 title = item.find('title')
                 if not title:
                     continue
                 url = get_rss_link(item)
                 if not url:
                     continue
+                
+                print(f'  Enriching: {title.get_text().strip()[:60]}...')
+                enriched = enrich_scholarship_with_ai(url, title.get_text().strip())
+                time.sleep(2)
+                
                 scholarships.append({
                     'title': title.get_text().strip(),
-                    'provider': 'Various', 'country': 'International',
-                    'level': 'various', 'description': '', 'apply_url': url,
-                    'source': 'googlenews', 'image_url': None,
-                    'eligibility': None, 'benefits': None, 'how_to_apply': None,
-                    'documents_needed': None, 'amount': None, 'duration': None, 'deadline': None,
+                    'provider': 'Various',
+                    'country': 'International',
+                    'level': 'various',
+                    'apply_url': url,
+                    'source': 'googlenews',
+                    'image_url': None,
+                    'description': enriched.get('description', ''),
+                    'eligibility': enriched.get('eligibility'),
+                    'benefits': enriched.get('benefits'),
+                    'how_to_apply': enriched.get('how_to_apply'),
+                    'documents_needed': enriched.get('documents_needed'),
+                    'amount': enriched.get('amount'),
+                    'duration': enriched.get('duration'),
+                    'deadline': enriched.get('deadline'),
                 })
     except Exception as e:
         print(f'Google News Scholarships error: {e}')
@@ -362,7 +492,6 @@ def save_jobs(jobs: list):
     if not jobs:
         print('No jobs to save')
         return
-    # shuffle so sources are mixed
     random.shuffle(jobs)
     saved = 0
     for job in jobs:
@@ -378,7 +507,6 @@ def save_scholarships(scholarships: list):
     if not scholarships:
         print('No scholarships to save')
         return
-    # shuffle so sources are mixed
     random.shuffle(scholarships)
     saved = 0
     for s in scholarships:
@@ -408,7 +536,7 @@ if __name__ == '__main__':
     save_jobs(all_jobs)
 
     print('\n' + '=' * 50)
-    print('SCRAPING SCHOLARSHIPS')
+    print('SCRAPING SCHOLARSHIPS WITH AI ENRICHMENT')
     print('=' * 50)
     all_scholarships = (
         scrape_scholarshipregion() +
