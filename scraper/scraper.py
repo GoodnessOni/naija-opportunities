@@ -18,7 +18,7 @@ load_dotenv(Path(__file__).parent.parent / '.env.local')
 
 supabase = create_client(
     os.getenv('NEXT_PUBLIC_SUPABASE_URL'),
-    os.getenv('NEXT_PUBLIC_SUPABASE_ANON_KEY')
+   os.getenv('SUPABASE_SERVICE_ROLE_KEY')
 )
 
 groq_client = groq_sdk.Groq(api_key=os.getenv('GROQ_API_KEY'))
@@ -38,6 +38,9 @@ session.headers.update(HEADERS)
 def fetch_page(url: str) -> BeautifulSoup | None:
     try:
         res = session.get(url, timeout=12)
+        if res.status_code == 403 or res.status_code == 406:
+            print(f'  🛑 BLOCKED BY CLOUDFLARE/BOT PROTECTION: {url}')
+            return None
         return BeautifulSoup(res.text, 'html.parser')
     except Exception as e:
         print(f'  Fetch error {url}: {e}')
@@ -128,7 +131,7 @@ CRITICAL: Set deadline to null (not a string). Do not use "Not specified" or any
         
         return data
     except Exception as e:
-        print(f'  AI enrichment error: {e}')
+        print(f'    ⚠️  AI enrichment failed: {e}')
         return {}
 
 
@@ -141,7 +144,7 @@ def scrape_jobberman() -> list:
         soup = fetch_page('https://www.jobberman.com/jobs')
         if not soup:
             return []
-        links = soup.find_all('link', rel='prerender')
+        links = soup.select('a[href*="/listings/"]')
         for link in links:
             href = link.get('href', '')
             if '/listings/' not in href:
@@ -261,6 +264,7 @@ def scrape_scholarshipregion() -> list:
     scholarships = []
     pages = [
         'https://www.scholarshipregion.com/category/nigerian-scholarships/',
+        'https://www.scholarshipregion.com/category/undergraduate-scholarships/',
         'https://www.scholarshipregion.com/category/africa-scholarships/',
     ]
     seen = set()
@@ -269,7 +273,7 @@ def scrape_scholarshipregion() -> list:
             soup = fetch_page(page_url)
             if not soup:
                 continue
-            titles = soup.select('h2 a, h3 a, .entry-title a')[:5]  # Reduced to 5 per page
+            titles = soup.select('h2 a, h3 a, .entry-title a')[:6]
             for t in titles:
                 title = t.text.strip()
                 link = t.get('href', '')
@@ -280,9 +284,14 @@ def scrape_scholarshipregion() -> list:
                 print(f'  Enriching: {title[:60]}...')
                 enriched = enrich_scholarship_with_ai(link, title)
                 
+                # Only save if we got a good description (200+ chars)
+                if not enriched.get('description') or len(enriched.get('description', '')) < 100:
+                    print(f'    ⚠️  Skipped - poor quality data')
+                    continue
+                
                 detail = fetch_page(link)
                 image_url = get_og_image(detail) if detail else None
-                time.sleep(2)  # Increased delay for AI calls
+                time.sleep(2)
                 
                 scholarships.append({
                     'title': title,
@@ -311,12 +320,13 @@ def scrape_scholars4dev() -> list:
     scholarships = []
     feeds = [
         'https://www.scholars4dev.com/category/scholarships-for-africans/feed/',
+        'https://www.scholars4dev.com/category/undergraduate-scholarships/feed/',
     ]
     seen = set()
     try:
         for feed in feeds:
             items = parse_rss(feed)
-            for item in items[:5]:  # Reduced to 5
+            for item in items[:6]:
                 title = item.find('title')
                 if not title:
                     continue
@@ -327,6 +337,10 @@ def scrape_scholars4dev() -> list:
                 
                 print(f'  Enriching: {title.get_text().strip()[:60]}...')
                 enriched = enrich_scholarship_with_ai(url, title.get_text().strip())
+                
+                if not enriched.get('description') or len(enriched.get('description', '')) < 100:
+                    print(f'    ⚠️  Skipped - poor quality data')
+                    continue
                 
                 detail = fetch_page(url)
                 image_url = get_og_image(detail) if detail else None
@@ -360,7 +374,7 @@ def scrape_opportunitydesk() -> list:
     try:
         items = parse_rss('https://opportunitydesk.org/category/scholarships/feed/')
         seen = set()
-        for item in items[:5]:  # Reduced to 5
+        for item in items[:8]:
             title = item.find('title')
             if not title:
                 continue
@@ -371,6 +385,10 @@ def scrape_opportunitydesk() -> list:
             
             print(f'  Enriching: {title.get_text().strip()[:60]}...')
             enriched = enrich_scholarship_with_ai(url, title.get_text().strip())
+            
+            if not enriched.get('description') or len(enriched.get('description', '')) < 100:
+                print(f'    ⚠️  Skipped - poor quality data')
+                continue
             
             detail = fetch_page(url)
             image_url = get_og_image(detail) if detail else None
@@ -404,7 +422,7 @@ def scrape_afterschoolafrica() -> list:
     try:
         items = parse_rss('https://www.afterschoolafrica.com/feed/')
         seen = set()
-        for item in items[:5]:  # Reduced to 5
+        for item in items[:8]:
             title = item.find('title')
             if not title:
                 continue
@@ -415,6 +433,10 @@ def scrape_afterschoolafrica() -> list:
             
             print(f'  Enriching: {title.get_text().strip()[:60]}...')
             enriched = enrich_scholarship_with_ai(url, title.get_text().strip())
+            
+            if not enriched.get('description') or len(enriched.get('description', '')) < 100:
+                print(f'    ⚠️  Skipped - poor quality data')
+                continue
             
             detail = fetch_page(url)
             image_url = get_og_image(detail) if detail else None
@@ -442,47 +464,105 @@ def scrape_afterschoolafrica() -> list:
     return scholarships
 
 
-def scrape_scholarships_googlenews() -> list:
-    print('Scraping scholarships via Google News...')
+def scrape_myschoolnews() -> list:
+    """NEW SOURCE - MySchoolNews has detailed Nigerian scholarship pages"""
+    print('Scraping MySchoolNews...')
     scholarships = []
-    queries = [
-        'fully+funded+scholarships+Nigeria+2026',
-        'MTN+scholarship+Nigeria+2026',
-    ]
     try:
-        for query in queries:
-            items = parse_rss(f'https://news.google.com/rss/search?q={query}&hl=en-NG&gl=NG&ceid=NG:en')
-            for item in items[:3]:  # Reduced to 3
-                title = item.find('title')
-                if not title:
-                    continue
-                url = get_rss_link(item)
-                if not url:
-                    continue
-                
-                print(f'  Enriching: {title.get_text().strip()[:60]}...')
-                enriched = enrich_scholarship_with_ai(url, title.get_text().strip())
-                time.sleep(2)
-                
-                scholarships.append({
-                    'title': title.get_text().strip(),
-                    'provider': 'Various',
-                    'country': 'International',
-                    'level': 'various',
-                    'apply_url': url,
-                    'source': 'googlenews',
-                    'image_url': None,
-                    'description': enriched.get('description', ''),
-                    'eligibility': enriched.get('eligibility'),
-                    'benefits': enriched.get('benefits'),
-                    'how_to_apply': enriched.get('how_to_apply'),
-                    'documents_needed': enriched.get('documents_needed'),
-                    'amount': enriched.get('amount'),
-                    'duration': enriched.get('duration'),
-                    'deadline': enriched.get('deadline'),
-                })
+        soup = fetch_page('https://myschoolnews.ng/category/scholarships/')
+        if not soup:
+            return []
+        
+        seen = set()
+        titles = soup.select('h2.entry-title a, h3.entry-title a')[:8]
+        for t in titles:
+            title = t.text.strip()
+            link = t.get('href', '')
+            if not link or link in seen or len(title) < 10:
+                continue
+            seen.add(link)
+            
+            print(f'  Enriching: {title[:60]}...')
+            enriched = enrich_scholarship_with_ai(link, title)
+            
+            if not enriched.get('description') or len(enriched.get('description', '')) < 100:
+                print(f'    ⚠️  Skipped - poor quality data')
+                continue
+            
+            detail = fetch_page(link)
+            image_url = get_og_image(detail) if detail else None
+            time.sleep(2)
+            
+            scholarships.append({
+                'title': title,
+                'provider': 'Various',
+                'country': 'Nigeria',
+                'level': 'various',
+                'apply_url': link,
+                'source': 'myschoolnews',
+                'image_url': image_url,
+                'description': enriched.get('description', ''),
+                'eligibility': enriched.get('eligibility'),
+                'benefits': enriched.get('benefits'),
+                'how_to_apply': enriched.get('how_to_apply'),
+                'documents_needed': enriched.get('documents_needed'),
+                'amount': enriched.get('amount'),
+                'duration': enriched.get('duration'),
+                'deadline': enriched.get('deadline'),
+            })
     except Exception as e:
-        print(f'Google News Scholarships error: {e}')
+        print(f'MySchoolNews error: {e}')
+    return scholarships
+
+
+def scrape_schoolgist() -> list:
+    """NEW SOURCE - SchoolGist has detailed scholarship information"""
+    print('Scraping SchoolGist...')
+    scholarships = []
+    try:
+        soup = fetch_page('https://schoolgist.ng/category/scholarships/')
+        if not soup:
+            return []
+        
+        seen = set()
+        titles = soup.select('h2 a, h3 a, .entry-title a')[:8]
+        for t in titles:
+            title = t.text.strip()
+            link = t.get('href', '')
+            if not link or link in seen or len(title) < 10:
+                continue
+            seen.add(link)
+            
+            print(f'  Enriching: {title[:60]}...')
+            enriched = enrich_scholarship_with_ai(link, title)
+            
+            if not enriched.get('description') or len(enriched.get('description', '')) < 100:
+                print(f'    ⚠️  Skipped - poor quality data')
+                continue
+            
+            detail = fetch_page(link)
+            image_url = get_og_image(detail) if detail else None
+            time.sleep(2)
+            
+            scholarships.append({
+                'title': title,
+                'provider': 'Various',
+                'country': 'Nigeria',
+                'level': 'various',
+                'apply_url': link,
+                'source': 'schoolgist',
+                'image_url': image_url,
+                'description': enriched.get('description', ''),
+                'eligibility': enriched.get('eligibility'),
+                'benefits': enriched.get('benefits'),
+                'how_to_apply': enriched.get('how_to_apply'),
+                'documents_needed': enriched.get('documents_needed'),
+                'amount': enriched.get('amount'),
+                'duration': enriched.get('duration'),
+                'deadline': enriched.get('deadline'),
+            })
+    except Exception as e:
+        print(f'SchoolGist error: {e}')
     return scholarships
 
 
@@ -496,7 +576,7 @@ def save_jobs(jobs: list):
     saved = 0
     for job in jobs:
         try:
-            supabase.table('jobs').insert(job).execute()
+            supabase.table('jobs').upsert(job, on_conflict='apply_url').execute()
             saved += 1
         except Exception as e:
             print(f'  Skip "{job["title"][:50]}": {e}')
@@ -511,7 +591,7 @@ def save_scholarships(scholarships: list):
     saved = 0
     for s in scholarships:
         try:
-            supabase.table('scholarships').insert(s).execute()
+            supabase.table('scholarships').upsert(s, on_conflict='apply_url').execute()
             saved += 1
         except Exception as e:
             print(f'  Skip "{s["title"][:50]}": {e}')
@@ -543,7 +623,8 @@ if __name__ == '__main__':
         scrape_scholars4dev() +
         scrape_opportunitydesk() +
         scrape_afterschoolafrica() +
-        scrape_scholarships_googlenews()
+        scrape_myschoolnews() +
+        scrape_schoolgist()
     )
     print(f'\nTotal scholarships: {len(all_scholarships)}')
     save_scholarships(all_scholarships)
