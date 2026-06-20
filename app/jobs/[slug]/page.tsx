@@ -162,9 +162,9 @@ export default async function JobPage({ params }: Props) {
     .neq('id', job.id)
     .limit(3)
 
-  const shareText = encodeURIComponent(
-    `💼 ${job.title}\n\n${job.description?.slice(0, 100)}...\n\n${job.salary ? `💰 ${job.salary}\n` : ''}${job.location ? `📍 ${job.location}\n` : ''}\nView & Apply 👇\nhttps://www.naijaopportunities.live/jobs/${slug}\n\n🤖 Let PathSync AI write your CV: https://pathsync-ai.vercel.app`
-  )
+ const shareText = encodeURIComponent(
+  `💼 ${job.title}\n\n${job.description?.slice(0, 100)}...\n\n${job.salary ? `💰 ${job.salary}\n` : ''}${job.location ? `📍 ${job.location}\n` : ''}\nView & Apply 👇\nhttps://www.naijaopportunities.live/jobs/${slug}\n\n🤖 Let PathSync AI write your CV: https://pathsync-ai.vercel.app\n\n📢 Join our WhatsApp community for daily opportunities: https://chat.whatsapp.com/IkNg6DbUyMVHucULkqjjF1`
+)
   const whatsappUrl = `https://wa.me/?text=${shareText}`
 
   return (
