@@ -23,7 +23,7 @@ export async function POST(request: Request) {
     // Send email via Resend
     await resend.emails.send({
       from: 'NaijaOpportunities <onboarding@resend.dev>',
-      to: ['goodnessengine2008@gmail.com', 'ogverse17@gmail.com'],
+      to: ['ogverse17@gmail.com'],
       subject: `[NaijaOpps Contact] ${subject}`,
       html: `
         <h2>New Contact Form Submission</h2>
