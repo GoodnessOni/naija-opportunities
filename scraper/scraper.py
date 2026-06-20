@@ -101,10 +101,10 @@ Return this exact JSON structure:
   "documents_needed": "List all required documents",
   "amount": "Scholarship amount (e.g. ₦200,000 or $5,000 or Full tuition)",
   "duration": "Duration (e.g. 1 year, 4 years, renewable)",
-  "deadline": null
+  "deadline": "2026-08-31"
 }}
 
-CRITICAL: Set deadline to null (not a string). Do not use "Not specified" or any text."""
+CRITICAL: For deadline, search the page carefully for any application closing date. Return it as YYYY-MM-DD (e.g. "2026-08-31"). Only return null if absolutely no date is mentioned anywhere on the page.
 
         response = groq_client.chat.completions.create(
             model="llama-3.3-70b-versatile",
