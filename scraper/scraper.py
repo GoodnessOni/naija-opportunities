@@ -104,7 +104,7 @@ Return this exact JSON structure:
   "deadline": "2026-08-31"
 }}
 
-CRITICAL: For deadline, search the page carefully for any application closing date. Return it as YYYY-MM-DD (e.g. "2026-08-31"). Only return null if absolutely no date is mentioned anywhere on the page.
+CRITICAL: For deadline, search the page carefully for any application closing date. Return it as YYYY-MM-DD (e.g. "2026-08-31"). Only return null if absolutely no date is mentioned anywhere on the page."""
 
         response = groq_client.chat.completions.create(
             model="llama-3.3-70b-versatile",
