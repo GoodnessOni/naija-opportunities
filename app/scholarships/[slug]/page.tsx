@@ -184,9 +184,9 @@ export default async function ScholarshipPage({ params }: Props) {
   .limit(3)
 
   // WhatsApp share text
-  const shareText = encodeURIComponent(
-    `🎓 ${s.title}\n\n${s.description?.slice(0, 100)}...\n\n${s.amount ? `💰 ${s.amount}\n` : ''}${s.deadline ? `⏰ Deadline: ${s.deadline}\n` : ''}\nApply & check if you qualify 👇\nhttps://www.naijaopportunities.live/scholarships/${slug}\n\n🤖 Let PathSync AI write your application letter free: https://pathsync-ai.vercel.app`
-  )
+ const shareText = encodeURIComponent(
+  `🎓 ${s.title}\n\n${s.description?.slice(0, 100)}...\n\n${s.amount ? `💰 ${s.amount}\n` : ''}${s.deadline ? `⏰ Deadline: ${s.deadline}\n` : ''}\nApply & check if you qualify 👇\nhttps://www.naijaopportunities.live/scholarships/${slug}\n\n🤖 Let PathSync AI write your application letter free: https://pathsync-ai.vercel.app\n\n📢 Join our WhatsApp community for daily opportunities: https://chat.whatsapp.com/IkNg6DbUyMVHucULkqjjF1`
+)
   const whatsappUrl = `https://wa.me/?text=${shareText}`
 
   return (

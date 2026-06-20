@@ -16,7 +16,8 @@ function makeSlug(title: string, shortId: number) {
 export default async function Home() {
   // Fetch latest 6 of each
   const { data: jobs } = await supabase.from('jobs').select('*').order('created_at', { ascending: false }).limit(6)
-  const { data: scholarships } = await supabase.from('scholarships').select('*').order('created_at', { ascending: false }).limit(6)
+  const today = new Date().toISOString().split('T')[0]
+  const { data: scholarships } = await supabase.from('scholarships').select('*').or(`deadline.is.null,deadline.gte.${today}`).order('created_at', { ascending: false }).limit(6)
 
   return (
     <div>
@@ -142,6 +143,31 @@ export default async function Home() {
             </div>
           </Link>
         ))}
+      </div>
+      {/* WHATSAPP COMMUNITY BANNER */}
+      <div className="mt-10">
+        
+          href="https://chat.whatsapp.com/IkNg6DbUyMVHucULkqjjF1"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block rounded-3xl p-6 text-white"
+          style={{ background: 'linear-gradient(135deg, #25D366, #128C7E)' }}
+        >
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-2xl">💬</span>
+                <span className="font-bold text-lg">Join our WhatsApp Community</span>
+              </div>
+              <p className="text-green-100 text-sm">Get daily scholarship and job alerts sent straight to your WhatsApp. Free, no spam.</p>
+            </div>
+            <div className="flex-shrink-0">
+              <span className="inline-block bg-white text-green-700 font-bold px-6 py-3 rounded-2xl text-sm whitespace-nowrap">
+                Join Now →
+              </span>
+            </div>
+          </div>
+        </a>
       </div>
     </div>
   )
