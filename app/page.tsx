@@ -16,7 +16,8 @@ function makeSlug(title: string, shortId: number) {
 export default async function Home() {
   // Fetch latest 6 of each
   const { data: jobs } = await supabase.from('jobs').select('*').order('created_at', { ascending: false }).limit(6)
-  const { data: scholarships } = await supabase.from('scholarships').select('*').order('created_at', { ascending: false }).limit(6)
+  const today = new Date().toISOString().split('T')[0]
+  const { data: scholarships } = await supabase.from('scholarships').select('*').or(`deadline.is.null,deadline.gte.${today}`).order('created_at', { ascending: false }).limit(6)
 
   return (
     <div>
