@@ -147,7 +147,7 @@ export default async function Home() {
       {/* WHATSAPP COMMUNITY BANNER */}
       <div className="mt-10">
         
-          href="https://chat.whatsapp.com/IkNg6DbUyMVHucULkqjjF1"
+          <a href="https://chat.whatsapp.com/IkNg6DbUyMVHucULkqjjF1"
           target="_blank"
           rel="noopener noreferrer"
           className="block rounded-3xl p-6 text-white"
