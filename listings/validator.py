@@ -76,6 +76,13 @@ def _build_http_reason_phrases():
 
 
 _HTTP_REASON_PHRASES = _build_http_reason_phrases()
+# A whole line that starts with an HTTP version or a Status label. The reason
+# phrase may be any text for that line. A . ! or ? before more text is a
+# second sentence, so the string is not the status line alone.
+_EXPLICIT_STATUS_LINE = re.compile(
+    r"(?:HTTP(?:/[0-9]+(?:\.[0-9]+)?)?|status):?\s+[1-5][0-9]{2}(?:\s+[^!?.]+)?",
+    re.IGNORECASE,
+)
 
 # ISO 3166-1 alpha-2 assigned codes from the local iso-codes list used while
 # implementing this pin (249 codes). ZZ is the contract's explicit unknown
@@ -778,8 +785,15 @@ def _free_text(path):
 
 
 def _evidence_is_http_status_alone(evidence):
-    """True when the whole string is an HTTP status line, not other prose."""
+    """True when the whole string is an HTTP status line, not other prose.
+
+    An explicit ``HTTP`` or ``Status`` line is status-only whatever its reason
+    phrase says. Without that prefix, only a bare code or a known reason phrase
+    is status-only. Text after ``.``, ``!``, or ``?`` is a further sentence.
+    """
     core = re.sub(r"[.!?]+$", "", evidence)
+    if _EXPLICIT_STATUS_LINE.fullmatch(core):
+        return True
     matched = _HTTP_STATUS_LINE.fullmatch(core)
     if matched is None:
         return False

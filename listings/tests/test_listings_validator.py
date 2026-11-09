@@ -17,7 +17,7 @@ Tests do not fetch that pin. Evaluation time is an argument.
 | 11 student match | test_eligibility_metadata_is_not_matching |
 | 12.1 URL acceptance | test_url_acceptance_oracles_do_not_rewrite |
 | 12.2 normalisation | test_normalise_url_is_not_part_of_validation |
-| 13 verification and freshness | test_freshness_failed_attempt_human_and_never_verified, test_confirmed_open_requires_the_attempt_bundle, test_http_status_line_is_not_evidence, test_every_known_http_status_line_is_rejected |
+| 13 verification and freshness | test_freshness_failed_attempt_human_and_never_verified, test_confirmed_open_requires_the_attempt_bundle, test_http_status_line_is_not_evidence, test_every_known_http_status_line_is_rejected, test_explicit_status_line_rejects_custom_reason |
 | 14 active and historical modes | test_valid_modes_and_negative_samples, test_historical_mismatch_and_short_circuit |
 | 15 identity and tombstone | test_identity_url_is_not_dedupe, test_award_employment_and_lifecycle_pairs, test_unknown_education_tombstone_uses_withdrawn_wording |
 | 16 digests | test_measured_digests_nfc_null_order_and_mismatch |
@@ -145,6 +145,7 @@ SECTION_TO_TESTS = {
         "test_confirmed_open_requires_the_attempt_bundle",
         "test_http_status_line_is_not_evidence",
         "test_every_known_http_status_line_is_rejected",
+        "test_explicit_status_line_rejects_custom_reason",
     ],
     "14": [
         "test_valid_modes_and_negative_samples",
@@ -1271,12 +1272,53 @@ class ListingsValidatorTest(unittest.TestCase):
         self.assertEqual(missed, [])
 
         accepted = (
-            "HTTP/1.1 200 Fine",
-            "HTTP/1.1 200 Fine.",
-            "Status: 200 students were admitted",
-            "HTTP/2 504 gateway time out",
             "200 level students only",
             "200 students were admitted",
+            "200 OK. The form was open.",
+            "HTTP/1.1 200 Fine. The form was open.",
+            "The official page returned HTTP 200 and the application form was open.",
+        )
+        for evidence in accepted:
+            listing = load_name("valid-scholarship")
+            listing["verification"]["evidence"] = evidence
+            rehash(listing)
+            self.assertEqual(validate_record(listing), [], evidence)
+
+    def test_explicit_status_line_rejects_custom_reason(self):
+        """An explicit HTTP or Status line is status-only even with a custom reason.
+
+        Without that prefix, the same words are prose. A sentence after . ! or ?
+        is more than the status line.
+        """
+        rejected = (
+            "HTTP/1.1 200 Fine",
+            "HTTP/1.1 200 Fine.",
+            "HTTP/2 504 gateway time out",
+            "Status: 200 students were admitted",
+            "http/1.1 200 fine",
+            "HTTP/1.1  200   Fine",
+            "HTTP/1.1 200 Fine!",
+            "HTTP/1.0 200 Fine",
+            "HTTP 200 Fine",
+            "HTTP/2 504 gateway time out.",
+            "status: 200 students were admitted",
+            "STATUS: 200 students were admitted.",
+            "Status 200 students were admitted",
+        )
+        missed = []
+        for evidence in rejected:
+            listing = load_name("valid-scholarship")
+            listing["verification"]["evidence"] = evidence
+            rehash(listing)
+            if codes(validate_record(listing)) != [("invalid_constraint", "verification.evidence")]:
+                missed.append(evidence)
+        self.assertEqual(missed, [])
+        accepted = (
+            "200 level students only",
+            "200 students were admitted",
+            "200 OK. The form was open.",
+            "HTTP/1.1 200 Fine. The form was open.",
+            "The official programme page was read on 8 November 2026 and the form was open.",
             "The official page returned HTTP 200 and the application form was open.",
         )
         for evidence in accepted:
