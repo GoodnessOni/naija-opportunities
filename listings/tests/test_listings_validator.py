@@ -17,7 +17,7 @@ Tests do not fetch that pin. Evaluation time is an argument.
 | 11 student match | test_eligibility_metadata_is_not_matching |
 | 12.1 URL acceptance | test_url_acceptance_oracles_do_not_rewrite |
 | 12.2 normalisation | test_normalise_url_is_not_part_of_validation |
-| 13 verification and freshness | test_freshness_failed_attempt_human_and_never_verified, test_confirmed_open_requires_the_attempt_bundle, test_http_status_line_is_not_evidence |
+| 13 verification and freshness | test_freshness_failed_attempt_human_and_never_verified, test_confirmed_open_requires_the_attempt_bundle, test_http_status_line_is_not_evidence, test_every_known_http_status_line_is_rejected |
 | 14 active and historical modes | test_valid_modes_and_negative_samples, test_historical_mismatch_and_short_circuit |
 | 15 identity and tombstone | test_identity_url_is_not_dedupe, test_award_employment_and_lifecycle_pairs, test_unknown_education_tombstone_uses_withdrawn_wording |
 | 16 digests | test_measured_digests_nfc_null_order_and_mismatch |
@@ -41,6 +41,7 @@ import sys
 import tempfile
 import unittest
 from datetime import datetime, timedelta
+from http import HTTPStatus
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[2]
@@ -143,6 +144,7 @@ SECTION_TO_TESTS = {
         "test_freshness_failed_attempt_human_and_never_verified",
         "test_confirmed_open_requires_the_attempt_bundle",
         "test_http_status_line_is_not_evidence",
+        "test_every_known_http_status_line_is_rejected",
     ],
     "14": [
         "test_valid_modes_and_negative_samples",
@@ -176,6 +178,41 @@ def rehash(listing):
 
 def codes(errors):
     return [(item["code"], item["field"]) for item in errors]
+
+
+# Earlier RFC reason phrases for the same code. These are not the Python 3.12
+# HTTPStatus phrase. 418 is not in this table: the standard library carries
+# "I'm a Teapot" (RFC 2324). RFC 9110 marks 418 unused.
+HTTP_HISTORICAL_REASON_PHRASES = {
+    302: ("Moved Temporarily",),  # RFC 1945; later "Found"
+    413: ("Payload Too Large", "Content Too Large"),  # RFC 7231, RFC 9110
+    414: ("URI Too Long",),  # RFC 7231 / RFC 9110
+    416: ("Range Not Satisfiable",),  # RFC 7231 / RFC 9110
+    422: ("Unprocessable Content",),  # RFC 9110
+    504: ("Gateway Time-out",),  # RFC 2616; later "Gateway Timeout"
+}
+
+
+def known_http_reason_phrases():
+    """Stdlib HTTPStatus phrases plus the historical aliases above."""
+    pairs = [(int(status), status.phrase) for status in HTTPStatus]
+    for code, aliases in HTTP_HISTORICAL_REASON_PHRASES.items():
+        for alias in aliases:
+            pairs.append((code, alias))
+    return pairs
+
+
+def http_status_line_forms(code, phrase):
+    """Case, terminal punctuation, and the prefixes the status check recognises."""
+    return (
+        f"{code} {phrase}",
+        f"{code} {phrase.casefold()}",
+        f"{code} {phrase}.",
+        f"HTTP/1.1 {code} {phrase}",
+        f"HTTP/2 {code} {phrase}.",
+        f"Status: {code} {phrase}",
+        f"status: {code} {phrase.casefold()}.",
+    )
 
 
 def stage3(code, field, evaluation_time=EVAL):
@@ -1181,6 +1218,66 @@ class ListingsValidatorTest(unittest.TestCase):
             "The official page returned HTTP 200 and the application form was open.",
             "200 level students only",
             "200 students were admitted",
+        )
+        for evidence in accepted:
+            listing = load_name("valid-scholarship")
+            listing["verification"]["evidence"] = evidence
+            rehash(listing)
+            self.assertEqual(validate_record(listing), [], evidence)
+
+    def test_every_known_http_status_line_is_rejected(self):
+        phrases = known_http_reason_phrases()
+        stdlib_count = len(list(HTTPStatus))
+        alias_count = sum(len(aliases) for aliases in HTTP_HISTORICAL_REASON_PHRASES.values())
+        self.assertEqual(stdlib_count, 62)
+        self.assertEqual(alias_count, 7)
+        self.assertEqual(len(phrases), stdlib_count + alias_count)
+        print(
+            f"HTTP_REASON_COVERAGE stdlib={stdlib_count} "
+            f"historical_aliases={alias_count} total={len(phrases)}"
+        )
+        stdlib_by_code = {int(status): status.phrase.casefold() for status in HTTPStatus}
+        for code, aliases in HTTP_HISTORICAL_REASON_PHRASES.items():
+            for alias in aliases:
+                self.assertNotEqual(alias.casefold(), stdlib_by_code[code])
+        self.assertIn((418, "I'm a Teapot"), phrases)
+        self.assertIn((504, "Gateway Time-out"), phrases)
+        self.assertIn((504, "Gateway Timeout"), phrases)
+
+        missed = []
+        checked = 0
+        for code, phrase in phrases:
+            for evidence in http_status_line_forms(code, phrase):
+                checked += 1
+                listing = load_name("valid-scholarship")
+                listing["verification"]["evidence"] = evidence
+                rehash(listing)
+                if codes(validate_record(listing)) != [("invalid_constraint", "verification.evidence")]:
+                    missed.append(evidence)
+        for status in HTTPStatus:
+            for evidence in (
+                str(int(status)),
+                f"HTTP/1.1 {int(status)}",
+                f"HTTP/2 {int(status)}",
+                f"Status: {int(status)}",
+            ):
+                checked += 1
+                listing = load_name("valid-scholarship")
+                listing["verification"]["evidence"] = evidence
+                rehash(listing)
+                if codes(validate_record(listing)) != [("invalid_constraint", "verification.evidence")]:
+                    missed.append(evidence)
+        print(f"HTTP_STATUS_LINES_CHECKED {checked}")
+        self.assertEqual(missed, [])
+
+        accepted = (
+            "HTTP/1.1 200 Fine",
+            "HTTP/1.1 200 Fine.",
+            "Status: 200 students were admitted",
+            "HTTP/2 504 gateway time out",
+            "200 level students only",
+            "200 students were admitted",
+            "The official page returned HTTP 200 and the application form was open.",
         )
         for evidence in accepted:
             listing = load_name("valid-scholarship")

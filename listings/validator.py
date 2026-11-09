@@ -19,6 +19,7 @@ import json
 import re
 import unicodedata
 from datetime import datetime, timedelta
+from http import HTTPStatus
 from zoneinfo import ZoneInfo
 
 CONTRACT_EVALUATION_TIME = "2026-11-08T12:00:00Z"
@@ -37,79 +38,44 @@ EMAIL_SEARCH_RE = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}")
 NIN_RE = re.compile(r"\b\d{11}\b")
 PHONE_RE = re.compile(r"\b(?:\+?234|0)[789]\d{9}\b")
 # A whole evidence string is an HTTP status line when it is only a status code,
-# or that code plus the reason phrase registered for it. Terminal . ! ? and
-# letter case do not make it something else. This is not a reading of a sentence.
+# or that code plus a known reason phrase for it. Terminal . ! ? and letter
+# case do not make it something else. This is not a reading of a sentence.
 _HTTP_STATUS_LINE = re.compile(
     r"(?:(?:HTTP(?:/[0-9]+(?:\.[0-9]+)?)?|status):?\s+)?"
     r"([1-5][0-9]{2})"
     r"(?:\s+(.+))?",
     re.IGNORECASE,
 )
-# Reason phrases from the IANA HTTP status registry (RFC 9110 and the extension
-# RFCs it cites), plus the older phrase still sent for the same code.
-_HTTP_REASON_PHRASES = {
-    100: ("continue",),
-    101: ("switching protocols",),
-    102: ("processing",),
-    103: ("early hints",),
-    200: ("ok",),
-    201: ("created",),
-    202: ("accepted",),
-    203: ("non-authoritative information",),
-    204: ("no content",),
-    205: ("reset content",),
-    206: ("partial content",),
-    207: ("multi-status",),
-    208: ("already reported",),
-    226: ("im used",),
-    300: ("multiple choices",),
-    301: ("moved permanently",),
-    302: ("found", "moved temporarily"),
-    303: ("see other",),
-    304: ("not modified",),
-    305: ("use proxy",),
-    307: ("temporary redirect",),
-    308: ("permanent redirect",),
-    400: ("bad request",),
-    401: ("unauthorized",),
-    402: ("payment required",),
-    403: ("forbidden",),
-    404: ("not found",),
-    405: ("method not allowed",),
-    406: ("not acceptable",),
-    407: ("proxy authentication required",),
-    408: ("request timeout",),
-    409: ("conflict",),
-    410: ("gone",),
-    411: ("length required",),
-    412: ("precondition failed",),
-    413: ("content too large", "payload too large", "request entity too large"),
-    414: ("uri too long", "request-uri too long"),
-    415: ("unsupported media type",),
-    416: ("range not satisfiable", "requested range not satisfiable"),
-    417: ("expectation failed",),
-    421: ("misdirected request",),
-    422: ("unprocessable content", "unprocessable entity"),
-    423: ("locked",),
-    424: ("failed dependency",),
-    425: ("too early",),
-    426: ("upgrade required",),
-    428: ("precondition required",),
-    429: ("too many requests",),
-    431: ("request header fields too large",),
-    451: ("unavailable for legal reasons",),
-    500: ("internal server error",),
-    501: ("not implemented",),
-    502: ("bad gateway",),
-    503: ("service unavailable",),
-    504: ("gateway timeout",),
-    505: ("http version not supported",),
-    506: ("variant also negotiates",),
-    507: ("insufficient storage",),
-    508: ("loop detected",),
-    510: ("not extended",),
-    511: ("network authentication required",),
+# Earlier RFC spellings of the same code. http.HTTPStatus on Python 3.12 already
+# carries the other historical spelling, including 418 "I'm a Teapot" from
+# RFC 2324. RFC 9110 marks 418 unused; that library phrase is still a status
+# line, and this table does not call 418 a current IANA assignment.
+_HTTP_HISTORICAL_REASON_PHRASES = {
+    302: ("Moved Temporarily",),  # RFC 1945; later "Found"
+    413: ("Payload Too Large", "Content Too Large"),  # RFC 7231, RFC 9110
+    414: ("URI Too Long",),  # RFC 7231 / RFC 9110
+    416: ("Range Not Satisfiable",),  # RFC 7231 / RFC 9110
+    422: ("Unprocessable Content",),  # RFC 9110
+    504: ("Gateway Time-out",),  # RFC 2616; later "Gateway Timeout"
 }
+
+
+def _normalise_http_reason(phrase):
+    return re.sub(r"\s+", " ", phrase).strip().casefold()
+
+
+def _build_http_reason_phrases():
+    phrases = {}
+    for status in HTTPStatus:
+        phrases.setdefault(int(status), set()).add(_normalise_http_reason(status.phrase))
+    for code, aliases in _HTTP_HISTORICAL_REASON_PHRASES.items():
+        bucket = phrases.setdefault(int(code), set())
+        for alias in aliases:
+            bucket.add(_normalise_http_reason(alias))
+    return {code: frozenset(values) for code, values in phrases.items()}
+
+
+_HTTP_REASON_PHRASES = _build_http_reason_phrases()
 
 # ISO 3166-1 alpha-2 assigned codes from the local iso-codes list used while
 # implementing this pin (249 codes). ZZ is the contract's explicit unknown
