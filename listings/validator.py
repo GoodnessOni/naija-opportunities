@@ -36,14 +36,80 @@ EMAIL_RE = re.compile(r"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$")
 EMAIL_SEARCH_RE = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}")
 NIN_RE = re.compile(r"\b\d{11}\b")
 PHONE_RE = re.compile(r"\b(?:\+?234|0)[789]\d{9}\b")
-# Whole evidence string is only an HTTP status line. A sentence that mentions a
-# status is not this pattern. The match is not a reading of what the page said.
-HTTP_ONLY_RE = re.compile(
-    r"^(?:(?:HTTP(?:/[0-9]+(?:\.[0-9]+)?)?|status)\s+)?"
-    r"[1-5][0-9]{2}"
-    r"(?:\s+[A-Za-z]+(?:\s+[A-Za-z]+){0,3})?$",
+# A whole evidence string is an HTTP status line when it is only a status code,
+# or that code plus the reason phrase registered for it. Terminal . ! ? and
+# letter case do not make it something else. This is not a reading of a sentence.
+_HTTP_STATUS_LINE = re.compile(
+    r"(?:(?:HTTP(?:/[0-9]+(?:\.[0-9]+)?)?|status):?\s+)?"
+    r"([1-5][0-9]{2})"
+    r"(?:\s+(.+))?",
     re.IGNORECASE,
 )
+# Reason phrases from the IANA HTTP status registry (RFC 9110 and the extension
+# RFCs it cites), plus the older phrase still sent for the same code.
+_HTTP_REASON_PHRASES = {
+    100: ("continue",),
+    101: ("switching protocols",),
+    102: ("processing",),
+    103: ("early hints",),
+    200: ("ok",),
+    201: ("created",),
+    202: ("accepted",),
+    203: ("non-authoritative information",),
+    204: ("no content",),
+    205: ("reset content",),
+    206: ("partial content",),
+    207: ("multi-status",),
+    208: ("already reported",),
+    226: ("im used",),
+    300: ("multiple choices",),
+    301: ("moved permanently",),
+    302: ("found", "moved temporarily"),
+    303: ("see other",),
+    304: ("not modified",),
+    305: ("use proxy",),
+    307: ("temporary redirect",),
+    308: ("permanent redirect",),
+    400: ("bad request",),
+    401: ("unauthorized",),
+    402: ("payment required",),
+    403: ("forbidden",),
+    404: ("not found",),
+    405: ("method not allowed",),
+    406: ("not acceptable",),
+    407: ("proxy authentication required",),
+    408: ("request timeout",),
+    409: ("conflict",),
+    410: ("gone",),
+    411: ("length required",),
+    412: ("precondition failed",),
+    413: ("content too large", "payload too large", "request entity too large"),
+    414: ("uri too long", "request-uri too long"),
+    415: ("unsupported media type",),
+    416: ("range not satisfiable", "requested range not satisfiable"),
+    417: ("expectation failed",),
+    421: ("misdirected request",),
+    422: ("unprocessable content", "unprocessable entity"),
+    423: ("locked",),
+    424: ("failed dependency",),
+    425: ("too early",),
+    426: ("upgrade required",),
+    428: ("precondition required",),
+    429: ("too many requests",),
+    431: ("request header fields too large",),
+    451: ("unavailable for legal reasons",),
+    500: ("internal server error",),
+    501: ("not implemented",),
+    502: ("bad gateway",),
+    503: ("service unavailable",),
+    504: ("gateway timeout",),
+    505: ("http version not supported",),
+    506: ("variant also negotiates",),
+    507: ("insufficient storage",),
+    508: ("loop detected",),
+    510: ("not extended",),
+    511: ("network authentication required",),
+}
 
 # ISO 3166-1 alpha-2 assigned codes from the local iso-codes list used while
 # implementing this pin (249 codes). ZZ is the contract's explicit unknown
@@ -745,6 +811,20 @@ def _free_text(path):
     return False
 
 
+def _evidence_is_http_status_alone(evidence):
+    """True when the whole string is an HTTP status line, not other prose."""
+    core = re.sub(r"[.!?]+$", "", evidence)
+    matched = _HTTP_STATUS_LINE.fullmatch(core)
+    if matched is None:
+        return False
+    code = int(matched.group(1))
+    reason = matched.group(2)
+    if reason is None:
+        return True
+    normalised = re.sub(r"\s+", " ", reason).strip().casefold()
+    return normalised in _HTTP_REASON_PHRASES.get(code, ())
+
+
 def _personal(value):
     return (
         NIN_RE.search(value) is not None
@@ -1307,7 +1387,7 @@ def _check_verification(listing, errors):
     if isinstance(checked, str) and accept_url(checked) is not None:
         _push(errors, "non_canonical_url", "verification.source_checked_url")
     if isinstance(evidence, str) and (
-        not (1 <= len(evidence) <= 2000) or HTTP_ONLY_RE.fullmatch(evidence) is not None
+        not (1 <= len(evidence) <= 2000) or _evidence_is_http_status_alone(evidence)
     ):
         _push(errors, "invalid_constraint", "verification.evidence")
 

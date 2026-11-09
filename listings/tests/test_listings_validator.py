@@ -1161,6 +1161,11 @@ class ListingsValidatorTest(unittest.TestCase):
             "200 OK",
             "HTTP/1.1 200 OK",
             "Status 200",
+            "200 OK.",
+            "HTTP/1.1 200 OK.",
+            "404 Not Found",
+            "404 Not Found.",
+            "HTTP/1.1 404 Not Found",
         )
         for evidence in rejected:
             listing = load_name("valid-scholarship")
@@ -1174,6 +1179,8 @@ class ListingsValidatorTest(unittest.TestCase):
         accepted = (
             "The official programme page was read on 8 November 2026 and the form was open.",
             "The official page returned HTTP 200 and the application form was open.",
+            "200 level students only",
+            "200 students were admitted",
         )
         for evidence in accepted:
             listing = load_name("valid-scholarship")
