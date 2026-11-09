@@ -272,3 +272,48 @@ The same temporary-copy reference command after the change: exit code 0, empty s
 - No queue, storage, previous-record policy, revocation, or publication integration. Permission for this attempt to succeed is not active-feed or publication permission. Active eligibility is validate_active_feed at an explicit evaluation time.
 
 No source-inspection, auth, queue, or publication integration is included. This appendix does not say the validator or this gate is approved, released, or production-complete.
+
+
+## Human review queue
+
+This card adds one offline in-memory queue for ambiguous verification attempts. It is evidence for review. It is not lead approval, not a release, and not a production-complete claim. No merge, no pull request, and no deploy.
+
+Owner decision for ambiguous evidence: syntax checks plus human review. Lead decision: only NaijaOpportunities' own server-side pipeline and signed-in staff reviewers are trusted callers. Students, the public API, and listing data never supply an assessment.
+
+`ReviewQueue` in `listings/review_queue.py` reuses `SourceAssessment` from `listings/verification_gate.py`. `enqueue(candidate, assessment)` accepts only category `ambiguous` and returns a stable item id; re-enqueueing the same attempt returns that id and does not create a duplicate. `list_pending()` returns pending items oldest first. `resolve(item_id, reviewer_id, decision, note)` requires decision `accept` or `reject`, a slug `reviewer_id`, and a non-empty note that names what was read (an HTTP status line alone is rejected, matching contract section 13). `accept` returns `SourceAssessment(human_resolved)` plus a human-attributed candidate copy usable by `decide_attempt`. `reject` returns `SourceAssessment(failed)`. Unknown or already-resolved items raise `ReviewQueueError`. Resolution records `reviewer_id` and a timezone-aware UTC `resolved_at`.
+
+### Commands and results
+
+From the repository root:
+
+```text
+PYTHONDONTWRITEBYTECODE=1 python3 -m unittest listings.tests.test_review_queue -v
+```
+
+`Ran 7 tests in 0.006s` / `OK`.
+
+```text
+PYTHONDONTWRITEBYTECODE=1 python3 -m unittest listings.tests.test_verification_gate -v
+```
+
+`Ran 11 tests in 0.056s` / `OK`. Printed marker unchanged: `GATE_DECISIONS ambiguous assessment_missing assessment_type attempt_not_successful candidate_type category_type category_unknown changed clear conflicting failed human_resolved inaccessible metadata record_invalid unresolved`.
+
+```text
+PYTHONDONTWRITEBYTECODE=1 python3 -m unittest listings.tests.test_listings_validator -v
+```
+
+`Ran 23 tests in 0.567s` / `OK`. Printed markers unchanged: `HTTP_REASON_COVERAGE stdlib=62 historical_aliases=7 total=69`, `HTTP_STATUS_LINES_CHECKED 731`, and the five `MEASURED_DIGESTS` lines already recorded above. The validator and gate files were not edited.
+
+### Changed paths
+
+- `listings/review_queue.py` (new)
+- `listings/tests/test_review_queue.py` (new)
+- `listings/HANDOVER.md` (this appendix only)
+
+### Known limitations
+
+- Reviewer authorisation is not implemented. reviewer_id is an opaque slug recorded on resolve; it is not an allow-list and does not prove a person is authorised staff.
+- Storage is not implemented. The queue holds state only in process memory and is lost when the process ends.
+- Publication is not implemented. Resolving an item does not write a listing feed or call decide_attempt.
+
+This appendix does not say the queue, gate, or validator is approved, released, or production-complete.
