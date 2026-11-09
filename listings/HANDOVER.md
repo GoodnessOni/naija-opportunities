@@ -158,3 +158,117 @@ A later recheck still accepted two status lines: `504 Gateway Time-out` (includi
 The phrase list still accepted a standalone line whose reason was not one of those 69: `HTTP/1.1 200 Fine`, `HTTP/1.1 200 Fine.`, `HTTP/2 504 gateway time out`, and `Status: 200 students were admitted`. An explicit `HTTP` or `Status` line is the status line itself, so the reason text does not have to be in the list. `test_explicit_status_line_rejects_custom_reason` failed on those lines first, then passed. `200 level students only`, `200 students were admitted`, and `200 OK. The form was open.` stay accepted, as does `HTTP/1.1 200 Fine. The form was open.` because a sentence follows the status line. The 731-line matrix stays green. The full suite is `Ran 22 tests` / `OK`. The temp-copy hash script still matches. No pull request and no merge.
 
 A missing space in that same explicit line was still accepted: `Status:200 Fine` and `HTTP/1.1 200Fine`, on all five fixtures, while `Status: 200 Fine` and `HTTP/1.1 200 Fine` were already rejected. `test_explicit_status_line_missing_space` failed on the unspaced forms first (75 mode results: 5 fixtures, 5 unspaced lines, record, active, and historical). The explicit-line syntax now allows the space after `Status:` and between the code and the reason to be absent. Spaced twins still reject. `200 level students only`, `200 students were admitted`, `200 OK. The form was open.`, and `HTTP/1.1 200Fine. The form was open.` stay accepted. The 731-line matrix stays green. The full suite is `Ran 23 tests` / `OK`. The temp-copy hash script still matches. No pull request and no merge.
+
+
+## Verification attempt gate
+
+This card adds one offline function that decides whether a proposed verification attempt may establish or renew success. It is evidence for review. It is not lead approval, not a release, and not a production-complete claim. No merge, no pull request, and no deploy.
+
+The branch head at the start was `36bfd66f3875ca0796b000b0339cdc06ad9a71da`, the same commit as the reviewed base. No earlier commit on this branch was rewritten. The pin in `listings/contract.lock.json` stays `b50440dc738d86ff3070386d8709b8faf2bc5982`. PathSync commit `d8b57290eb08fe96fd4140a234436cb1556f77a1` is decision context for that external approval. It is not a contract amendment, and this card does not edit that repository.
+
+`decide_attempt(candidate, assessment)` in `listings/verification_gate.py` is the function. `assessment` is a `SourceAssessment` from the producer caller. It is not a listing field and not a user attestation. The result is an `AttemptDecision`. `permitted` is true only for a clear or human-resolved assessment when this attempt is a successful confirmation under the pinned vocabulary and `validate_record` returns no errors. The permitted candidate is the same object. Every other result has `candidate` None. The function does not mutate the listing and does not move `fresh_until`.
+
+There is no source inspection, no caller authentication, no reviewer authorisation, no queue, and no publication integration. Active eligibility stays `validate_active_feed` at an explicit evaluation time. Permission for an attempt to succeed is not active-feed permission and not publication permission.
+
+### Decision matrix
+
+Sections 5, 13, 14, and 18. The fixed evaluation instant in the new tests is `2026-11-08T12:00:00Z`. The gate does not take that instant and does not read a clock.
+
+| Order | Condition | Disposition | Reason | Contract tie |
+| --- | --- | --- | --- | --- |
+| 1 | Candidate is not a JSON object. A JSON string is included, even when `validate_record` would accept it. | `input_error` | `candidate_type` | Section 18 input shape. Fail closed. Not stored. |
+| 1 | Assessment is absent (`None`). | `input_error` | `assessment_missing` | Section 5. Clear is not inferred. |
+| 1 | Assessment is not a `SourceAssessment`. A dict or the string `clear` does not qualify. | `input_error` | `assessment_type` | Caller value is typed. Not a listing field. |
+| 1 | `category` is not a string. | `input_error` | `category_type` | Wrong type fails closed. |
+| 1 | `category` is not one of the eight names below. `human`, `verified`, `permit`, and `CLEAR` are unknown. | `input_error` | `category_unknown` | Unknown context is not clear and not human-resolved. |
+| 2 | `ambiguous`, `inaccessible`, `changed`, `conflicting`, or `unresolved`. | `review` | that category | Section 5. These are human review. A valid record that claims `verified` or `human_review` still does not succeed. `validate_record` is not consulted. |
+| 2 | `failed`. | `reject` | `failed` | Sections 5 and 13. A failed attempt does not establish or renew success. Old `last_success_at` and `fresh_until` stay put and are not returned. |
+| 3 | `clear` without `method` `automated_review`, `reviewed_by` `automation`, `reviewer_id` null, and string attempt-bundle fields. | `reject` | `metadata` | Section 13 automation pair. Section 5: no mandatory human review only when that automation metadata is present. |
+| 3 | `human_resolved` without `method` `human_review`, `reviewed_by` `human`, an opaque slug of length 1..64, and the same bundle strings. | `reject` | `metadata` | Sections 5 and 13. Missing or wrong human metadata blocks. A slug is not an allow-list. |
+| 4 | Bundle is present, but this latest attempt is not a successful confirmation. That includes unverified, `failed`, `inconclusive`, a success time that is not this attempt, and a `fresh_until` that is not a UTC timestamp. | `reject` | `attempt_not_successful` | Section 13. An older success kept on the record does not renew. The exact 168-hour gap is the next row. |
+| 5 | The attempt looks successful, and `validate_record` returns any stage 1 or stage 2 error. | `reject` | `record_invalid` | Section 18. `record_errors` are those contract errors, copied. The decision reason is not a contract code. A 90-day human window fails here. `fresh_until` is not corrected. |
+| 6 | `clear` passes rows 3 to 5. | `permit` | `clear` | Section 5 routine automation. The same 168 hours as a human success. |
+| 6 | `human_resolved` passes rows 3 to 5. | `permit` | `human_resolved` | Section 5 human review after a genuine resolution supplied by the caller. Same 168 hours. No 90-day window. |
+
+`200 Fine`, `404 Nope`, and `HTTP/1.1 200 Fine. The form was open.` are not classified by this function. With a caller assessment of `ambiguous` they are review. With `clear` or `human_resolved` and a record `validate_record` accepts, the attempt can be permitted. `HTTP/1.1 200 Fine` is `record_invalid` because the existing validator rejects that status line. This card adds no phrase list and no `Read:` marker.
+
+### Active feed is separate (sections 13 and 14)
+
+`decide_attempt` does not call `validate_active_feed` or `validate_historical`. A closed, expired, or stale row that passes `validate_record` is not labelled invalid verification because it is off the active feed.
+
+| Record | Evaluation time | Attempt | Active feed |
+| --- | --- | --- | --- |
+| `valid-scholarship`, clear automation, `fresh_until` `2026-11-15T09:00:00Z` | `2026-11-15T09:00:00Z` | permit `clear` | no errors. Equality with the 168-hour instant stays active. |
+| same | `2026-11-15T09:00:01Z` | permit `clear` | `stale_listing` on `verification.fresh_until` only. `lifecycle.status` stays `open`. Historical mode has no errors. |
+| same timestamps, human metadata, `human_resolved` | equality and the next second | permit `human_resolved` | same active results as automation. |
+| human metadata with `fresh_until` 90 days after `last_success_at` | not used | `record_invalid` on `verification.fresh_until` | not the decision. |
+| scholarship whose success is `2027-03-24T22:59:59Z` and whose `fresh_until` equals `fixed_at` `2027-03-31T22:59:59Z` | `2027-03-31T22:59:59Z` | permit `clear` | no errors. Deadline equality stays open. |
+| same | `2027-03-31T23:00:00Z` | permit `clear` | `expired_deadline` and `stale_listing`. Historical mode is `expired_deadline` only. |
+| `invalid-expired-open` | `2026-11-08T12:00:00Z` | permit `clear` | `expired_deadline` on `deadline.fixed_at`. Record validation passed. |
+| `valid-historical-expired` clear, `valid-tombstone` human-resolved, and a `provider_closed` / `confirmed_closed` scholarship | `2026-11-08T12:00:00Z` | permit on the matching path | `not_on_active_feed` on `lifecycle.status` only. |
+| `valid-internship` and `valid-job` | `2028-01-01T00:00:00Z` | permit `clear` | `stale_listing` only. No `expired_deadline`. |
+| draft with no attempt | `2026-11-08T12:00:00Z` | `metadata` | `not_on_active_feed`. That code is not the gate reason. |
+| open scholarship, any permitted attempt | `not-a-timestamp` | unchanged permit | `invalid_constraint` on `$evaluation_time`. |
+
+An old success with a later `failed` or `inconclusive` attempt still passes `validate_record` and can still be inside the old freshness window on the active feed. `decide_attempt` does not permit it for `clear`, `failed`, or `ambiguous`, and it does not move `last_success_at` or `fresh_until`. A new confirmation whose own `last_success_at` equals `last_attempt_at`, with `fresh_until` exactly 168 hours later, can be permitted without a stored previous record. The function has no previous-record argument.
+
+### Runtime
+
+- Python 3.12.3
+- tzdata `version 2026e` (`/usr/share/zoneinfo/tzdata.zi`)
+- Same pair printed by the pinned `hash-output.txt`
+
+### Commands and results
+
+From the repository root, before any file in this card existed, at `36bfd66f3875ca0796b000b0339cdc06ad9a71da`:
+
+```text
+PYTHONDONTWRITEBYTECODE=1 python3 -m unittest listings.tests.test_listings_validator -v
+```
+
+`Ran 23 tests in 0.568s` / `OK`. Printed markers: `HTTP_REASON_COVERAGE stdlib=62 historical_aliases=7 total=69`, `HTTP_STATUS_LINES_CHECKED 731`, and the five `MEASURED_DIGESTS` lines already recorded above. The new gate suite was not present, so it was not run.
+
+Pinned reference output, from a temporary copy of `listings/reference/pathsync-ai/docs`, command `python3 docs/listings/compute_listing_hashes.py`: exit code 0, empty stderr, stdout equal to `listings/reference/pathsync-ai/docs/listings/hash-output.txt`, including `python: 3.12.3`, `tzdata: version 2026e`, and `result: ok`.
+
+After `listings/verification_gate.py` and `listings/tests/test_verification_gate.py` were added, the same validator command returned `Ran 23 tests in 0.559s` / `OK`, with the same `HTTP_STATUS_LINES_CHECKED 731` and the same five measured digests. The validator file and its test file were not edited.
+
+```text
+PYTHONDONTWRITEBYTECODE=1 python3 -m unittest listings.tests.test_verification_gate -v
+```
+
+`Ran 11 tests in 0.053s` / `OK`. Every test passed:
+
+- `test_absent_or_invalid_context_fails_closed`
+- `test_clear_automation_success`
+- `test_every_decision_branch`
+- `test_freshness_deadline_and_lifecycle_stay_separate`
+- `test_human_resolved_metadata`
+- `test_old_success_cannot_promote`
+- `test_phrase_examples_follow_the_caller_assessment`
+- `test_record_claims_do_not_bypass`
+- `test_record_invalid_uses_full_validate_record`
+- `test_repeatable_immutable_and_offline`
+- `test_unresolved_categories_block`
+
+Printed marker: `GATE_DECISIONS ambiguous assessment_missing assessment_type attempt_not_successful candidate_type category_type category_unknown changed clear conflicting failed human_resolved inaccessible metadata record_invalid unresolved`.
+
+The same temporary-copy reference command after the change: exit code 0, empty stderr, stdout still equal to the vendored `hash-output.txt`, `python: 3.12.3`, `tzdata: version 2026e`, `result: ok`.
+
+### Unchanged pin, lock, and reference
+
+`listings/contract.lock.json` `git_sha` is still `b50440dc738d86ff3070386d8709b8faf2bc5982`. `git hash-object listings/contract.lock.json` is `6436035af5b4e1707b47a6d16b7acf6ff589b5d6`. `listings/validator.py` is `d2ea96543c40c2966e11b740e735d06a2203b71d`. `listings/tests/test_listings_validator.py` is `496eb0572d91491c2c5680f623e453825a7764b0`. Those three hashes are the blobs at the reviewed base. The vendored contract, fixtures, hash script, `hash-output.txt`, manifest, and lock were not edited.
+
+### Changed paths
+
+- `listings/verification_gate.py` (new)
+- `listings/tests/test_verification_gate.py` (new)
+- `listings/HANDOVER.md` (this appendix only)
+
+### Limitations
+
+- Caller trust is not implemented. A SourceAssessment is a typed value supplied by the producer caller. This function does not authenticate that caller.
+- Source inspection is not implemented. This function does not fetch a URL, open a page, or decide whether evidence text is clear.
+- Reviewer authorisation is not implemented. reviewer_id is checked as an opaque slug. It is not an allow-list and it does not prove a person acted.
+- No queue, storage, previous-record policy, revocation, or publication integration. Permission for this attempt to succeed is not active-feed or publication permission. Active eligibility is validate_active_feed at an explicit evaluation time.
+
+No source-inspection, auth, queue, or publication integration is included. This appendix does not say the validator or this gate is approved, released, or production-complete.
