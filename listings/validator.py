@@ -36,7 +36,14 @@ EMAIL_RE = re.compile(r"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$")
 EMAIL_SEARCH_RE = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}")
 NIN_RE = re.compile(r"\b\d{11}\b")
 PHONE_RE = re.compile(r"\b(?:\+?234|0)[789]\d{9}\b")
-HTTP_ONLY_RE = re.compile(r"^(?:(?:HTTP(?:/[0-9.]+)?|status) )?[1-5][0-9]{2}$")
+# Whole evidence string is only an HTTP status line. A sentence that mentions a
+# status is not this pattern. The match is not a reading of what the page said.
+HTTP_ONLY_RE = re.compile(
+    r"^(?:(?:HTTP(?:/[0-9]+(?:\.[0-9]+)?)?|status)\s+)?"
+    r"[1-5][0-9]{2}"
+    r"(?:\s+[A-Za-z]+(?:\s+[A-Za-z]+){0,3})?$",
+    re.IGNORECASE,
+)
 
 # ISO 3166-1 alpha-2 assigned codes from the local iso-codes list used while
 # implementing this pin (249 codes). ZZ is the contract's explicit unknown
@@ -894,10 +901,12 @@ def _check_eligibility(listing, errors):
         education[name]
         for name in ("stages", "qualifications", "courses", "years")
     ) or bool(names)
+    withdrawn = listing["lifecycle"]["publication_status"] == "withdrawn"
     if known_education and ereq in {"unrestricted", "unknown"}:
         if filled or ireq != ereq:
             _push(errors, "invalid_constraint", "eligibility.education.requirement")
-        if ereq == "unknown" and wording != "Not stated by the source.":
+        # Unknown wording is the fixed sentence, except a tombstone, which must be [withdrawn].
+        if ereq == "unknown" and not withdrawn and wording != "Not stated by the source.":
             _push(errors, "invalid_constraint", "eligibility.education.source_wording")
     elif known_education and ereq == "restricted" and not filled:
         _push(errors, "invalid_constraint", "eligibility.education.requirement")
@@ -942,7 +951,6 @@ def _check_eligibility(listing, errors):
     stated = eligibility["criteria_stated"]
     text = eligibility["criteria_text"]
     _length(errors, text, "eligibility.criteria_text", 1, 4000)
-    withdrawn = listing["lifecycle"]["publication_status"] == "withdrawn"
     if withdrawn:
         if text != "[withdrawn]":
             _push(errors, "invalid_constraint", "eligibility.criteria_text")
@@ -1284,6 +1292,18 @@ def _check_verification(listing, errors):
     )
     if any(attempt_flags) and not all(attempt_flags):
         _push(errors, "invalid_constraint", "verification.method")
+    # A success is itself an attempt. reviewer_id stays null for automation.
+    if success_at is not None or outcome is not None:
+        for field, value in (
+            ("verification.method", method),
+            ("verification.reviewed_by", reviewed),
+            ("verification.source_checked_url", checked),
+            ("verification.evidence", evidence),
+            ("verification.last_attempt_at", attempt_at),
+            ("verification.last_attempt_outcome", attempt_outcome),
+        ):
+            if value is None:
+                _push(errors, "invalid_constraint", field)
     if isinstance(checked, str) and accept_url(checked) is not None:
         _push(errors, "non_canonical_url", "verification.source_checked_url")
     if isinstance(evidence, str) and (

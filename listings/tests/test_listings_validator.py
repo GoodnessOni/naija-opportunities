@@ -17,9 +17,9 @@ Tests do not fetch that pin. Evaluation time is an argument.
 | 11 student match | test_eligibility_metadata_is_not_matching |
 | 12.1 URL acceptance | test_url_acceptance_oracles_do_not_rewrite |
 | 12.2 normalisation | test_normalise_url_is_not_part_of_validation |
-| 13 verification and freshness | test_freshness_failed_attempt_human_and_never_verified |
+| 13 verification and freshness | test_freshness_failed_attempt_human_and_never_verified, test_confirmed_open_requires_the_attempt_bundle, test_http_status_line_is_not_evidence |
 | 14 active and historical modes | test_valid_modes_and_negative_samples, test_historical_mismatch_and_short_circuit |
-| 15 identity and tombstone | test_identity_url_is_not_dedupe, test_award_employment_and_lifecycle_pairs |
+| 15 identity and tombstone | test_identity_url_is_not_dedupe, test_award_employment_and_lifecycle_pairs, test_unknown_education_tombstone_uses_withdrawn_wording |
 | 16 digests | test_measured_digests_nfc_null_order_and_mismatch |
 | 17 personal data | test_personal_data_placeholder_and_string_hygiene |
 | 18 stages and card samples | test_valid_modes_and_negative_samples, test_stage1_shape_stops_before_hashes |
@@ -139,7 +139,11 @@ SECTION_TO_TESTS = {
     "11": ["test_eligibility_metadata_is_not_matching"],
     "12.1": ["test_url_acceptance_oracles_do_not_rewrite"],
     "12.2": ["test_normalise_url_is_not_part_of_validation"],
-    "13": ["test_freshness_failed_attempt_human_and_never_verified"],
+    "13": [
+        "test_freshness_failed_attempt_human_and_never_verified",
+        "test_confirmed_open_requires_the_attempt_bundle",
+        "test_http_status_line_is_not_evidence",
+    ],
     "14": [
         "test_valid_modes_and_negative_samples",
         "test_historical_mismatch_and_short_circuit",
@@ -147,6 +151,7 @@ SECTION_TO_TESTS = {
     "15": [
         "test_identity_url_is_not_dedupe",
         "test_award_employment_and_lifecycle_pairs",
+        "test_unknown_education_tombstone_uses_withdrawn_wording",
     ],
     "16": ["test_measured_digests_nfc_null_order_and_mismatch"],
     "17": ["test_personal_data_placeholder_and_string_hygiene"],
@@ -1021,6 +1026,160 @@ class ListingsValidatorTest(unittest.TestCase):
         rehash(html)
         self.assertEqual(codes(validate_record(html)), [("invalid_constraint", "description")])
         self.assertIn("<b>", html["description"])
+
+    def test_confirmed_open_requires_the_attempt_bundle(self):
+        listing = load_name("valid-scholarship")
+        for field in (
+            "method",
+            "reviewed_by",
+            "reviewer_id",
+            "source_checked_url",
+            "evidence",
+            "last_attempt_at",
+            "last_attempt_outcome",
+        ):
+            listing["verification"][field] = None
+        rehash(listing)
+        self.assertEqual(
+            listing["dedupe_key"],
+            "f18f8da3972c4d1932d54f31f674ec259d4b939fb38b184876341d978895e96f",
+        )
+        self.assertEqual(
+            listing["content_hash"],
+            "511e03282b9437093e3f7e31ddfcb2380102a28d5d2fd0531052476fa1210e4c",
+        )
+        self.assertEqual(listing["verification"]["state"], "verified")
+        self.assertEqual(listing["verification"]["outcome"], "confirmed_open")
+        self.assertIsNone(listing["verification"]["reviewer_id"])
+        expected = [
+            ("invalid_constraint", "verification.evidence"),
+            ("invalid_constraint", "verification.last_attempt_at"),
+            ("invalid_constraint", "verification.last_attempt_outcome"),
+            ("invalid_constraint", "verification.method"),
+            ("invalid_constraint", "verification.reviewed_by"),
+            ("invalid_constraint", "verification.source_checked_url"),
+        ]
+        self.assertEqual(codes(validate_record(listing)), expected)
+        self.assertEqual(codes(validate_active_feed(listing, EVAL)), expected)
+        self.assertEqual(codes(validate_historical(listing, EVAL)), expected)
+        self.assertNotIn("verification.reviewer_id", {field for _code, field in expected})
+
+        automation = load_name("valid-scholarship")
+        self.assertIsNone(automation["verification"]["reviewer_id"])
+        self.assertEqual(automation["verification"]["reviewed_by"], "automation")
+        self.assertEqual(validate_record(automation), [])
+        self.assertEqual(validate_active_feed(automation, EVAL), [])
+        self.assertEqual(validate_historical(automation, EVAL), [])
+
+        never = load_name("valid-scholarship")
+        never["verification"] = {
+            "state": "unverified",
+            "outcome": None,
+            "method": None,
+            "reviewed_by": None,
+            "reviewer_id": None,
+            "source_checked_url": None,
+            "evidence": None,
+            "last_attempt_at": None,
+            "last_attempt_outcome": None,
+            "last_success_at": None,
+            "fresh_until": None,
+        }
+        rehash(never)
+        self.assertEqual(validate_record(never), [])
+        self.assertEqual(validate_historical(never, EVAL), [])
+        self.assertEqual(
+            validate_active_feed(never, EVAL),
+            [stage3("not_verified", "verification.state")],
+        )
+
+    def test_unknown_education_tombstone_uses_withdrawn_wording(self):
+        def clear_unknown(listing, wording):
+            education = listing["eligibility"]["education"]
+            education["requirement"] = "unknown"
+            education["stages"] = []
+            education["qualifications"] = []
+            education["courses"] = []
+            education["years"] = []
+            education["institutions"] = {"requirement": "unknown", "names": []}
+            education["source_wording"] = wording
+            return listing
+
+        tombstone = clear_unknown(load_name("valid-tombstone"), "[withdrawn]")
+        self.assertIs(tombstone["eligibility"]["criteria_stated"], False)
+        self.assertEqual(tombstone["eligibility"]["criteria_text"], "[withdrawn]")
+        self.assertEqual(tombstone["lifecycle"]["publication_status"], "withdrawn")
+        rehash(tombstone)
+        self.assertEqual(tombstone["dedupe_key"], DIGESTS["valid-tombstone"][0])
+        self.assertEqual(validate_record(tombstone), [])
+        self.assertEqual(validate_historical(tombstone, EVAL), [])
+        self.assertEqual(
+            validate_active_feed(tombstone, EVAL),
+            [stage3("not_on_active_feed", "lifecycle.status")],
+        )
+
+        stated = clear_unknown(load_name("valid-tombstone"), "Not stated by the source.")
+        rehash(stated)
+        self.assertIn(
+            ("invalid_constraint", "eligibility.education.source_wording"),
+            codes(validate_record(stated)),
+        )
+
+        open_unknown = clear_unknown(load_name("valid-job"), "Not stated by the source.")
+        rehash(open_unknown)
+        self.assertEqual(validate_record(open_unknown), [])
+        self.assertEqual(validate_active_feed(open_unknown, EVAL), [])
+        self.assertEqual(validate_historical(open_unknown, EVAL), [])
+        withdrawn_sentence = clear_unknown(load_name("valid-job"), "[withdrawn]")
+        rehash(withdrawn_sentence)
+        self.assertIn(
+            ("invalid_constraint", "eligibility.education.source_wording"),
+            codes(validate_record(withdrawn_sentence)),
+        )
+
+        unrestricted = load_name("valid-tombstone")
+        education = unrestricted["eligibility"]["education"]
+        education["requirement"] = "unrestricted"
+        education["stages"] = []
+        education["qualifications"] = []
+        education["courses"] = []
+        education["years"] = []
+        education["institutions"] = {"requirement": "unrestricted", "names": []}
+        education["source_wording"] = "[withdrawn]"
+        rehash(unrestricted)
+        self.assertEqual(validate_record(unrestricted), [])
+        self.assertEqual(validate_historical(unrestricted, EVAL), [])
+
+    def test_http_status_line_is_not_evidence(self):
+        rejected = (
+            "200",
+            "404",
+            "HTTP 200",
+            "HTTP/1.1 200",
+            "HTTP/2 200",
+            "status 200",
+            "200 OK",
+            "HTTP/1.1 200 OK",
+            "Status 200",
+        )
+        for evidence in rejected:
+            listing = load_name("valid-scholarship")
+            listing["verification"]["evidence"] = evidence
+            rehash(listing)
+            self.assertEqual(
+                codes(validate_record(listing)),
+                [("invalid_constraint", "verification.evidence")],
+                evidence,
+            )
+        accepted = (
+            "The official programme page was read on 8 November 2026 and the form was open.",
+            "The official page returned HTTP 200 and the application form was open.",
+        )
+        for evidence in accepted:
+            listing = load_name("valid-scholarship")
+            listing["verification"]["evidence"] = evidence
+            rehash(listing)
+            self.assertEqual(validate_record(listing), [], evidence)
 
     def test_repeatable_immutable_and_offline(self):
         listing = load_name("valid-scholarship")

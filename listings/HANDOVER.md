@@ -122,8 +122,31 @@ No student match, onboarding, UI, scraper, migration, storage, revision store, r
 - The 730-day tombstone window is not enforced.
 - `schema_version` other than `1.0.0` is `invalid_constraint` on `schema_version`. `unsupported_schema_version` is the reader/sync code from section 19.
 - `confirmed_open` `source_checked_url` must equal `provider.url` or `application.url` when `url_kind` is `direct_application` or `official_programme_page`.
-- Evidence must be 1..2000 characters and not only an HTTP status. The validator does not judge whether the sentence names the page that was read.
+- Evidence must be 1..2000 characters. A string that is only an HTTP status line is rejected: a bare code, `HTTP` or `Status` plus a code, or that line plus a short alphabetic reason such as `OK`. A sentence that mentions a status is still accepted. This pattern does not decide whether the sentence truly names the page that was read.
+- A successful verification requires the attempt bundle (`method`, `reviewed_by`, `source_checked_url`, `evidence`, `last_attempt_at`, `last_attempt_outcome`). `reviewer_id` stays null for automation and is required only when `reviewed_by` is `human`. A never-verified row with no attempt stays valid as a record and on the historical feed.
+- Unknown education uses `Not stated by the source.` off a tombstone. On a tombstone the same requirement uses `[withdrawn]`, with the education arrays empty.
 - Country codes are the 249 assigned ISO 3166-1 alpha-2 codes embedded from iso-codes on this machine, plus `ZZ`. Citizenship lists do not accept `ZZ`.
 - `contact_email` is syntax only. A role mailbox cannot be distinguished from a personal one.
 - Audience tags and education wording are checked as metadata. Nothing infers a student match or converts CGPA across scales.
 - IANA conversion uses the machine tzdata. The pinned samples were measured with 2026e, which is what this run used.
+
+## Correction after lead review
+
+Commit `3f07678310b1d2a4b1106f6afc6dbe156d8cc183` was not accepted. Three measured defects were fixed on `rebuild/listings-validator`. The pin, vendored contract, fixtures, hash script, `hash-output.txt`, manifest, and lock were not edited. No pull request and no merge.
+
+New tests were run on that commit before the validator change:
+
+```text
+PYTHONDONTWRITEBYTECODE=1 python3 -m unittest \
+  listings.tests.test_listings_validator.ListingsValidatorTest.test_confirmed_open_requires_the_attempt_bundle \
+  listings.tests.test_listings_validator.ListingsValidatorTest.test_unknown_education_tombstone_uses_withdrawn_wording \
+  listings.tests.test_listings_validator.ListingsValidatorTest.test_http_status_line_is_not_evidence -v
+```
+
+Result: `Ran 3 tests` / `FAILED (failures=3)`.
+
+- All-null attempt fields on a verified `confirmed_open` scholarship, hash `511e03282b9437093e3f7e31ddfcb2380102a28d5d2fd0531052476fa1210e4c`, returned `[]` for record, active, and historical.
+- Unknown-education tombstone with `[withdrawn]` wording returned `invalid_constraint` on `eligibility.education.source_wording`.
+- Evidence `200 OK` returned `[]`.
+
+After the validator change the same three tests return `OK`, and the full suite is `Ran 20 tests` / `OK` on Python 3.12.3 and tzdata `version 2026e`. A temp-copy run of `compute_listing_hashes.py` still matches the vendored `hash-output.txt` (`python: 3.12.3`, `tzdata: version 2026e`). This correction is for lead recheck. It is not approval.
