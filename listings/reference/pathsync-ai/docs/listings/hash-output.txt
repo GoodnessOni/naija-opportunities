@@ -1,0 +1,84 @@
+synthetic: true
+not_production_data: true
+command: python3 docs/listings/compute_listing_hashes.py
+python: 3.12.3
+tzdata: version 2026e
+hash_excludes: content_hash
+hash_includes: dedupe_key and every other stored field, including JSON null
+collision_rule: same dedupe_key with a different listing_id is a duplicate of that round
+url_rule: application URL is not dedupe material and does not block a new round
+version_rule: same listing_id and revision with a different content_hash is revision_conflict
+self_check_null_vs_absent: null=d091f9c83c091f79652fe8786375b3fe4ce0861a56f5bfbafedbe431877ff0e8 absent=44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
+self_check_unicode_nfc: composed=86028b41ba792eaf82aa26a45b218f6734f7f1096a86f1746c8296e088a0ccb4
+self_check_array_order: GH before NG differs from NG before GH
+url_accept: https://apply.rivertrust.example/2027 ok
+url_accept: https://rivertrust.example ok
+url_accept: https://apply.rivertrust.example/Path?a=1&b=2 ok
+url_reject: http://apply.rivertrust.example/2027 scheme
+url_reject: https://user:pass@apply.rivertrust.example/2027 userinfo
+url_reject: https://apply.rivertrust.example/2027#form fragment
+url_reject: https://apply.rivertrust.example:443/2027 host
+url_reject: https://Apply.Rivertrust.example/2027 host
+url_reject: https://apply.rivertrust.example/2027/ path
+url_reject: https://localhost/2027 placeholder_host
+url_reject: https://example.com/2027 placeholder_host
+url_reject: https://apply.example.com/2027 placeholder_host
+url_reject: https://apply.rivertrust.example/2027?utm_source=x tracking_query
+url_reject: https://apply.rivertrust.example/2027?b=1&a=2 query_order
+url_reject: https://apply.rivertrust.example/2027?B=1 query_key
+url_reject: https://apply.rivertrust.example/2027?q=%2f query_value
+url_normalise_not_acceptance: input=https://Apply.River.Example/Path/?utm_source=x&b=2&a=1
+url_normalise_not_acceptance: input_accepted=no
+url_normalise_not_acceptance: output=https://apply.river.example/Path?a=1&b=2
+url_normalise_not_acceptance: output_accepted=yes
+self_check_identity: crockford listing_id accepted; I rejected
+self_check_round: same_round=65941874416207509e0b39022e94b84e6ac4b780cf92d6c45d356db44934eda4
+self_check_new_round: next_round=9c2f233946856cda8a68c3429c69b3d5d89a532240fc438f6923b89c104e5682
+self_check_url_not_in_dedupe: application URL is not dedupe material
+fixture: docs/listings/fixtures/valid-scholarship.json
+listing_id: lst_01ARZ3NDEKTSV4RRFFQ69G5FAV
+kind: scholarship
+revision: 1
+dedupe_key: f18f8da3972c4d1932d54f31f674ec259d4b939fb38b184876341d978895e96f
+content_hash: 64b7f2a8104bb0600312e75af20769ea4d78e47250f8c19396e9fce585680653
+deadline_fixed_at: 2027-03-31T22:59:59Z
+assert: match
+fixture: docs/listings/fixtures/valid-internship.json
+listing_id: lst_01ARZ3NDEKTSV4RRFFQ69G5FAW
+kind: internship
+revision: 1
+dedupe_key: 695c935abed9b17a0774037c5c74101395f73462836a7116d69040237f73a58c
+content_hash: 3fbfadf0f3208ac0591f3c91b4e9103705d9e4e25041870a8f139432ea8065a1
+deadline_fixed_at: n/a
+assert: match
+fixture: docs/listings/fixtures/valid-job.json
+listing_id: lst_01ARZ3NDEKTSV4RRFFQ69G5FAX
+kind: job
+revision: 1
+dedupe_key: 2803f370604f5557da4817c2197a5035d9ee966a99f5bfbfb7ef6e52bee73c41
+content_hash: 7b0feda2e51ec39b8a18ff91b0e9f2081114b9896bead2309c02dbdf0748b537
+deadline_fixed_at: n/a
+assert: match
+fixture: docs/listings/fixtures/valid-historical-expired.json
+listing_id: lst_01ARZ3NDEKTSV4RRFFQ69G5FAY
+kind: scholarship
+revision: 2
+dedupe_key: 65941874416207509e0b39022e94b84e6ac4b780cf92d6c45d356db44934eda4
+content_hash: 1a9c667969f8fc7a83776750d01cab23243c7dc8994435a9e6174285bc225044
+deadline_fixed_at: 2026-10-31T23:59:59Z
+assert: match
+fixture: docs/listings/fixtures/valid-tombstone.json
+listing_id: lst_01ARZ3NDEKTSV4RRFFQ69G5FB3
+kind: scholarship
+revision: 2
+dedupe_key: 7eb7658492e0e678f476dcc16e5830feb49afc1e13ee480b6d218f07f2d4d6a3
+content_hash: 6a664c2050a125fbee1e56590467fd3d48d48c9963ed3f121c60a35ca57ab9ab
+deadline_fixed_at: 2027-03-31T22:59:59Z
+assert: match
+oracle: date_only_no_zone stated=none resolved=Africa/Lagos local=2027-03-31T23:59:59 fixed_at=2027-03-31T22:59:59Z
+oracle: date_only_europe_london stated=Europe/London resolved=Europe/London local=2026-10-31T23:59:59 fixed_at=2026-10-31T23:59:59Z
+oracle: date_only_wat_default_check stated=none resolved=Africa/Lagos local=2026-01-15T23:59:59 fixed_at=2026-01-15T22:59:59Z
+oracle: instant_europe_paris stated=Europe/Paris resolved=Europe/Paris local=2027-06-01T15:00:00 fixed_at=2027-06-01T13:00:00Z
+oracle_freshness: success=2026-11-08T09:00:00Z fresh_until=2026-11-15T09:00:00Z still_active_at=2026-11-15T09:00:00Z stale_at=2026-11-15T09:00:01Z
+fixtures_checked: 5
+result: ok

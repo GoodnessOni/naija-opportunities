@@ -1,0 +1,137 @@
+{
+  "schema_version": "1.0.0",
+  "listing_id": "lst_01ARZ3NDEKTSV4RRFFQ69G5FB2",
+  "kind": "scholarship",
+  "synthetic": true,
+  "revision": 1,
+  "title": "River Trust Bridge Award 2026",
+  "summary": "Synthetic award still marked open after its deadline. Validators must reject it on the active feed.",
+  "description": "A fictional award whose closing instant has passed while lifecycle.status is still open. This is the active-feed rejection case. It is synthetic.",
+  "provider": {
+    "name": "River Trust",
+    "type": "foundation",
+    "country": "NG",
+    "url": "https://rivertrust.example"
+  },
+  "source": {
+    "name": "synthetic-directory",
+    "kind": "aggregator",
+    "url": "https://directory.example/listings/river-trust-bridge-2026-open",
+    "retrieved_at": "2026-11-08T09:00:00Z"
+  },
+  "application": {
+    "url": "https://apply.rivertrust.example/bridge-2026-open",
+    "url_kind": "official_programme_page",
+    "contact_email": null
+  },
+  "eligibility": {
+    "audience_tags": [
+      "nigerian_university_student"
+    ],
+    "criteria_stated": true,
+    "criteria_text": "Nigerian citizen. Undergraduate in 200, 300, or 400 level. Engineering or computer science. Minimum CGPA 3.50 on a 5.0 scale.",
+    "citizenship": {
+      "requirement": "explicit",
+      "countries": [
+        "NG"
+      ]
+    },
+    "education": {
+      "requirement": "restricted",
+      "stages": [
+        "undergraduate"
+      ],
+      "qualifications": [
+        "bachelor"
+      ],
+      "courses": [
+        "computer_science",
+        "engineering"
+      ],
+      "years": [
+        "200",
+        "300",
+        "400"
+      ],
+      "institutions": {
+        "requirement": "unrestricted",
+        "names": []
+      },
+      "source_wording": "Nigerian citizen. Undergraduate in 200, 300, or 400 level. Engineering or computer science. Minimum CGPA 3.50 on a 5.0 scale."
+    },
+    "grade": {
+      "requirement": "explicit",
+      "scale": "5.0",
+      "minimum_hundredths": 350,
+      "source_wording": "Minimum CGPA 3.50 on a 5.0 scale."
+    },
+    "demographics": {
+      "requirements": [],
+      "preferences": []
+    }
+  },
+  "deadline": {
+    "kind": "fixed",
+    "form": "date_only",
+    "stated_timezone": null,
+    "resolved_timezone": "Africa/Lagos",
+    "display_date": "2026-01-15",
+    "local_time": "23:59:59",
+    "boundary": "inclusive_end_of_local_day",
+    "fixed_at": "2026-01-15T22:59:59Z",
+    "raw_text": "Closes 15 January 2026."
+  },
+  "award": {
+    "kind": "cash",
+    "summary": "200000 NGN for one academic year.",
+    "currency": "NGN",
+    "amount_minor": 20000000,
+    "period": "per_year"
+  },
+  "location": {
+    "country": "NG",
+    "locality": null,
+    "arrangement": "on_site"
+  },
+  "employment": null,
+  "documents_required": [
+    "CGPA transcript",
+    "University ID"
+  ],
+  "how_to_apply": "Submit the synthetic form on the programme page.",
+  "lifecycle": {
+    "publication_status": "published",
+    "status": "open",
+    "closed_reason": null
+  },
+  "verification": {
+    "state": "verified",
+    "outcome": "confirmed_open",
+    "method": "automated_review",
+    "reviewed_by": "automation",
+    "reviewer_id": null,
+    "source_checked_url": "https://apply.rivertrust.example/bridge-2026-open",
+    "evidence": "Official provider page checked for open status, deadline, eligibility, and the application link. This is not an HTTP status alone.",
+    "last_attempt_at": "2026-11-08T09:00:00Z",
+    "last_attempt_outcome": "confirmed_open",
+    "last_success_at": "2026-11-08T09:00:00Z",
+    "fresh_until": "2026-11-15T09:00:00Z"
+  },
+  "timestamps": {
+    "created_at": "2026-10-01T08:00:00Z",
+    "updated_at": "2026-11-08T09:00:00Z",
+    "published_at": "2026-10-01T08:00:00Z",
+    "expired_at": null,
+    "closed_at": null,
+    "withdrawn_at": null
+  },
+  "dedupe_key": "16628e74dcf38ae0cda6ad4165bfe68e4b9dfa26983cb0781b93485ef6aa49bb",
+  "content_hash": "410fe92ecc5237623ac290f2ba4dbb1bf895fc8c13fbc1d1532ae1f13cd5e0ab",
+  "identity": {
+    "provider_key": "river-trust",
+    "opportunity_key": "bridge-award-open-counterexample",
+    "round_key": "2026",
+    "round_evidence": "Synthetic counterexample of a 2026 round left open after the deadline."
+  },
+  "previous_round_id": null
+}

@@ -1,0 +1,137 @@
+{
+  "schema_version": "1.0.0",
+  "listing_id": "lst_01ARZ3NDEKTSV4RRFFQ69G5FAY",
+  "kind": "scholarship",
+  "synthetic": true,
+  "revision": 2,
+  "title": "River Trust Bridge Award 2026",
+  "summary": "Synthetic award retained after its deadline for history. It is not open.",
+  "description": "A fictional award whose closing date has passed. The source names the United Kingdom, so the deadline uses Europe/London rather than West Africa Time. The producer keeps the record and marks it expired. This record is synthetic.",
+  "provider": {
+    "name": "River Trust",
+    "type": "foundation",
+    "country": "NG",
+    "url": "https://rivertrust.example"
+  },
+  "source": {
+    "name": "synthetic-directory",
+    "kind": "aggregator",
+    "url": "https://directory.example/listings/river-trust-bridge-2026",
+    "retrieved_at": "2026-11-01T00:00:00Z"
+  },
+  "application": {
+    "url": "https://apply.rivertrust.example/bridge-2026",
+    "url_kind": "official_programme_page",
+    "contact_email": null
+  },
+  "eligibility": {
+    "audience_tags": [
+      "nigerian_university_student"
+    ],
+    "criteria_stated": true,
+    "criteria_text": "Nigerian citizen. Undergraduate in 200, 300, or 400 level. Engineering or computer science. Minimum CGPA 3.50 on a 5.0 scale.",
+    "citizenship": {
+      "requirement": "explicit",
+      "countries": [
+        "NG"
+      ]
+    },
+    "education": {
+      "requirement": "restricted",
+      "stages": [
+        "undergraduate"
+      ],
+      "qualifications": [
+        "bachelor"
+      ],
+      "courses": [
+        "computer_science",
+        "engineering"
+      ],
+      "years": [
+        "200",
+        "300",
+        "400"
+      ],
+      "institutions": {
+        "requirement": "unrestricted",
+        "names": []
+      },
+      "source_wording": "Nigerian citizen. Undergraduate in 200, 300, or 400 level. Engineering or computer science. Minimum CGPA 3.50 on a 5.0 scale."
+    },
+    "grade": {
+      "requirement": "explicit",
+      "scale": "5.0",
+      "minimum_hundredths": 350,
+      "source_wording": "Minimum CGPA 3.50 on a 5.0 scale."
+    },
+    "demographics": {
+      "requirements": [],
+      "preferences": []
+    }
+  },
+  "deadline": {
+    "kind": "fixed",
+    "form": "date_only",
+    "stated_timezone": "Europe/London",
+    "resolved_timezone": "Europe/London",
+    "display_date": "2026-10-31",
+    "local_time": "23:59:59",
+    "boundary": "inclusive_end_of_local_day",
+    "fixed_at": "2026-10-31T23:59:59Z",
+    "raw_text": "Closes 31 October 2026 (United Kingdom)."
+  },
+  "award": {
+    "kind": "cash",
+    "summary": "200000 NGN for one academic year.",
+    "currency": "NGN",
+    "amount_minor": 20000000,
+    "period": "per_year"
+  },
+  "location": {
+    "country": "NG",
+    "locality": null,
+    "arrangement": "on_site"
+  },
+  "employment": null,
+  "documents_required": [
+    "CGPA transcript",
+    "University ID"
+  ],
+  "how_to_apply": "Submit the synthetic form on the programme page.",
+  "lifecycle": {
+    "publication_status": "published",
+    "status": "expired",
+    "closed_reason": "deadline_passed"
+  },
+  "verification": {
+    "state": "verified",
+    "outcome": "confirmed_expired",
+    "method": "automated_review",
+    "reviewed_by": "automation",
+    "reviewer_id": null,
+    "source_checked_url": "https://apply.rivertrust.example/bridge-2026",
+    "evidence": "Official provider page shows the deadline has passed. Open status, deadline, eligibility, and the application link were checked. This is not an HTTP status alone.",
+    "last_attempt_at": "2026-11-01T00:00:00Z",
+    "last_attempt_outcome": "confirmed_expired",
+    "last_success_at": "2026-11-01T00:00:00Z",
+    "fresh_until": "2026-11-08T00:00:00Z"
+  },
+  "timestamps": {
+    "created_at": "2026-09-01T08:00:00Z",
+    "updated_at": "2026-11-01T00:00:00Z",
+    "published_at": "2026-09-01T08:00:00Z",
+    "expired_at": "2026-11-01T00:00:00Z",
+    "closed_at": null,
+    "withdrawn_at": null
+  },
+  "dedupe_key": "65941874416207509e0b39022e94b84e6ac4b780cf92d6c45d356db44934eda4",
+  "content_hash": "1a9c667969f8fc7a83776750d01cab23243c7dc8994435a9e6174285bc225044",
+  "identity": {
+    "provider_key": "river-trust",
+    "opportunity_key": "bridge-award",
+    "round_key": "2026",
+    "round_evidence": "The source names the 2026 United Kingdom round."
+  },
+  "previous_round_id": null
+}

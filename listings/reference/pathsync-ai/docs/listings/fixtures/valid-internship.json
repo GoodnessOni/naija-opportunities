@@ -1,0 +1,139 @@
+{
+  "schema_version": "1.0.0",
+  "listing_id": "lst_01ARZ3NDEKTSV4RRFFQ69G5FAW",
+  "kind": "internship",
+  "synthetic": true,
+  "revision": 1,
+  "title": "River Trust Campus Internship 2027",
+  "summary": "Synthetic 12-week paid internship for Nigerian university students in computer science.",
+  "description": "A fictional Lagos host offers a 12-week paid internship. Applications stay open on a rolling basis. This record is synthetic and is not a real internship.",
+  "provider": {
+    "name": "River Trust",
+    "type": "foundation",
+    "country": "NG",
+    "url": "https://rivertrust.example"
+  },
+  "source": {
+    "name": "synthetic-directory",
+    "kind": "aggregator",
+    "url": "https://directory.example/listings/river-trust-intern-2027",
+    "retrieved_at": "2026-11-08T09:00:00Z"
+  },
+  "application": {
+    "url": "https://apply.rivertrust.example/interns/2027",
+    "url_kind": "official_programme_page",
+    "contact_email": null
+  },
+  "eligibility": {
+    "audience_tags": [
+      "nigerian_university_student",
+      "open_international"
+    ],
+    "criteria_stated": true,
+    "criteria_text": "Open to university students in computer science. No nationality limit and no minimum CGPA are stated.",
+    "citizenship": {
+      "requirement": "unconstrained",
+      "countries": [
+        "*"
+      ]
+    },
+    "education": {
+      "requirement": "restricted",
+      "stages": [
+        "postgraduate",
+        "undergraduate"
+      ],
+      "qualifications": [
+        "bachelor",
+        "master"
+      ],
+      "courses": [
+        "computer_science"
+      ],
+      "years": [],
+      "institutions": {
+        "requirement": "unrestricted",
+        "names": []
+      },
+      "source_wording": "Open to university students in computer science. No nationality limit and no minimum CGPA are stated."
+    },
+    "grade": {
+      "requirement": "none",
+      "scale": null,
+      "minimum_hundredths": null,
+      "source_wording": "The source states no minimum grade."
+    },
+    "demographics": {
+      "requirements": [],
+      "preferences": []
+    }
+  },
+  "deadline": {
+    "kind": "rolling",
+    "form": null,
+    "stated_timezone": null,
+    "resolved_timezone": null,
+    "display_date": null,
+    "local_time": null,
+    "boundary": null,
+    "fixed_at": null,
+    "raw_text": "Applications are accepted on a rolling basis until positions are filled."
+  },
+  "award": {
+    "kind": "stipend",
+    "summary": "150000 NGN per month.",
+    "currency": "NGN",
+    "amount_minor": 15000000,
+    "period": "per_month"
+  },
+  "location": {
+    "country": "NG",
+    "locality": "Lagos",
+    "arrangement": "hybrid"
+  },
+  "employment": {
+    "employment_type": "internship",
+    "duration_text": "12 weeks",
+    "paid": true
+  },
+  "documents_required": [
+    "CV",
+    "University ID"
+  ],
+  "how_to_apply": "Submit the synthetic internship form on the programme page.",
+  "lifecycle": {
+    "publication_status": "published",
+    "status": "open",
+    "closed_reason": null
+  },
+  "verification": {
+    "state": "verified",
+    "outcome": "confirmed_open",
+    "method": "automated_review",
+    "reviewed_by": "automation",
+    "reviewer_id": null,
+    "source_checked_url": "https://apply.rivertrust.example/interns/2027",
+    "evidence": "Official provider page checked for open status, deadline, eligibility, and the application link. This is not an HTTP status alone.",
+    "last_attempt_at": "2026-11-08T09:00:00Z",
+    "last_attempt_outcome": "confirmed_open",
+    "last_success_at": "2026-11-08T09:00:00Z",
+    "fresh_until": "2026-11-15T09:00:00Z"
+  },
+  "timestamps": {
+    "created_at": "2026-10-01T08:00:00Z",
+    "updated_at": "2026-11-08T09:00:00Z",
+    "published_at": "2026-10-01T08:00:00Z",
+    "expired_at": null,
+    "closed_at": null,
+    "withdrawn_at": null
+  },
+  "dedupe_key": "695c935abed9b17a0774037c5c74101395f73462836a7116d69040237f73a58c",
+  "content_hash": "3fbfadf0f3208ac0591f3c91b4e9103705d9e4e25041870a8f139432ea8065a1",
+  "identity": {
+    "provider_key": "river-trust",
+    "opportunity_key": "campus-internship",
+    "round_key": "2027",
+    "round_evidence": "The source names the 2027 internship."
+  },
+  "previous_round_id": null
+}

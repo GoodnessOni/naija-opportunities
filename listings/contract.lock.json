@@ -1,0 +1,6 @@
+{
+  "consumer_repository": "GoodnessOni/pathsync-ai",
+  "contract_path": "docs/data-contract.md",
+  "git_sha": "b50440dc738d86ff3070386d8709b8faf2bc5982",
+  "schema_version": "1.0.0"
+}

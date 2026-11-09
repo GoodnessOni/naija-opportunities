@@ -1,0 +1,92 @@
+{
+  "consumer_repository": "GoodnessOni/pathsync-ai",
+  "contract_path": "docs/data-contract.md",
+  "git_sha": "b50440dc738d86ff3070386d8709b8faf2bc5982",
+  "schema_version": "1.0.0",
+  "schema_name": "ogverse.listings",
+  "role": "reference-only byte copy of the pinned upstream files. Not an editable contract fork. Tests must not fetch this pin.",
+  "files": [
+    {
+      "upstream_path": "docs/data-contract.md",
+      "vendored_path": "listings/reference/pathsync-ai/docs/data-contract.md",
+      "git_blob_sha": "cdd2f52b39e2cb9b92d1139c51b0d9bcf7a2ad83",
+      "sha256": "009ae7d6f1cea0cc7bef3b8533bf26f68a2e14ac4094fa00987246b6ad6847be",
+      "size_bytes": 130990
+    },
+    {
+      "upstream_path": "docs/listings/compute_listing_hashes.py",
+      "vendored_path": "listings/reference/pathsync-ai/docs/listings/compute_listing_hashes.py",
+      "git_blob_sha": "40f852838b09d2c21a5b65b7614c113f7fb8d4a4",
+      "sha256": "9fffc26cc10fa7c09841eba52d5bd4db24a2e309ddc026d8cfa4f894be1b99ab",
+      "size_bytes": 21479
+    },
+    {
+      "upstream_path": "docs/listings/hash-output.txt",
+      "vendored_path": "listings/reference/pathsync-ai/docs/listings/hash-output.txt",
+      "git_blob_sha": "c11a359c383f5a5ef91614a7adadb16d94a3f294",
+      "sha256": "bfd25d0fbd46ea2e866ff4183cb1fd1d88d753d2c15c7d755cf24c484b3b38e1",
+      "size_bytes": 4707
+    },
+    {
+      "upstream_path": "docs/listings/fixtures/valid-historical-expired.json",
+      "vendored_path": "listings/reference/pathsync-ai/docs/listings/fixtures/valid-historical-expired.json",
+      "git_blob_sha": "6bcd1d8ab82cab8f2e9f36e713547abae0cc4125",
+      "sha256": "da6367bdfa4e2d9dc9b9bca53eea5fb4de17c99695a161d9f82a0fe2a899f9ca",
+      "size_bytes": 4349
+    },
+    {
+      "upstream_path": "docs/listings/fixtures/valid-internship.json",
+      "vendored_path": "listings/reference/pathsync-ai/docs/listings/fixtures/valid-internship.json",
+      "git_blob_sha": "a8082a8e5038c15337213e23fbc3dc096acecade",
+      "sha256": "bed5eb1e18d11eb72ff33d7c75bc8a334bdc0f05fed2c079beac2824030949dd",
+      "size_bytes": 4198
+    },
+    {
+      "upstream_path": "docs/listings/fixtures/valid-job.json",
+      "vendored_path": "listings/reference/pathsync-ai/docs/listings/fixtures/valid-job.json",
+      "git_blob_sha": "fc0d479ae006b12fe21a4f831c778ec6abe2e420",
+      "sha256": "d76ffa4817307b891bd02f607dbf5a9e3fc1d7d119625625e47c601faa5115e4",
+      "size_bytes": 3651
+    },
+    {
+      "upstream_path": "docs/listings/fixtures/valid-scholarship.json",
+      "vendored_path": "listings/reference/pathsync-ai/docs/listings/fixtures/valid-scholarship.json",
+      "git_blob_sha": "3d3fdb1ffe284fbfed6e73c702a711130aeddf97",
+      "sha256": "f7e77a10252485bd5d5cdb029dff1c87ffdea7afc926e14b61e5eac5b123202e",
+      "size_bytes": 4211
+    },
+    {
+      "upstream_path": "docs/listings/fixtures/valid-tombstone.json",
+      "vendored_path": "listings/reference/pathsync-ai/docs/listings/fixtures/valid-tombstone.json",
+      "git_blob_sha": "af9a79d06397b8c1a95f2731bc8f11627662fea6",
+      "sha256": "1e621581afd50d28414e9ab5b7bf3ef7b95906917ce7226b419d0e00b162955e",
+      "size_bytes": 3721
+    }
+  ],
+  "section_21_negative_samples": [
+    {
+      "sample": "invalid-missing-title",
+      "extracted_path": "listings/tests/fixtures/invalid-missing-title.json",
+      "extracted_from": "docs/data-contract.md",
+      "section": "21",
+      "sha256": "6995b3096ae9bab3a5082ce384e768179233474fe7993e409bcd589624945748",
+      "size_bytes": 4148
+    },
+    {
+      "sample": "invalid-revision-type",
+      "extracted_path": "listings/tests/fixtures/invalid-revision-type.json",
+      "extracted_from": "docs/data-contract.md",
+      "section": "21",
+      "sha256": "66a8071a52f7458ea765d7cbf9dc6d6017b5ab145036e90c5b4fd709bc3f8715",
+      "size_bytes": 4213
+    },
+    {
+      "sample": "invalid-expired-open",
+      "extracted_path": "listings/tests/fixtures/invalid-expired-open.json",
+      "extracted_from": "docs/data-contract.md",
+      "section": "21",
+      "sha256": "9e58ff1e8e3908a6b3ba4afac97832a9552af18f05f2038ad71405360d600fae",
+      "size_bytes": 4250
+    }
+  ]
+}

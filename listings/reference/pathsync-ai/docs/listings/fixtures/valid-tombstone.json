@@ -1,0 +1,134 @@
+{
+  "schema_version": "1.0.0",
+  "listing_id": "lst_01ARZ3NDEKTSV4RRFFQ69G5FB3",
+  "kind": "scholarship",
+  "synthetic": true,
+  "revision": 2,
+  "title": "River Trust Withdrawn Example 2027",
+  "summary": "[withdrawn]",
+  "description": "[withdrawn]",
+  "provider": {
+    "name": "River Trust",
+    "type": "foundation",
+    "country": "NG",
+    "url": "https://rivertrust.example"
+  },
+  "source": {
+    "name": "synthetic-directory",
+    "kind": "aggregator",
+    "url": "https://directory.example/listings/river-trust-withdrawn-2027",
+    "retrieved_at": "2026-11-08T09:00:00Z"
+  },
+  "application": {
+    "url": "https://apply.rivertrust.example/withdrawn-2027",
+    "url_kind": "official_programme_page",
+    "contact_email": null
+  },
+  "eligibility": {
+    "audience_tags": [
+      "nigerian_university_student"
+    ],
+    "criteria_stated": false,
+    "criteria_text": "[withdrawn]",
+    "citizenship": {
+      "requirement": "explicit",
+      "countries": [
+        "NG"
+      ]
+    },
+    "education": {
+      "requirement": "restricted",
+      "stages": [
+        "undergraduate"
+      ],
+      "qualifications": [
+        "bachelor"
+      ],
+      "courses": [
+        "computer_science",
+        "engineering"
+      ],
+      "years": [
+        "200",
+        "300",
+        "400"
+      ],
+      "institutions": {
+        "requirement": "unrestricted",
+        "names": []
+      },
+      "source_wording": "[withdrawn]"
+    },
+    "grade": {
+      "requirement": "explicit",
+      "scale": "5.0",
+      "minimum_hundredths": 350,
+      "source_wording": "Minimum CGPA 3.50 on a 5.0 scale."
+    },
+    "demographics": {
+      "requirements": [],
+      "preferences": []
+    }
+  },
+  "deadline": {
+    "kind": "fixed",
+    "form": "date_only",
+    "stated_timezone": null,
+    "resolved_timezone": "Africa/Lagos",
+    "display_date": "2027-03-31",
+    "local_time": "23:59:59",
+    "boundary": "inclusive_end_of_local_day",
+    "fixed_at": "2027-03-31T22:59:59Z",
+    "raw_text": "Closes 31 March 2027."
+  },
+  "award": {
+    "kind": "not_stated",
+    "summary": null,
+    "currency": null,
+    "amount_minor": null,
+    "period": null
+  },
+  "location": {
+    "country": "NG",
+    "locality": null,
+    "arrangement": "on_site"
+  },
+  "employment": null,
+  "documents_required": [],
+  "how_to_apply": "[withdrawn]",
+  "lifecycle": {
+    "publication_status": "withdrawn",
+    "status": "closed",
+    "closed_reason": "removed_by_producer"
+  },
+  "verification": {
+    "state": "verified",
+    "outcome": "confirmed_withdrawn",
+    "method": "human_review",
+    "reviewed_by": "human",
+    "reviewer_id": "editor-synthetic-01",
+    "source_checked_url": "https://apply.rivertrust.example/withdrawn-2027",
+    "evidence": "Official provider page says this round was withdrawn. Open status, deadline, eligibility, and the application link were checked. This is not an HTTP status alone.",
+    "last_attempt_at": "2026-11-08T10:00:00Z",
+    "last_attempt_outcome": "confirmed_withdrawn",
+    "last_success_at": "2026-11-08T10:00:00Z",
+    "fresh_until": "2026-11-15T10:00:00Z"
+  },
+  "timestamps": {
+    "created_at": "2026-10-01T08:00:00Z",
+    "updated_at": "2026-11-08T10:00:00Z",
+    "published_at": "2026-10-01T08:00:00Z",
+    "expired_at": null,
+    "closed_at": null,
+    "withdrawn_at": "2026-11-08T10:00:00Z"
+  },
+  "dedupe_key": "7eb7658492e0e678f476dcc16e5830feb49afc1e13ee480b6d218f07f2d4d6a3",
+  "content_hash": "6a664c2050a125fbee1e56590467fd3d48d48c9963ed3f121c60a35ca57ab9ab",
+  "identity": {
+    "provider_key": "river-trust",
+    "opportunity_key": "withdrawn-example",
+    "round_key": "2027",
+    "round_evidence": "The source names the 2027 example round."
+  },
+  "previous_round_id": null
+}
