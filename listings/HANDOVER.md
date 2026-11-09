@@ -317,3 +317,56 @@ PYTHONDONTWRITEBYTECODE=1 python3 -m unittest listings.tests.test_listings_valid
 - Publication is not implemented. Resolving an item does not write a listing feed or call decide_attempt.
 
 This appendix does not say the queue, gate, or validator is approved, released, or production-complete.
+
+
+## Active feed publish
+
+This card adds one offline pure-Python step that builds the active feed PathSync will read. It is evidence for review. It is not lead approval, not a release, and not a production-complete claim. No merge, no pull request, and no deploy.
+
+`build_active_feed(records, decisions, now)` in `listings/publish.py` takes listing records, a map of `listing_id` to the latest `AttemptDecision`, and a timezone-aware `now`. A record is included only when that decision `permitted` is true, `now` is still inside the seven-day window on `verification.fresh_until` (equality stays active; the next second is stale), and a fixed deadline has not passed. Ambiguous, failed, missing, and stale decisions, and expired deadlines, are excluded with reasons. Every included row is checked with `validate_active_feed`; any failure raises `ActiveFeedError`. No network, database, or file write.
+
+Owner rule: automated and human verification use the same seven-day (168-hour) window already enforced by the validator and gate.
+
+### Commands and results
+
+From the repository root:
+
+```text
+PYTHONDONTWRITEBYTECODE=1 python3 -m unittest listings.tests.test_publish -v
+```
+
+`Ran 8 tests` / `OK`.
+
+```text
+PYTHONDONTWRITEBYTECODE=1 python3 -m unittest listings.tests.test_review_queue -v
+```
+
+`Ran 7 tests` / `OK`.
+
+```text
+PYTHONDONTWRITEBYTECODE=1 python3 -m unittest listings.tests.test_verification_gate -v
+```
+
+`Ran 11 tests` / `OK`.
+
+```text
+PYTHONDONTWRITEBYTECODE=1 python3 -m unittest listings.tests.test_listings_validator -v
+```
+
+`Ran 23 tests` / `OK`.
+
+Together: `Ran 49 tests` / `OK` on Python 3.12.3 and tzdata `version 2026e`. The validator, gate, and review-queue modules were not edited.
+
+### Changed paths
+
+- `listings/publish.py` (new)
+- `listings/tests/test_publish.py` (new)
+- `listings/HANDOVER.md` (this appendix only)
+
+### Known limitations
+
+- Caller trust is not implemented. Decisions and records are supplied by the producer caller.
+- Storage and sync are not implemented. This function does not write a feed file or call a network API.
+- Decision history is not implemented. The caller supplies the latest AttemptDecision per listing_id.
+
+This appendix does not say the publish step, queue, gate, or validator is approved, released, or production-complete.
