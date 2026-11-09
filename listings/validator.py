@@ -77,10 +77,12 @@ def _build_http_reason_phrases():
 
 _HTTP_REASON_PHRASES = _build_http_reason_phrases()
 # A whole line that starts with an HTTP version or a Status label. The reason
-# phrase may be any text for that line. A . ! or ? before more text is a
-# second sentence, so the string is not the status line alone.
+# phrase may be any text for that line. A missing space after Status: or
+# between the code and the reason is still that line. A . ! or ? before more
+# text is a second sentence, so the string is not the status line alone.
 _EXPLICIT_STATUS_LINE = re.compile(
-    r"(?:HTTP(?:/[0-9]+(?:\.[0-9]+)?)?|status):?\s+[1-5][0-9]{2}(?:\s+[^!?.]+)?",
+    r"(?:HTTP(?:/[0-9]+(?:\.[0-9]+)?)?\s+|status(?::\s*|\s+))"
+    r"[1-5][0-9]{2}(?:\s*[^!?.]+)?",
     re.IGNORECASE,
 )
 

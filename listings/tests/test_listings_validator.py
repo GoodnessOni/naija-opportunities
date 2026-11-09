@@ -17,7 +17,7 @@ Tests do not fetch that pin. Evaluation time is an argument.
 | 11 student match | test_eligibility_metadata_is_not_matching |
 | 12.1 URL acceptance | test_url_acceptance_oracles_do_not_rewrite |
 | 12.2 normalisation | test_normalise_url_is_not_part_of_validation |
-| 13 verification and freshness | test_freshness_failed_attempt_human_and_never_verified, test_confirmed_open_requires_the_attempt_bundle, test_http_status_line_is_not_evidence, test_every_known_http_status_line_is_rejected, test_explicit_status_line_rejects_custom_reason |
+| 13 verification and freshness | test_freshness_failed_attempt_human_and_never_verified, test_confirmed_open_requires_the_attempt_bundle, test_http_status_line_is_not_evidence, test_every_known_http_status_line_is_rejected, test_explicit_status_line_rejects_custom_reason, test_explicit_status_line_missing_space |
 | 14 active and historical modes | test_valid_modes_and_negative_samples, test_historical_mismatch_and_short_circuit |
 | 15 identity and tombstone | test_identity_url_is_not_dedupe, test_award_employment_and_lifecycle_pairs, test_unknown_education_tombstone_uses_withdrawn_wording |
 | 16 digests | test_measured_digests_nfc_null_order_and_mismatch |
@@ -146,6 +146,7 @@ SECTION_TO_TESTS = {
         "test_http_status_line_is_not_evidence",
         "test_every_known_http_status_line_is_rejected",
         "test_explicit_status_line_rejects_custom_reason",
+        "test_explicit_status_line_missing_space",
     ],
     "14": [
         "test_valid_modes_and_negative_samples",
@@ -1326,6 +1327,54 @@ class ListingsValidatorTest(unittest.TestCase):
             listing["verification"]["evidence"] = evidence
             rehash(listing)
             self.assertEqual(validate_record(listing), [], evidence)
+
+    def test_explicit_status_line_missing_space(self):
+        """Explicit HTTP or Status lines stay status-only when one space is missing.
+
+        The spaced twins are the same lines. Number-led prose and a sentence
+        after the status line are not status-only.
+        """
+        rejected = (
+            "Status:200 Fine",
+            "HTTP/1.1 200Fine",
+            "Status:200Fine",
+            "status:200 fine.",
+            "HTTP/1.1 200Fine.",
+        )
+        spaced = (
+            "Status: 200 Fine",
+            "HTTP/1.1 200 Fine",
+        )
+        evidence_error = [("invalid_constraint", "verification.evidence")]
+        missed = []
+        for name in VALID:
+            for evidence in rejected + spaced:
+                listing = load_name(name)
+                listing["verification"]["evidence"] = evidence
+                rehash(listing)
+                for result in (
+                    validate_record(listing),
+                    validate_active_feed(listing, EVAL),
+                    validate_historical(listing, EVAL),
+                ):
+                    if codes(result) != evidence_error:
+                        missed.append((name, evidence, codes(result)))
+        self.assertEqual(missed, [])
+        accepted = (
+            "200 level students only",
+            "200 students were admitted",
+            "200 OK. The form was open.",
+            "HTTP/1.1 200 Fine. The form was open.",
+            "HTTP/1.1 200Fine. The form was open.",
+            "The official page returned HTTP 200 and the application form was open.",
+        )
+        for evidence in accepted:
+            listing = load_name("valid-scholarship")
+            listing["verification"]["evidence"] = evidence
+            rehash(listing)
+            self.assertEqual(validate_record(listing), [], evidence)
+            self.assertEqual(validate_active_feed(listing, EVAL), [], evidence)
+            self.assertEqual(validate_historical(listing, EVAL), [], evidence)
 
     def test_repeatable_immutable_and_offline(self):
         listing = load_name("valid-scholarship")
