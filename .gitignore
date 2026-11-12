@@ -43,3 +43,6 @@ next-env.d.ts
 # python
 scraper/venv/
 scraper/__pycache__/
+scraper/scrape-output.json
+scraper/.pytest_cache/
+scraper/tests/__pycache__/
