@@ -91,3 +91,22 @@ access denial, duplicate submission handling, draft invisibility, the
 staff audit insert, optimistic revision conflicts, and public visibility
 after approval. A real staging project is still needed to exercise
 GoTrue sign-in, PostgREST, staff provisioning, and deployment credentials.
+
+## Scheduled freshness queue
+
+After applying `005_rechecks.sql`, run `node --env-file=.env.local scripts/enqueue-rechecks.mjs`
+from `app-v2` using staging credentials. Schedule the same command every six
+hours once staging has passed. It records due listings in a database queue
+without changing freshness. A retry is idempotent for each listing revision.
+An open or closed staff confirmation clears the queued item. The worker does
+not fetch provider pages yet, so all successful checks still require a
+reviewer to confirm the official-source facts.
+
+## Source discovery
+
+Run `node scripts/discover-jobs.mjs <greenhouse-board-token>` for an
+official employer board you have confirmed. Multiple tokens are supported.
+The adapter reports unique candidates, skipped rows, and empty boards.
+Employer location wording is preserved as evidence, never inferred as
+citizenship or remote eligibility. This command is read-only and emits
+review candidates as JSON. It does not write to Supabase or publish.
