@@ -1,0 +1,29 @@
+name: NaijaOpportunities v2
+
+on:
+  push:
+    branches: [v2/rebuild]
+    paths: [app-v2/**, .github/workflows/v2.yml]
+  pull_request:
+    paths: [app-v2/**, .github/workflows/v2.yml]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app-v2
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: app-v2/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build

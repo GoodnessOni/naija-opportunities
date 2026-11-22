@@ -33,3 +33,21 @@ feed, then HTML, then browser rendering for sources requiring JavaScript.
 Keep each adapter's sample responses in test fixtures where permitted. Track
 attempts, accepted candidates, duplicates, and errors by source. An empty result
 after a source changes markup should surface for review.
+
+## PathSync preview API
+
+Apply `002_partner_feed.sql` after the first migration. Set the service role
+key on the server and set `FEED_API_KEY_HASHES` to comma-separated lowercase
+SHA-256 digests of independently generated high-entropy keys. Give PathSync
+the corresponding raw key through its server environment. No key belongs in
+client code or Git.
+
+- `GET /api/v1/feed/active?page_size=25` accepts a bearer key and returns
+  `evaluation_time`, `listings`, and an opaque `cursor`. Pass the cursor to
+  request another page. Pagination pins evaluation time but reads current
+  row state, so a withdrawal takes effect during paging.
+- `GET /api/v1/listings/{listing_id}` returns the active record or a reason
+  with HTTP 404. Draft and synthetic lookups return `not_found`.
+
+Test both routes in a staging environment with real verified and inactive
+rows. The current branch does not implement distributed rate limits.
