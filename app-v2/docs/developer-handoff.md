@@ -51,3 +51,43 @@ client code or Git.
 
 Test both routes in a staging environment with real verified and inactive
 rows. The current branch does not implement distributed rate limits.
+
+## Staff review preview
+
+Apply `003_review.sql` in staging after the feed migrations. Create a password
+account using Supabase Auth and insert that user's UUID into `listings.staff`
+with a unique reviewer slug and role `reviewer`. Visit `/admin` to sign in.
+The browser keeps the signed-in user's access token in page memory. The server
+checks the identity with Supabase Auth and checks staff membership before
+returning any queue data. Only the server holds the service role key.
+
+Review candidates come from the listings table. The preview queues drafts and
+published open records with a recent failed or inconclusive check or a freshness
+cutoff within 24 hours. Passing an open review requires notes on open status,
+deadline, eligibility, and application. The database saves the decision and
+its evidence in one transaction and rejects stale edits by revision. A failed
+or inconclusive attempt preserves the last successful check and does not renew
+its freshness deadline. Confirming a closure hides the listing immediately.
+
+Organisation submission and automatic candidate import still need to supply
+the queue. Verify with staff and non-staff accounts in staging before rollout.
+
+## Organisation intake preview
+
+Apply `004_submissions.sql` after the review migration. The `/submit` form
+uses existing verified Supabase password accounts provisioned for staging.
+Submissions enter as unverified drafts. Review decisions update the submission
+record in the same transaction. Round, provider, kind, and title form the
+preview deduplication key. The content digest is provisional pending the
+PathSync canonical hash contract. This preview covers date-only deadlines
+and free-text eligibility. Self-service signup, a status portal, and email
+notifications are still pending.
+
+### Local verification
+
+The four migrations were applied to an isolated embedded PostgreSQL database
+with a minimal Supabase auth/role stub. The smoke test checked anonymous
+access denial, duplicate submission handling, draft invisibility, the
+staff audit insert, optimistic revision conflicts, and public visibility
+after approval. A real staging project is still needed to exercise
+GoTrue sign-in, PostgREST, staff provisioning, and deployment credentials.

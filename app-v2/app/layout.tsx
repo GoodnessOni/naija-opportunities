@@ -21,7 +21,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           </div>
         </header>
         <main id="main" className="shell" tabIndex={-1}>{children}</main>
-        <footer className="shell site-footer">An OGverse product</footer>
+        <footer className="shell site-footer">An OGverse product <Link href="/submit">Submit an opportunity</Link></footer>
       </body>
     </html>
   );

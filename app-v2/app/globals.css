@@ -37,3 +37,8 @@ input, select, textarea { border: 1px solid var(--navy); background: var(--cream
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto; transition: none; animation: none; }
 }
+.review-form { display: grid; gap: .8rem; margin-block: 2rem; max-width: 42rem; }
+.review-form textarea { width: 100%; min-height: 4.5rem; }
+.review-form button { justify-self: start; }
+.site-footer { display: flex; justify-content: space-between; flex-wrap: wrap; gap: .75rem; }
+.site-footer a { text-decoration: underline; }
