@@ -1,0 +1,10 @@
+:root { color-scheme: dark; background: #111; color: #eee; font: 16px/1.55 system-ui, sans-serif; }
+* { box-sizing: border-box; }
+main, nav { max-width: 75rem; margin: auto; padding: 1rem; }
+nav { display: flex; flex-wrap: wrap; gap: 1rem; border-bottom: 1px solid #444; }
+nav a:first-child { margin-inline-end: auto; font-weight: 700; }
+a { color: #87e7a8; }
+a:focus-visible { outline: 2px solid white; outline-offset: 3px; }
+ul { padding: 0; list-style: none; display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr)); }
+li, article { padding: 1rem; border: 1px solid #444; border-radius: .75rem; background: #1b1b1b; }
+h2 { font-size: 1.15rem; }
