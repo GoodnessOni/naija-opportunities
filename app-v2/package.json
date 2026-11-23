@@ -1,0 +1,32 @@
+{
+  "name": "naijaopportunities-v2",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "check": "tsc --noEmit",
+    "test": "vitest run",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "next": "16.2.4",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "@fontsource-variable/fraunces": "^5",
+    "@fontsource/ibm-plex-sans": "^5",
+    "zod": "^4"
+  },
+  "devDependencies": {
+    "typescript": "^5",
+    "@types/node": "^24",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "tailwindcss": "^4",
+    "@tailwindcss/postcss": "^4",
+    "vitest": "^4",
+    "eslint": "^9",
+    "eslint-config-next": "16.2.4"
+  }
+}

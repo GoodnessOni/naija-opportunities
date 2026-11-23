@@ -1,0 +1,44 @@
+@import "tailwindcss";
+
+:root {
+  --cream: #fff8ea;
+  --navy: #101b3e;
+  --orange: #ea8417;
+  --gold: #eeac16;
+  --font-heading: "Fraunces Variable", "Source Serif 4", Georgia, serif;
+  --font-body: "IBM Plex Sans", "Source Sans 3", sans-serif;
+}
+
+body {
+  color: var(--navy);
+  background-color: var(--cream);
+  background-image: linear-gradient(#101b3e0a 1px, transparent 1px),
+    linear-gradient(90deg, #101b3e0a 1px, transparent 1px);
+  background-size: 32px 32px;
+  font: 1rem/1.5 var(--font-body);
+}
+
+.shell { width: min(100% - 2rem, 75rem); margin-inline: auto; }
+.site-header, .site-footer { border-block-end: 1px solid var(--navy); padding-block: 1rem; }
+.site-footer { border-block: 1px solid var(--navy) 0; }
+.wordmark { display: inline-flex; gap: .55rem; align-items: center; font-weight: 600; }
+.wordmark span { width: 1.5rem; height: .75rem; background: var(--orange); border-radius: 2rem 2rem 0 0; }
+.intro { padding-block: clamp(4rem, 12vw, 10rem); }
+h1, h2, h3 { font-family: var(--font-heading); line-height: 1.2; }
+h1 { font-size: clamp(2.65rem, 9vw, 6rem); letter-spacing: -.055em; max-width: 14ch; }
+.intro p { margin-top: 1rem; font-size: 1.125rem; max-width: 66ch; }
+:focus-visible { outline: 2px solid var(--navy); outline-offset: 3px; }
+.skip-link { position: fixed; inset: .5rem auto auto .5rem; transform: translateY(-200%); }
+.skip-link:focus { transform: translateY(0); }
+.button, .skip-link { padding: .65rem 1rem; background: var(--navy); color: var(--cream); }
+.button-accent { background: var(--orange); color: var(--navy); }
+label { display: block; font-weight: 600; }
+input, select, textarea { border: 1px solid var(--navy); background: var(--cream); padding: .6rem; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto; transition: none; animation: none; }
+}
+.review-form { display: grid; gap: .8rem; margin-block: 2rem; max-width: 42rem; }
+.review-form textarea { width: 100%; min-height: 4.5rem; }
+.review-form button { justify-self: start; }
+.site-footer { display: flex; justify-content: space-between; flex-wrap: wrap; gap: .75rem; }
+.site-footer a { text-decoration: underline; }
