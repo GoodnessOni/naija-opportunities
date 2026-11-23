@@ -25,5 +25,6 @@ jobs:
           cache-dependency-path: app-v2/package-lock.json
       - run: npm ci
       - run: npm run lint
+      - run: npm run check
       - run: npm test
       - run: npm run build
