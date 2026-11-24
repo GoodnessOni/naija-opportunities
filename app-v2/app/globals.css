@@ -106,3 +106,16 @@ input, select, textarea { border: 1px solid var(--navy); background: var(--cream
   .listing-content { grid-area: 1 / 1; }
   .listing-apply { grid-area: 1 / 2; position: sticky; top: 1rem; }
 }
+
+.home-intro { display: grid; gap: 2rem; align-items: center; padding-block: clamp(2rem, 7vw, 6rem); }
+.home-intro .button { border-radius: .65rem; font-weight: 600; }
+.home-photo { position: relative; min-height: 16rem; aspect-ratio: 4 / 3; overflow: hidden; border-radius: 1.25rem; background: #dcceb6; }
+.home-photo img { object-fit: cover; }
+.home-categories { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr)); gap: .75rem; }
+.home-categories a { display: flex; justify-content: space-between; gap: .5rem; padding: .9rem 1rem; background: #fffdf6; border: 1px solid #101b3e25; border-radius: .7rem; font-weight: 600; }
+.home-categories a:hover { border-color: var(--navy); }
+.opportunity-card[data-kind="internship"] .opportunity-meta span:first-child { background: #dcecf0; }
+.opportunity-card[data-kind="scholarship"] .opportunity-meta span:first-child { background: #e6e2fb; }
+@media (min-width: 52rem) {
+  .home-intro { grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); }
+}

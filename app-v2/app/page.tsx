@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { readPublicListings } from "../lib/listings/public-store";
 import { OpportunityCards } from "./opportunity-cards";
@@ -9,11 +10,21 @@ export default async function Home() {
 
   return (
     <>
-      <section className="intro">
-        <h1>Find your next opportunity.</h1>
-        <p>Scholarships, internships, jobs, and more, right at your doorstep.</p>
-        <Link className="button" href="/opportunities">Browse opportunities</Link>
+      <section className="intro home-intro">
+        <div>
+          <h1>Find your next opportunity.</h1>
+          <p>Scholarships, internships, jobs, and more, right at your doorstep.</p>
+          <Link className="button" href="/opportunities">Browse opportunities</Link>
+        </div>
+        <div className="home-photo">
+          <Image src="/study-hall.webp" alt="" fill sizes="(max-width: 832px) 100vw, 45vw" />
+        </div>
       </section>
+      <nav className="home-categories" aria-label="Opportunity categories">
+        <Link href="/scholarships">Scholarships <span aria-hidden="true">↗</span></Link>
+        <Link href="/internships">Internships <span aria-hidden="true">↗</span></Link>
+        <Link href="/jobs">Jobs <span aria-hidden="true">↗</span></Link>
+      </nav>
       <section className="browse" aria-labelledby="open-opportunities">
         <h2 id="open-opportunities">Open opportunities</h2>
         {listings === null && <p>Opportunities are temporarily unavailable. Please try again later.</p>}

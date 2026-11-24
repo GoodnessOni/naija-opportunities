@@ -1,0 +1,40 @@
+name: Refresh rebuild job listings
+
+on:
+  schedule:
+    - cron: '27 5 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rebuild-job-refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: app-v2
+    env:
+      SUPABASE_URL: https://jtnpeuwinkdtzeahegeo.supabase.co
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.REBUILD_SUPABASE_SERVICE_ROLE_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: v2/rebuild
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: app-v2/package-lock.json
+      - run: npm ci
+      - name: Refresh Moniepoint listings
+        run: node scripts/import-greenhouse.mjs moniepoint Moniepoint --refresh-only
+      - name: Refresh Canonical listings
+        if: ${{ !cancelled() }}
+        run: node scripts/import-greenhouse.mjs canonical Canonical --nigeria-and-remote --refresh-only
