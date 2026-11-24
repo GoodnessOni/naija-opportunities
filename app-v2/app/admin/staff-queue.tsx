@@ -1,7 +1,9 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useCallback, useEffect, useState, type FormEvent } from "react";
 import type { Listing } from "../../lib/listings/schema";
+
+const sessionKey = "naijaopportunities.staff.access";
 
 export default function StaffQueue() {
   const [token, setToken] = useState("");
@@ -11,15 +13,26 @@ export default function StaffQueue() {
   const [notice, setNotice] = useState("");
   const [busy, setBusy] = useState(false);
 
-  async function refresh(accessToken: string) {
+  const refresh = useCallback(async (accessToken: string) => {
     const response = await fetch("/api/staff/review", { headers: { Authorization: `Bearer ${accessToken}` } });
     if (!response.ok) {
-      if (response.status === 401 || response.status === 403) setToken("");
+      if (response.status === 401 || response.status === 403) {
+        sessionStorage.removeItem(sessionKey);
+        setToken("");
+        setSelected(null);
+        setListings([]);
+      }
       throw new Error(response.status === 403 ? "This account does not have staff access." : "The review queue is unavailable.");
     }
     const result: { listings: Listing[] } = await response.json();
     setListings(result.listings);
-  }
+  }, []);
+
+  useEffect(() => {
+    const saved = sessionStorage.getItem(sessionKey);
+    if (!saved) return;
+    refresh(saved).then(() => setToken(saved)).catch(error => setNotice(error.message));
+  }, [refresh]);
 
   async function signIn(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -35,6 +48,7 @@ export default function StaffQueue() {
       if (!response.ok) throw new Error("Sign-in failed. Check your details and try again.");
       const result: { access_token: string } = await response.json();
       await refresh(result.access_token);
+      sessionStorage.setItem(sessionKey, result.access_token);
       setToken(result.access_token);
     } catch (error) {
       setNotice(error instanceof Error ? error.message : "Sign-in failed.");
@@ -58,7 +72,12 @@ export default function StaffQueue() {
         headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
         body: JSON.stringify({ listing_id: selected.listing_id, revision: selected.revision, review: { outcome, evidence } }),
       });
-      if (response.status === 401 || response.status === 403) setToken("");
+      if (response.status === 401 || response.status === 403) {
+        sessionStorage.removeItem(sessionKey);
+        setToken("");
+        setSelected(null);
+        setListings([]);
+      }
       if (!response.ok) {
         const result = await response.json();
         throw new Error(response.status === 409 ? "Another reviewer changed this listing. Refresh the queue." :
@@ -82,7 +101,7 @@ export default function StaffQueue() {
       <button className="button" disabled={busy}>Sign in</button>
     </form> : <>
       <button className="button-outline" disabled={busy} onClick={() => refresh(token).catch(error => setNotice(error.message))}>Refresh queue</button>
-      <button className="button-outline" disabled={busy} onClick={() => { setToken(""); setSelected(null); setListings([]); }}>Sign out</button>
+      <button className="button-outline" disabled={busy} onClick={() => { sessionStorage.removeItem(sessionKey); setToken(""); setSelected(null); setListings([]); }}>Sign out</button>
       <ul className="listing-list">
         {listings.map(listing => <li key={listing.listing_id}>
           <h2>{listing.title}</h2><p>{listing.provider.name}</p>
