@@ -27,6 +27,15 @@ body {
 h1, h2, h3 { font-family: var(--font-heading); line-height: 1.2; }
 h1 { font-size: clamp(2.65rem, 9vw, 6rem); letter-spacing: -.055em; max-width: 14ch; }
 .intro p { margin-top: 1rem; font-size: 1.125rem; max-width: 66ch; }
+.intro .button { display: inline-block; margin-top: 1.25rem; }
+.browse { display: grid; gap: 1rem; padding-block: 2rem 3rem; }
+.browse h1 { font-size: clamp(2.25rem, 6vw, 4rem); max-width: none; }
+.browse h2 { font-size: 1.5rem; }
+.search-form { display: flex; flex-wrap: wrap; align-items: end; gap: .75rem; }
+.search-form input, .search-form select { max-width: 100%; }
+.listing-list { display: grid; gap: 1rem; }
+.listing-list li { padding: 1rem; border: 1px solid var(--navy); }
+.browse a { text-decoration: underline; }
 :focus-visible { outline: 2px solid var(--navy); outline-offset: 3px; }
 .skip-link { position: fixed; inset: .5rem auto auto .5rem; transform: translateY(-200%); }
 .skip-link:focus { transform: translateY(0); }
