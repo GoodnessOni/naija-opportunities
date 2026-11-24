@@ -2,17 +2,23 @@ import { verifyGreenhouseListing } from "../lib/listings/greenhouse-verification
 import { makeGreenhouseDraft } from "../lib/listings/submission.ts";
 import { fetchGreenhouseCandidates } from "./sources/greenhouse.mjs";
 
-const [board, provider, mode] = process.argv.slice(2);
+const [board, provider, ...flags] = process.argv.slice(2);
 const { SUPABASE_URL: url, SUPABASE_SERVICE_ROLE_KEY: key } = process.env;
-if ((mode && mode !== "--publish-verified") || !board || !provider?.trim() || !url || !key) {
-  console.error('Usage: node --env-file=.env.local scripts/import-greenhouse.mjs <board> "<employer name>" [--publish-verified]');
+if (flags.some(flag => !["--publish-verified", "--nigeria-and-remote"].includes(flag)) || !board || !provider?.trim() || !url || !key) {
+  console.error('Usage: node --env-file=.env.local scripts/import-greenhouse.mjs <board> "<employer name>" [--publish-verified] [--nigeria-and-remote]');
   process.exit(1);
 }
 
 const { candidates, skipped } = await fetchGreenhouseCandidates(board);
+const publishVerified = flags.includes("--publish-verified");
+const nigeriaAndRemote = flags.includes("--nigeria-and-remote");
 const clock = new Date();
-const counts = { inserted: 0, duplicate: 0, publishedOrRefreshed: 0, rejected: skipped, failed: 0 };
+const counts = { inserted: 0, duplicate: 0, publishedOrRefreshed: 0, rejected: skipped, outsideRegion: 0, failed: 0 };
 for (const candidate of candidates) {
+  if (nigeriaAndRemote && !/(?:\bNigeria\b|^Home based - (?:EMEA|Worldwide)$)/i.test(candidate.location ?? "")) {
+    counts.outsideRegion++;
+    continue;
+  }
   let draft;
   try {
     draft = makeGreenhouseDraft(provider, candidate, clock);
@@ -21,7 +27,7 @@ for (const candidate of candidates) {
     continue;
   }
   try {
-    const listing = mode === "--publish-verified"
+    const listing = publishVerified
       ? verifyGreenhouseListing(draft, board, candidate.identifier, clock) : draft;
     const publish = listing.lifecycle.publication_status === "published";
     const rpc = publish ? "sync_verified_greenhouse_job" : "insert_greenhouse_draft";

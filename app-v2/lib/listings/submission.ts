@@ -62,7 +62,7 @@ export function makeSubmission(input: z.infer<typeof submissionInput>, clock: Da
 
 export function makeGreenhouseDraft(
   provider: string,
-  candidate: { source_key: string; title: string; source_url: string; location: string | null },
+  candidate: { source_key: string; title: string; source_url: string; location: string | null; description?: string | null },
   clock: Date,
 ) {
   const input = submissionInput.parse({
@@ -72,7 +72,7 @@ export function makeGreenhouseDraft(
     source: candidate.source_url,
     apply: candidate.source_url,
     summary: candidate.location ? `Location listed by the employer: ${candidate.location}`.slice(0, 400) : "See the employer's listing for details.",
-    description: "See the employer's listing for the job description and application instructions.",
+    description: candidate.description?.replace(/\s+/g, " ").slice(0, 8000).trim() || "See the employer's listing for the job description and application instructions.",
     criteria: "",
     deadlineKind: "unknown",
     deadlineDate: "",

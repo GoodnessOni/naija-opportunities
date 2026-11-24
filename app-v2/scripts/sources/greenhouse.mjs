@@ -1,3 +1,23 @@
+import { decodeHTML } from "entities";
+import { convert } from "html-to-text";
+
+function readDescription(content) {
+  if (typeof content !== "string") return null;
+  return convert(decodeHTML(content), {
+    wordwrap: false,
+    selectors: [
+      { selector: "a", options: { ignoreHref: true } },
+      { selector: "img", format: "skip" },
+      { selector: "script", format: "skip" },
+      { selector: "style", format: "skip" },
+    ],
+  }).replace(/[\w.+-]+@[\w.-]+\.[a-z]{2,}/gi, "")
+    .replace(/(?:\b\d{11}\b|(?:\+234|234)[\s-]*\d(?:[\s-]*\d){9}\b)/g, "")
+    .replace(/[<>]/g, "")
+    .split("\n").map(line => line.trim().replace(/\s+/g, " ")).join("\n")
+    .replace(/\n{3,}/g, "\n\n").trim() || null;
+}
+
 const boardToken = /^[a-zA-Z0-9_-]{1,80}$/;
 const MAX_SIZE = 4 * 1024 * 1024;
 
@@ -23,7 +43,7 @@ async function readBoard(response) {
 
 export async function fetchGreenhouseCandidates(board, fetchPage = fetch) {
   if (typeof board !== "string" || !boardToken.test(board)) throw new Error("Invalid Greenhouse board token");
-  const response = await fetchPage(`https://boards-api.greenhouse.io/v1/boards/${board}/jobs`, {
+  const response = await fetchPage(`https://boards-api.greenhouse.io/v1/boards/${board}/jobs?content=true`, {
     headers: { Accept: "application/json" },
     redirect: "error",
     signal: AbortSignal.timeout(15000),
@@ -50,6 +70,7 @@ export async function fetchGreenhouseCandidates(board, fetchPage = fetch) {
         identifier: job.id,
         title: job.title.trim(),
         location: typeof job.location?.name === "string" ? job.location.name.trim() : null,
+        description: readDescription(job.content),
         source_url: source.href,
         source_updated_at: typeof job.updated_at === "string" ? job.updated_at : null,
         disposition: "needs_review",
