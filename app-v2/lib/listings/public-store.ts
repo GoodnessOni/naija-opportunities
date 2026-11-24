@@ -10,7 +10,7 @@ export async function readPublicListings(filters: { kind?: Listing["kind"]; id?:
   const response = await fetch(new URL("/rest/v1/rpc/active_listings", url), {
     method: "POST",
     cache: "no-store",
-    headers: { apikey: key, Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+    headers: { apikey: key, ...(key.startsWith("sb_") ? {} : { Authorization: `Bearer ${key}` }), "Content-Type": "application/json" },
     body: JSON.stringify({
       selected_kind: filters.kind ?? null, selected_id: filters.id ?? null,
       search_text: filters.query ?? null, page_limit: filters.limit ?? 30,

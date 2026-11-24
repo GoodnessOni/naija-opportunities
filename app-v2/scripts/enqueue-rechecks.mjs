@@ -8,7 +8,7 @@ if (!url || !key) {
   try {
     const response = await fetch(new URL("/rest/v1/rpc/enqueue_listing_rechecks", url), {
       method: "POST",
-      headers: { apikey: key, Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+      headers: { apikey: key, ...(key.startsWith("sb_") ? {} : { Authorization: `Bearer ${key}` }), "Content-Type": "application/json" },
       body: "{}",
       signal: AbortSignal.timeout(30000),
     });

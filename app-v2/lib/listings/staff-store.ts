@@ -12,7 +12,7 @@ export async function staffRpc(name: string, input: object): Promise<unknown> {
   if (!url || !key) throw new StaffRequestError(503, "staff_service_unavailable");
   const response = await fetch(new URL(`/rest/v1/rpc/${name}`, url), {
     method: "POST", cache: "no-store",
-    headers: { apikey: key, Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+    headers: { apikey: key, ...(key.startsWith("sb_") ? {} : { Authorization: `Bearer ${key}` }), "Content-Type": "application/json" },
     body: JSON.stringify(input),
   });
   if (!response.ok) throw new StaffRequestError(503, "staff_service_unavailable");

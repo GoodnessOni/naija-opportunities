@@ -46,7 +46,7 @@ export async function readPartnerListings(evaluatedAt: string, limit: number, af
   if (!url || !key) throw new Error("Missing partner feed configuration");
   const response = await fetch(new URL("/rest/v1/rpc/partner_listings", url), {
     method: "POST", cache: "no-store",
-    headers: { apikey: key, Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+    headers: { apikey: key, ...(key.startsWith("sb_") ? {} : { Authorization: `Bearer ${key}` }), "Content-Type": "application/json" },
     body: JSON.stringify({ evaluated_at: evaluatedAt, after_id: afterId, selected_id: selectedId, page_limit: limit }),
   });
   if (!response.ok) throw new Error("Partner feed unavailable");

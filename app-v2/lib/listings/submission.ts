@@ -1,7 +1,7 @@
 import { createHash, randomBytes } from "node:crypto";
 import { z } from "zod";
-import { resolveDateOnlyDeadline } from "./deadline";
-import { listingSchema } from "./schema";
+import { resolveDateOnlyDeadline } from "./deadline.ts";
+import { listingSchema } from "./schema.ts";
 
 export const submissionInput = z.strictObject({
   kind: z.enum(["job", "internship", "scholarship"]),
@@ -19,14 +19,14 @@ function slug(value: string) {
   return value.normalize("NFKD").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 }
 
-export function makeSubmission(input: z.infer<typeof submissionInput>, clock: Date) {
+export function makeSubmission(input: z.infer<typeof submissionInput>, clock: Date, sourceKey?: string) {
   const alphabet = "0123456789ABCDEFGHJKMNPQRSTVWXYZ";
   const id = Array.from(randomBytes(26), byte => alphabet[byte & 31]).join("");
   const at = clock.toISOString();
   const providerKey = slug(input.provider);
   const opportunityKey = slug(input.title);
   const roundKey = slug(input.round) || "unspecified";
-  const dedupeKey = createHash("sha256").update([input.kind, providerKey, opportunityKey, roundKey].join("\n")).digest("hex");
+  const dedupeKey = createHash("sha256").update(sourceKey ?? [input.kind, providerKey, opportunityKey, roundKey].join("\n")).digest("hex");
   const fields = {
     schema_version: "1.0.0", listing_id: `lst_${id}`, kind: input.kind, synthetic: false, revision: 1,
     title: input.title, summary: input.summary, description: input.description,
@@ -58,4 +58,26 @@ export function makeSubmission(input: z.infer<typeof submissionInput>, clock: Da
   };
   const hash = createHash("sha256").update(JSON.stringify(fields)).digest("hex");
   return listingSchema.parse({ ...fields, content_hash: hash });
+}
+
+export function makeGreenhouseDraft(
+  provider: string,
+  candidate: { source_key: string; title: string; source_url: string; location: string | null },
+  clock: Date,
+) {
+  const input = submissionInput.parse({
+    kind: "job",
+    title: candidate.title,
+    provider,
+    source: candidate.source_url,
+    apply: candidate.source_url,
+    summary: candidate.location ? `Location listed by the employer: ${candidate.location}`.slice(0, 400) : "See the employer's listing for details.",
+    description: "See the employer's listing for the job description and application instructions.",
+    criteria: "",
+    deadlineKind: "unknown",
+    deadlineDate: "",
+    timezone: "",
+    round: candidate.source_key,
+  });
+  return makeSubmission(input, clock, candidate.source_key);
 }

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { FRESHNESS_MS } from "./active-feed";
+import { FRESHNESS_MS } from "./active-feed.ts";
 
 const text = (max: number, min = 1) => z.string().min(min).max(max)
   .refine(value => value.trim() === value && !/[\x00-\x1f\x7f<>]/.test(value), "unsafe_text")
