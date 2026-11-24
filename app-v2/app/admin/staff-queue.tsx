@@ -31,7 +31,10 @@ export default function StaffQueue() {
   useEffect(() => {
     const saved = sessionStorage.getItem(sessionKey);
     if (!saved) return;
-    refresh(saved).then(() => setToken(saved)).catch(error => setNotice(error.message));
+    const restore = window.setTimeout(() => {
+      refresh(saved).then(() => setToken(saved)).catch(error => setNotice(error.message));
+    }, 0);
+    return () => window.clearTimeout(restore);
   }, [refresh]);
 
   async function signIn(event: FormEvent<HTMLFormElement>) {
