@@ -7,7 +7,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: { default: "NaijaOpportunities", template: "%s | NaijaOpportunities" },
-  description: "Scholarships, internships and jobs for Nigerians.",
+  description: "Scholarships, internships, jobs, and more, right at your doorstep.",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
