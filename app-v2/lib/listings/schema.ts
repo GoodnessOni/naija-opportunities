@@ -1,8 +1,8 @@
 import { z } from "zod";
 import { FRESHNESS_MS } from "./active-feed.ts";
 
-const text = (max: number, min = 1) => z.string().min(min).max(max)
-  .refine(value => value.trim() === value && !/[\x00-\x1f\x7f<>]/.test(value), "unsafe_text")
+const text = (max: number, min = 1, multiline = false) => z.string().min(min).max(max)
+  .refine(value => value.trim() === value && !/[\x00-\x1f\x7f<>]/.test(multiline ? value.replaceAll("\n", "") : value), "unsafe_text")
   .refine(value => !/(?:\b\d{11}\b|(?:\+234|234)[\s-]*\d(?:[\s-]*\d){9}\b|[\w.+-]+@[\w.-]+\.[a-z]{2,})/i.test(value), "personal_data");
 const listingId = z.string().regex(/^lst_[0-9A-HJKMNP-TV-Z]{26}$/);
 const slug = z.string().regex(/^[a-z0-9]+(?:[-_][a-z0-9]+)*$/);
@@ -34,7 +34,7 @@ export const listingSchema = obj({
   kind: options(["scholarship", "internship", "job"]),
   synthetic: z.boolean(), revision: z.int().min(1).max(1000000),
   title: text(180).refine(value => !/^(untitled|n\/a|tbd|placeholder)$/i.test(value), "placeholder_title"),
-  summary: text(400), description: text(8000),
+  summary: text(400), description: text(8000, 1, true),
   provider: obj({
     name: text(160), type: options(["government", "tertiary_institution", "company", "foundation", "ngo", "multilateral", "unknown"]),
     country, url: url.nullable(),

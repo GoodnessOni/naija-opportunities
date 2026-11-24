@@ -1,3 +1,4 @@
+import { descriptionBlocks } from "../../../lib/listings/description-blocks";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cache } from "react";
@@ -56,7 +57,15 @@ export default async function Detail({ params }: { params: Promise<{ slug: strin
         <div className="listing-content">
           <section>
             <h2>{kind === "job" ? "About the role" : "About this opportunity"}</h2>
-            <p className="listing-description">{description ?? "Read the full description on the source listing."}</p>
+            <div className="listing-description">
+              {description ? descriptionBlocks(description).map((block, index) => {
+                switch (block.kind) {
+                  case "heading": return <h3 key={index}>{block.text}</h3>;
+                  case "list": return <ul key={index}>{block.items.map((item, itemIndex) => <li key={itemIndex}>{item}</li>)}</ul>;
+                  case "paragraph": return <p key={index}>{block.text}</p>;
+                }
+              }) : <p>Read the full description on the source listing.</p>}
+            </div>
           </section>
           {listing.eligibility.criteria_text && <section><h2>Eligibility</h2><p>{listing.eligibility.criteria_text}</p></section>}
           {listing.documents_required.length > 0 && (

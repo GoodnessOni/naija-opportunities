@@ -72,7 +72,7 @@ export function makeGreenhouseDraft(
     source: candidate.source_url,
     apply: candidate.source_url,
     summary: candidate.location ? `Location listed by the employer: ${candidate.location}`.slice(0, 400) : "See the employer's listing for details.",
-    description: candidate.description?.replace(/\s+/g, " ").slice(0, 8000).trim() || "See the employer's listing for the job description and application instructions.",
+    description: candidate.description?.slice(0, 8000).trim() || "See the employer's listing for the job description and application instructions.",
     criteria: "",
     deadlineKind: "unknown",
     deadlineDate: "",
