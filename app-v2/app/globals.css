@@ -36,6 +36,28 @@ h1 { font-size: clamp(2.65rem, 9vw, 6rem); letter-spacing: -.055em; max-width: 1
 .listing-list { display: grid; gap: 1rem; }
 .listing-list li { padding: 1rem; border: 1px solid var(--navy); }
 .browse a { text-decoration: underline; }
+.opportunity-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr));
+  gap: 1rem;
+}
+.opportunity-card {
+  display: flex;
+  flex-direction: column;
+  gap: .8rem;
+  height: 100%;
+  padding: 1.25rem;
+  border: 1px solid #101b3e24;
+  border-radius: 1rem;
+  background: #fffdf6;
+  overflow-wrap: anywhere;
+}
+.browse .opportunity-card { text-decoration: none; }
+.opportunity-card:hover { border-color: var(--navy); }
+.opportunity-card h2, .opportunity-card h3 { font-size: 1.35rem; }
+.opportunity-meta { display: flex; align-items: baseline; flex-wrap: wrap; gap: .55rem; font-size: .875rem; }
+.opportunity-meta span:first-child { background: #ffe8c3; border-radius: 2rem; padding: .2rem .65rem; font-weight: 600; }
+.opportunity-action { margin-top: auto; font-weight: 600; text-decoration: underline; text-underline-offset: .2em; }
 :focus-visible { outline: 2px solid var(--navy); outline-offset: 3px; }
 .skip-link { position: fixed; inset: .5rem auto auto .5rem; transform: translateY(-200%); }
 .skip-link:focus { transform: translateY(0); }

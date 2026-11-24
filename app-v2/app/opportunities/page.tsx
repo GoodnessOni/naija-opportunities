@@ -1,5 +1,7 @@
 import Link from "next/link";
-import { listingHref, readPublicListings } from "../../lib/listings/public-store";
+import { readPublicListings } from "../../lib/listings/public-store";
+
+import { OpportunityCards } from "../opportunity-cards";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Browse opportunities" };
@@ -23,13 +25,7 @@ export default async function Browse({ searchParams }: { searchParams: Promise<{
       </form>
       <p>{results.length === 30 ? "Showing the first 30 results" : `${results.length} results`}</p>
       {results.length === 0 && <p>No open opportunities match these filters. <Link href="/opportunities">Clear filters</Link>.</p>}
-      <ul className="listing-list">
-        {results.map(listing => <li key={listing.listing_id}>
-          <h2><Link href={listingHref(listing)}>{listing.title}</Link></h2>
-          <p>{listing.provider.name}{listing.location.locality && ` · ${listing.location.locality}`}</p>
-          <p>{listing.summary}</p>
-        </li>)}
-      </ul>
+      <OpportunityCards listings={results} heading="h2" />
     </section>
   );
 }

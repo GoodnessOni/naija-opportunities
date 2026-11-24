@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { listingHref, readPublicListings } from "../lib/listings/public-store";
+import { readPublicListings } from "../lib/listings/public-store";
+import { OpportunityCards } from "./opportunity-cards";
 
 export const dynamic = "force-dynamic";
 
@@ -17,17 +18,7 @@ export default async function Home() {
         <h2 id="open-opportunities">Open opportunities</h2>
         {listings === null && <p>Opportunities are temporarily unavailable. Please try again later.</p>}
         {listings?.length === 0 && <p>There are no open opportunities right now.</p>}
-        {!!listings?.length && (
-          <ul className="listing-list">
-            {listings.map(listing => (
-              <li key={listing.listing_id}>
-                <h3><Link href={listingHref(listing)}>{listing.title}</Link></h3>
-                <p>{listing.provider.name}</p>
-                <p>{listing.summary}</p>
-              </li>
-            ))}
-          </ul>
-        )}
+        {!!listings?.length && <OpportunityCards listings={listings} heading="h3" />}
       </section>
     </>
   );
