@@ -37,3 +37,19 @@ export function resolveDateOnlyDeadline(date: string, statedTimezone: string | n
     boundary: "inclusive_end_of_local_day" as const,
   };
 }
+
+export function formatFixedDeadline(deadline: {
+  fixed_at: string;
+  resolved_timezone: string;
+  boundary: "inclusive_end_of_local_day" | "inclusive_instant";
+}) {
+  const instant = new Date(deadline.fixed_at);
+  const timeZone = deadline.resolved_timezone;
+  const date = new Intl.DateTimeFormat("en-GB", { dateStyle: "long", timeZone }).format(instant);
+  if (deadline.boundary !== "inclusive_instant") return date;
+
+  const time = new Intl.DateTimeFormat("en-GB", {
+    hour: "2-digit", minute: "2-digit", hourCycle: "h23", timeZone,
+  }).format(instant);
+  return `${date} at ${time} (${timeZone})`;
+}

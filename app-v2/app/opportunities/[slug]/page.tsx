@@ -1,3 +1,4 @@
+import { formatFixedDeadline } from "../../../lib/listings/deadline";
 import { descriptionBlocks } from "../../../lib/listings/description-blocks";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -28,7 +29,7 @@ export default async function Detail({ params }: { params: Promise<{ slug: strin
   const category = categories[kind];
   const canApply = ["direct_application", "official_programme_page"].includes(application.url_kind);
   const deadlineLabel = deadline.kind === "fixed"
-    ? new Intl.DateTimeFormat("en-NG", { dateStyle: "long", timeZone: deadline.resolved_timezone }).format(new Date(deadline.fixed_at))
+    ? formatFixedDeadline(deadline)
     : deadline.kind === "rolling" ? "Rolling deadline" : null;
   const description = listing.description === "See the employer's listing for the job description and application instructions."
     ? null : listing.description;
@@ -47,7 +48,7 @@ export default async function Detail({ params }: { params: Promise<{ slug: strin
       <div className="listing-layout">
         <aside className="listing-apply">
           <h2>Application</h2>
-          {deadlineLabel && <dl><dt>Deadline</dt><dd>{deadlineLabel}</dd></dl>}
+          {deadlineLabel && <dl><dt>Deadline</dt><dd>{deadline.kind === "fixed" ? <time dateTime={deadline.fixed_at}>{deadlineLabel}</time> : deadlineLabel}</dd></dl>}
           <a className="button listing-apply-link" href={application.url}>
             {canApply ? (kind === "job" ? "Apply on the employer site" : "Apply on the official site") : "View source listing"}
             <span aria-hidden="true">↗</span>
