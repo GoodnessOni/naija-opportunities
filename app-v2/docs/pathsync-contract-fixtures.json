@@ -1,0 +1,931 @@
+{
+  "note": "Synthetic schema 1.0.0 fixtures. Generated from app-v2/tests/fixtures/contract.ts; do not edit by hand.",
+  "active_feed_page": {
+    "evaluation_time": "2027-03-24T09:00:00Z",
+    "listings": [
+      {
+        "schema_version": "1.0.0",
+        "listing_id": "lst_00000000000000000000000S01",
+        "kind": "scholarship",
+        "synthetic": true,
+        "revision": 1,
+        "title": "Merit Scholarship 2027",
+        "summary": "Tuition support for new undergraduates in Nigeria.",
+        "description": "The foundation supports applicants entering their first year.",
+        "provider": {
+          "name": "Example Foundation",
+          "type": "foundation",
+          "country": "NG",
+          "url": null
+        },
+        "source": {
+          "name": "example",
+          "kind": "official",
+          "url": "https://example.org/scholarship",
+          "retrieved_at": "2027-03-24T22:59:59Z"
+        },
+        "application": {
+          "url": "https://example.org/apply",
+          "url_kind": "direct_application",
+          "contact_email": null
+        },
+        "eligibility": {
+          "citizenship": {
+            "requirement": "explicit",
+            "countries": [
+              "NG"
+            ]
+          },
+          "education": {
+            "requirement": "unknown",
+            "source_wording": null,
+            "stages": [],
+            "qualifications": [],
+            "years": [],
+            "courses": [],
+            "institution_names": []
+          },
+          "grade": {
+            "requirement": "unknown",
+            "scale": null,
+            "minimum_hundredths": null
+          },
+          "demographics": {
+            "requirements": [],
+            "preferences": []
+          },
+          "audience_tags": [],
+          "criteria_stated": true,
+          "criteria_text": "Nigerian citizens may apply."
+        },
+        "deadline": {
+          "kind": "fixed",
+          "fixed_at": "2027-03-31T22:59:59Z",
+          "stated_timezone": null,
+          "resolved_timezone": "Africa/Lagos",
+          "boundary": "inclusive_end_of_local_day"
+        },
+        "award": {
+          "kind": "full_tuition",
+          "summary": "Full tuition for the first year.",
+          "currency": null,
+          "amount_minor": null,
+          "period": "per_year"
+        },
+        "location": {
+          "country": "NG",
+          "locality": null,
+          "arrangement": "unknown"
+        },
+        "employment": null,
+        "documents_required": [],
+        "how_to_apply": "Not stated by the source.",
+        "lifecycle": {
+          "publication_status": "published",
+          "status": "open",
+          "closed_reason": null
+        },
+        "verification": {
+          "state": "verified",
+          "outcome": "confirmed_open",
+          "method": "human_review",
+          "reviewed_by": "human",
+          "reviewer_id": "staff-fixture",
+          "source_checked_url": "https://example.org/apply",
+          "last_success_at": "2027-03-20T09:00:00Z",
+          "fresh_until": "2027-03-27T09:00:00Z",
+          "last_attempt_at": "2027-03-20T09:00:00Z",
+          "last_attempt_outcome": "confirmed_open"
+        },
+        "timestamps": {
+          "created_at": "2027-03-19T09:00:00Z",
+          "updated_at": "2027-03-20T09:00:00Z",
+          "published_at": "2027-03-20T09:00:00Z",
+          "expired_at": null,
+          "withdrawn_at": null,
+          "closed_at": null
+        },
+        "identity": {
+          "provider_key": "example",
+          "opportunity_key": "merit",
+          "round_key": "2027",
+          "round_evidence": null
+        },
+        "dedupe_key": "1111111111111111111111111111111111111111111111111111111111111111",
+        "content_hash": "1111111111111111111111111111111111111111111111111111111111111111",
+        "previous_round_id": null
+      },
+      {
+        "schema_version": "1.0.0",
+        "listing_id": "lst_00000000000000000000000N01",
+        "kind": "internship",
+        "synthetic": true,
+        "revision": 1,
+        "title": "Software Engineering Intern",
+        "summary": "Six month paid internship in Lagos, hybrid.",
+        "description": "Work with the product team on web services.",
+        "provider": {
+          "name": "Example Tech",
+          "type": "company",
+          "country": "NG",
+          "url": "https://example.com"
+        },
+        "source": {
+          "name": "example",
+          "kind": "official",
+          "url": "https://example.org/scholarship",
+          "retrieved_at": "2027-03-24T22:59:59Z"
+        },
+        "application": {
+          "url": "https://example.org/apply",
+          "url_kind": "direct_application",
+          "contact_email": null
+        },
+        "eligibility": {
+          "citizenship": {
+            "requirement": "explicit",
+            "countries": [
+              "NG"
+            ]
+          },
+          "education": {
+            "requirement": "unknown",
+            "source_wording": null,
+            "stages": [],
+            "qualifications": [],
+            "years": [],
+            "courses": [],
+            "institution_names": []
+          },
+          "grade": {
+            "requirement": "unknown",
+            "scale": null,
+            "minimum_hundredths": null
+          },
+          "demographics": {
+            "requirements": [],
+            "preferences": []
+          },
+          "audience_tags": [],
+          "criteria_stated": true,
+          "criteria_text": "Open to Nigerian undergraduates."
+        },
+        "deadline": {
+          "kind": "rolling",
+          "fixed_at": null,
+          "stated_timezone": null,
+          "resolved_timezone": null,
+          "boundary": null
+        },
+        "award": {
+          "kind": "stipend",
+          "summary": "Monthly stipend.",
+          "currency": "NGN",
+          "amount_minor": 15000000,
+          "period": "per_month"
+        },
+        "location": {
+          "country": "NG",
+          "locality": "Lagos",
+          "arrangement": "hybrid"
+        },
+        "employment": {
+          "employment_type": "internship",
+          "duration_text": "Six months",
+          "paid": true
+        },
+        "documents_required": [],
+        "how_to_apply": "Not stated by the source.",
+        "lifecycle": {
+          "publication_status": "published",
+          "status": "open",
+          "closed_reason": null
+        },
+        "verification": {
+          "state": "verified",
+          "outcome": "confirmed_open",
+          "method": "human_review",
+          "reviewed_by": "human",
+          "reviewer_id": "staff-fixture",
+          "source_checked_url": "https://example.org/apply",
+          "last_success_at": "2027-03-20T09:00:00Z",
+          "fresh_until": "2027-03-27T09:00:00Z",
+          "last_attempt_at": "2027-03-20T09:00:00Z",
+          "last_attempt_outcome": "confirmed_open"
+        },
+        "timestamps": {
+          "created_at": "2027-03-19T09:00:00Z",
+          "updated_at": "2027-03-20T09:00:00Z",
+          "published_at": "2027-03-20T09:00:00Z",
+          "expired_at": null,
+          "withdrawn_at": null,
+          "closed_at": null
+        },
+        "identity": {
+          "provider_key": "example-tech",
+          "opportunity_key": "swe-intern",
+          "round_key": "rolling",
+          "round_evidence": null
+        },
+        "dedupe_key": "2222222222222222222222222222222222222222222222222222222222222222",
+        "content_hash": "2222222222222222222222222222222222222222222222222222222222222222",
+        "previous_round_id": null
+      },
+      {
+        "schema_version": "1.0.0",
+        "listing_id": "lst_00000000000000000000000J01",
+        "kind": "job",
+        "synthetic": true,
+        "revision": 1,
+        "title": "Junior Data Analyst",
+        "summary": "Full time analyst role in Abuja.",
+        "description": "Work with the product team on web services.",
+        "provider": {
+          "name": "Example Tech",
+          "type": "company",
+          "country": "NG",
+          "url": "https://example.com"
+        },
+        "source": {
+          "name": "example",
+          "kind": "official",
+          "url": "https://example.org/scholarship",
+          "retrieved_at": "2027-03-24T22:59:59Z"
+        },
+        "application": {
+          "url": "https://example.org/apply",
+          "url_kind": "direct_application",
+          "contact_email": null
+        },
+        "eligibility": {
+          "citizenship": {
+            "requirement": "explicit",
+            "countries": [
+              "NG"
+            ]
+          },
+          "education": {
+            "requirement": "unknown",
+            "source_wording": null,
+            "stages": [],
+            "qualifications": [],
+            "years": [],
+            "courses": [],
+            "institution_names": []
+          },
+          "grade": {
+            "requirement": "unknown",
+            "scale": null,
+            "minimum_hundredths": null
+          },
+          "demographics": {
+            "requirements": [],
+            "preferences": []
+          },
+          "audience_tags": [],
+          "criteria_stated": true,
+          "criteria_text": "Open to Nigerian undergraduates."
+        },
+        "deadline": {
+          "kind": "rolling",
+          "fixed_at": null,
+          "stated_timezone": null,
+          "resolved_timezone": null,
+          "boundary": null
+        },
+        "award": {
+          "kind": "not_stated",
+          "summary": null,
+          "currency": null,
+          "amount_minor": null,
+          "period": null
+        },
+        "location": {
+          "country": "NG",
+          "locality": "Abuja",
+          "arrangement": "on_site"
+        },
+        "employment": {
+          "employment_type": "full_time",
+          "duration_text": null,
+          "paid": null
+        },
+        "documents_required": [],
+        "how_to_apply": "Not stated by the source.",
+        "lifecycle": {
+          "publication_status": "published",
+          "status": "open",
+          "closed_reason": null
+        },
+        "verification": {
+          "state": "verified",
+          "outcome": "confirmed_open",
+          "method": "human_review",
+          "reviewed_by": "human",
+          "reviewer_id": "staff-fixture",
+          "source_checked_url": "https://example.org/apply",
+          "last_success_at": "2027-03-20T09:00:00Z",
+          "fresh_until": "2027-03-27T09:00:00Z",
+          "last_attempt_at": "2027-03-20T09:00:00Z",
+          "last_attempt_outcome": "confirmed_open"
+        },
+        "timestamps": {
+          "created_at": "2027-03-19T09:00:00Z",
+          "updated_at": "2027-03-20T09:00:00Z",
+          "published_at": "2027-03-20T09:00:00Z",
+          "expired_at": null,
+          "withdrawn_at": null,
+          "closed_at": null
+        },
+        "identity": {
+          "provider_key": "example-tech",
+          "opportunity_key": "data-analyst",
+          "round_key": "2027",
+          "round_evidence": null
+        },
+        "dedupe_key": "3333333333333333333333333333333333333333333333333333333333333333",
+        "content_hash": "3333333333333333333333333333333333333333333333333333333333333333",
+        "previous_round_id": null
+      }
+    ],
+    "cursor": null
+  },
+  "inactive_lookups": {
+    "lst_00000000000000000000000E01": {
+      "error": "expired_deadline"
+    },
+    "lst_00000000000000000000000W01": {
+      "error": "withdrawn"
+    }
+  },
+  "records": {
+    "scholarshipFixed": {
+      "schema_version": "1.0.0",
+      "listing_id": "lst_00000000000000000000000S01",
+      "kind": "scholarship",
+      "synthetic": true,
+      "revision": 1,
+      "title": "Merit Scholarship 2027",
+      "summary": "Tuition support for new undergraduates in Nigeria.",
+      "description": "The foundation supports applicants entering their first year.",
+      "provider": {
+        "name": "Example Foundation",
+        "type": "foundation",
+        "country": "NG",
+        "url": null
+      },
+      "source": {
+        "name": "example",
+        "kind": "official",
+        "url": "https://example.org/scholarship",
+        "retrieved_at": "2027-03-24T22:59:59Z"
+      },
+      "application": {
+        "url": "https://example.org/apply",
+        "url_kind": "direct_application",
+        "contact_email": null
+      },
+      "eligibility": {
+        "citizenship": {
+          "requirement": "explicit",
+          "countries": [
+            "NG"
+          ]
+        },
+        "education": {
+          "requirement": "unknown",
+          "source_wording": null,
+          "stages": [],
+          "qualifications": [],
+          "years": [],
+          "courses": [],
+          "institution_names": []
+        },
+        "grade": {
+          "requirement": "unknown",
+          "scale": null,
+          "minimum_hundredths": null
+        },
+        "demographics": {
+          "requirements": [],
+          "preferences": []
+        },
+        "audience_tags": [],
+        "criteria_stated": true,
+        "criteria_text": "Nigerian citizens may apply."
+      },
+      "deadline": {
+        "kind": "fixed",
+        "fixed_at": "2027-03-31T22:59:59Z",
+        "stated_timezone": null,
+        "resolved_timezone": "Africa/Lagos",
+        "boundary": "inclusive_end_of_local_day"
+      },
+      "award": {
+        "kind": "full_tuition",
+        "summary": "Full tuition for the first year.",
+        "currency": null,
+        "amount_minor": null,
+        "period": "per_year"
+      },
+      "location": {
+        "country": "NG",
+        "locality": null,
+        "arrangement": "unknown"
+      },
+      "employment": null,
+      "documents_required": [],
+      "how_to_apply": "Not stated by the source.",
+      "lifecycle": {
+        "publication_status": "published",
+        "status": "open",
+        "closed_reason": null
+      },
+      "verification": {
+        "state": "verified",
+        "outcome": "confirmed_open",
+        "method": "human_review",
+        "reviewed_by": "human",
+        "reviewer_id": "staff-fixture",
+        "source_checked_url": "https://example.org/apply",
+        "last_success_at": "2027-03-20T09:00:00Z",
+        "fresh_until": "2027-03-27T09:00:00Z",
+        "last_attempt_at": "2027-03-20T09:00:00Z",
+        "last_attempt_outcome": "confirmed_open"
+      },
+      "timestamps": {
+        "created_at": "2027-03-19T09:00:00Z",
+        "updated_at": "2027-03-20T09:00:00Z",
+        "published_at": "2027-03-20T09:00:00Z",
+        "expired_at": null,
+        "withdrawn_at": null,
+        "closed_at": null
+      },
+      "identity": {
+        "provider_key": "example",
+        "opportunity_key": "merit",
+        "round_key": "2027",
+        "round_evidence": null
+      },
+      "dedupe_key": "1111111111111111111111111111111111111111111111111111111111111111",
+      "content_hash": "1111111111111111111111111111111111111111111111111111111111111111",
+      "previous_round_id": null
+    },
+    "internshipRolling": {
+      "schema_version": "1.0.0",
+      "listing_id": "lst_00000000000000000000000N01",
+      "kind": "internship",
+      "synthetic": true,
+      "revision": 1,
+      "title": "Software Engineering Intern",
+      "summary": "Six month paid internship in Lagos, hybrid.",
+      "description": "Work with the product team on web services.",
+      "provider": {
+        "name": "Example Tech",
+        "type": "company",
+        "country": "NG",
+        "url": "https://example.com"
+      },
+      "source": {
+        "name": "example",
+        "kind": "official",
+        "url": "https://example.org/scholarship",
+        "retrieved_at": "2027-03-24T22:59:59Z"
+      },
+      "application": {
+        "url": "https://example.org/apply",
+        "url_kind": "direct_application",
+        "contact_email": null
+      },
+      "eligibility": {
+        "citizenship": {
+          "requirement": "explicit",
+          "countries": [
+            "NG"
+          ]
+        },
+        "education": {
+          "requirement": "unknown",
+          "source_wording": null,
+          "stages": [],
+          "qualifications": [],
+          "years": [],
+          "courses": [],
+          "institution_names": []
+        },
+        "grade": {
+          "requirement": "unknown",
+          "scale": null,
+          "minimum_hundredths": null
+        },
+        "demographics": {
+          "requirements": [],
+          "preferences": []
+        },
+        "audience_tags": [],
+        "criteria_stated": true,
+        "criteria_text": "Open to Nigerian undergraduates."
+      },
+      "deadline": {
+        "kind": "rolling",
+        "fixed_at": null,
+        "stated_timezone": null,
+        "resolved_timezone": null,
+        "boundary": null
+      },
+      "award": {
+        "kind": "stipend",
+        "summary": "Monthly stipend.",
+        "currency": "NGN",
+        "amount_minor": 15000000,
+        "period": "per_month"
+      },
+      "location": {
+        "country": "NG",
+        "locality": "Lagos",
+        "arrangement": "hybrid"
+      },
+      "employment": {
+        "employment_type": "internship",
+        "duration_text": "Six months",
+        "paid": true
+      },
+      "documents_required": [],
+      "how_to_apply": "Not stated by the source.",
+      "lifecycle": {
+        "publication_status": "published",
+        "status": "open",
+        "closed_reason": null
+      },
+      "verification": {
+        "state": "verified",
+        "outcome": "confirmed_open",
+        "method": "human_review",
+        "reviewed_by": "human",
+        "reviewer_id": "staff-fixture",
+        "source_checked_url": "https://example.org/apply",
+        "last_success_at": "2027-03-20T09:00:00Z",
+        "fresh_until": "2027-03-27T09:00:00Z",
+        "last_attempt_at": "2027-03-20T09:00:00Z",
+        "last_attempt_outcome": "confirmed_open"
+      },
+      "timestamps": {
+        "created_at": "2027-03-19T09:00:00Z",
+        "updated_at": "2027-03-20T09:00:00Z",
+        "published_at": "2027-03-20T09:00:00Z",
+        "expired_at": null,
+        "withdrawn_at": null,
+        "closed_at": null
+      },
+      "identity": {
+        "provider_key": "example-tech",
+        "opportunity_key": "swe-intern",
+        "round_key": "rolling",
+        "round_evidence": null
+      },
+      "dedupe_key": "2222222222222222222222222222222222222222222222222222222222222222",
+      "content_hash": "2222222222222222222222222222222222222222222222222222222222222222",
+      "previous_round_id": null
+    },
+    "job": {
+      "schema_version": "1.0.0",
+      "listing_id": "lst_00000000000000000000000J01",
+      "kind": "job",
+      "synthetic": true,
+      "revision": 1,
+      "title": "Junior Data Analyst",
+      "summary": "Full time analyst role in Abuja.",
+      "description": "Work with the product team on web services.",
+      "provider": {
+        "name": "Example Tech",
+        "type": "company",
+        "country": "NG",
+        "url": "https://example.com"
+      },
+      "source": {
+        "name": "example",
+        "kind": "official",
+        "url": "https://example.org/scholarship",
+        "retrieved_at": "2027-03-24T22:59:59Z"
+      },
+      "application": {
+        "url": "https://example.org/apply",
+        "url_kind": "direct_application",
+        "contact_email": null
+      },
+      "eligibility": {
+        "citizenship": {
+          "requirement": "explicit",
+          "countries": [
+            "NG"
+          ]
+        },
+        "education": {
+          "requirement": "unknown",
+          "source_wording": null,
+          "stages": [],
+          "qualifications": [],
+          "years": [],
+          "courses": [],
+          "institution_names": []
+        },
+        "grade": {
+          "requirement": "unknown",
+          "scale": null,
+          "minimum_hundredths": null
+        },
+        "demographics": {
+          "requirements": [],
+          "preferences": []
+        },
+        "audience_tags": [],
+        "criteria_stated": true,
+        "criteria_text": "Open to Nigerian undergraduates."
+      },
+      "deadline": {
+        "kind": "rolling",
+        "fixed_at": null,
+        "stated_timezone": null,
+        "resolved_timezone": null,
+        "boundary": null
+      },
+      "award": {
+        "kind": "not_stated",
+        "summary": null,
+        "currency": null,
+        "amount_minor": null,
+        "period": null
+      },
+      "location": {
+        "country": "NG",
+        "locality": "Abuja",
+        "arrangement": "on_site"
+      },
+      "employment": {
+        "employment_type": "full_time",
+        "duration_text": null,
+        "paid": null
+      },
+      "documents_required": [],
+      "how_to_apply": "Not stated by the source.",
+      "lifecycle": {
+        "publication_status": "published",
+        "status": "open",
+        "closed_reason": null
+      },
+      "verification": {
+        "state": "verified",
+        "outcome": "confirmed_open",
+        "method": "human_review",
+        "reviewed_by": "human",
+        "reviewer_id": "staff-fixture",
+        "source_checked_url": "https://example.org/apply",
+        "last_success_at": "2027-03-20T09:00:00Z",
+        "fresh_until": "2027-03-27T09:00:00Z",
+        "last_attempt_at": "2027-03-20T09:00:00Z",
+        "last_attempt_outcome": "confirmed_open"
+      },
+      "timestamps": {
+        "created_at": "2027-03-19T09:00:00Z",
+        "updated_at": "2027-03-20T09:00:00Z",
+        "published_at": "2027-03-20T09:00:00Z",
+        "expired_at": null,
+        "withdrawn_at": null,
+        "closed_at": null
+      },
+      "identity": {
+        "provider_key": "example-tech",
+        "opportunity_key": "data-analyst",
+        "round_key": "2027",
+        "round_evidence": null
+      },
+      "dedupe_key": "3333333333333333333333333333333333333333333333333333333333333333",
+      "content_hash": "3333333333333333333333333333333333333333333333333333333333333333",
+      "previous_round_id": null
+    },
+    "expiredHistorical": {
+      "schema_version": "1.0.0",
+      "listing_id": "lst_00000000000000000000000E01",
+      "kind": "scholarship",
+      "synthetic": true,
+      "revision": 1,
+      "title": "Merit Scholarship 2026",
+      "summary": "Tuition support for new undergraduates in Nigeria.",
+      "description": "The foundation supports applicants entering their first year.",
+      "provider": {
+        "name": "Example Foundation",
+        "type": "foundation",
+        "country": "NG",
+        "url": null
+      },
+      "source": {
+        "name": "example",
+        "kind": "official",
+        "url": "https://example.org/scholarship",
+        "retrieved_at": "2027-03-24T22:59:59Z"
+      },
+      "application": {
+        "url": "https://example.org/apply",
+        "url_kind": "direct_application",
+        "contact_email": null
+      },
+      "eligibility": {
+        "citizenship": {
+          "requirement": "explicit",
+          "countries": [
+            "NG"
+          ]
+        },
+        "education": {
+          "requirement": "unknown",
+          "source_wording": null,
+          "stages": [],
+          "qualifications": [],
+          "years": [],
+          "courses": [],
+          "institution_names": []
+        },
+        "grade": {
+          "requirement": "unknown",
+          "scale": null,
+          "minimum_hundredths": null
+        },
+        "demographics": {
+          "requirements": [],
+          "preferences": []
+        },
+        "audience_tags": [],
+        "criteria_stated": true,
+        "criteria_text": "Nigerian citizens may apply."
+      },
+      "deadline": {
+        "kind": "fixed",
+        "fixed_at": "2026-03-31T22:59:59Z",
+        "stated_timezone": null,
+        "resolved_timezone": "Africa/Lagos",
+        "boundary": "inclusive_end_of_local_day"
+      },
+      "award": {
+        "kind": "full_tuition",
+        "summary": "Full tuition for the first year.",
+        "currency": null,
+        "amount_minor": null,
+        "period": "per_year"
+      },
+      "location": {
+        "country": "NG",
+        "locality": null,
+        "arrangement": "unknown"
+      },
+      "employment": null,
+      "documents_required": [],
+      "how_to_apply": "Not stated by the source.",
+      "lifecycle": {
+        "publication_status": "published",
+        "status": "expired",
+        "closed_reason": "deadline_passed"
+      },
+      "verification": {
+        "state": "verified",
+        "outcome": "confirmed_open",
+        "method": "human_review",
+        "reviewed_by": "human",
+        "reviewer_id": "staff-fixture",
+        "source_checked_url": "https://example.org/apply",
+        "last_success_at": "2027-03-20T09:00:00Z",
+        "fresh_until": "2027-03-27T09:00:00Z",
+        "last_attempt_at": "2027-03-20T09:00:00Z",
+        "last_attempt_outcome": "confirmed_open"
+      },
+      "timestamps": {
+        "created_at": "2027-03-19T09:00:00Z",
+        "updated_at": "2027-03-20T09:00:00Z",
+        "published_at": "2027-03-20T09:00:00Z",
+        "expired_at": "2026-03-31T23:00:00Z",
+        "withdrawn_at": null,
+        "closed_at": null
+      },
+      "identity": {
+        "provider_key": "example",
+        "opportunity_key": "merit",
+        "round_key": "2026",
+        "round_evidence": null
+      },
+      "dedupe_key": "4444444444444444444444444444444444444444444444444444444444444444",
+      "content_hash": "4444444444444444444444444444444444444444444444444444444444444444",
+      "previous_round_id": null
+    },
+    "tombstone": {
+      "schema_version": "1.0.0",
+      "listing_id": "lst_00000000000000000000000W01",
+      "kind": "scholarship",
+      "synthetic": true,
+      "revision": 1,
+      "title": "Merit Scholarship 2027",
+      "summary": "[withdrawn]",
+      "description": "[withdrawn]",
+      "provider": {
+        "name": "Example Foundation",
+        "type": "foundation",
+        "country": "NG",
+        "url": null
+      },
+      "source": {
+        "name": "example",
+        "kind": "official",
+        "url": "https://example.org/scholarship",
+        "retrieved_at": "2027-03-24T22:59:59Z"
+      },
+      "application": {
+        "url": "https://example.org/apply",
+        "url_kind": "direct_application",
+        "contact_email": null
+      },
+      "eligibility": {
+        "citizenship": {
+          "requirement": "explicit",
+          "countries": [
+            "NG"
+          ]
+        },
+        "education": {
+          "requirement": "unknown",
+          "source_wording": "[withdrawn]",
+          "stages": [],
+          "qualifications": [],
+          "years": [],
+          "courses": [],
+          "institution_names": []
+        },
+        "grade": {
+          "requirement": "unknown",
+          "scale": null,
+          "minimum_hundredths": null
+        },
+        "demographics": {
+          "requirements": [],
+          "preferences": []
+        },
+        "audience_tags": [],
+        "criteria_stated": false,
+        "criteria_text": "[withdrawn]"
+      },
+      "deadline": {
+        "kind": "fixed",
+        "fixed_at": "2027-03-31T22:59:59Z",
+        "stated_timezone": null,
+        "resolved_timezone": "Africa/Lagos",
+        "boundary": "inclusive_end_of_local_day"
+      },
+      "award": {
+        "kind": "not_stated",
+        "summary": null,
+        "currency": null,
+        "amount_minor": null,
+        "period": null
+      },
+      "location": {
+        "country": "NG",
+        "locality": null,
+        "arrangement": "unknown"
+      },
+      "employment": null,
+      "documents_required": [],
+      "how_to_apply": "[withdrawn]",
+      "lifecycle": {
+        "publication_status": "withdrawn",
+        "status": "closed",
+        "closed_reason": "removed_by_producer"
+      },
+      "verification": {
+        "state": "verified",
+        "outcome": "confirmed_open",
+        "method": "human_review",
+        "reviewed_by": "human",
+        "reviewer_id": "staff-fixture",
+        "source_checked_url": "https://example.org/apply",
+        "last_success_at": "2027-03-20T09:00:00Z",
+        "fresh_until": "2027-03-27T09:00:00Z",
+        "last_attempt_at": "2027-03-20T09:00:00Z",
+        "last_attempt_outcome": "confirmed_open"
+      },
+      "timestamps": {
+        "created_at": "2027-03-19T09:00:00Z",
+        "updated_at": "2027-03-20T09:00:00Z",
+        "published_at": "2027-03-20T09:00:00Z",
+        "expired_at": null,
+        "withdrawn_at": "2027-03-22T09:00:00Z",
+        "closed_at": "2027-03-22T09:00:00Z"
+      },
+      "identity": {
+        "provider_key": "example",
+        "opportunity_key": "merit",
+        "round_key": "2027-withdrawn",
+        "round_evidence": null
+      },
+      "dedupe_key": "5555555555555555555555555555555555555555555555555555555555555555",
+      "content_hash": "5555555555555555555555555555555555555555555555555555555555555555",
+      "previous_round_id": null
+    }
+  }
+}
