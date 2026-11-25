@@ -1,6 +1,7 @@
 import { formatFixedDeadline } from "../../../lib/listings/deadline";
 import { descriptionBlocks } from "../../../lib/listings/description-blocks";
 import Link from "next/link";
+import { pathSyncListingUrl } from "../../../lib/pathsync";
 import { notFound } from "next/navigation";
 import { cache } from "react";
 import { readPublicListings } from "../../../lib/listings/public-store";
@@ -37,6 +38,7 @@ export default async function Detail({ params }: { params: Promise<{ slug: strin
   const description = listing.description === "See the employer's listing for the job description and application instructions."
     ? null : listing.description;
   const instructions = listing.how_to_apply === "Not stated by the source." ? null : listing.how_to_apply;
+  const qualifyUrl = pathSyncListingUrl(listing.listing_id);
   const location = listing.location.locality ?? listing.summary.match(/^Location listed by the employer: (.+)$/)?.[1];
 
   return (
@@ -66,6 +68,10 @@ export default async function Detail({ params }: { params: Promise<{ slug: strin
             <span aria-hidden="true">↗</span>
           </a>
           {listing.source.url !== application.url && <a href={listing.source.url}>View original listing</a>}
+          {qualifyUrl && <p className="listing-qualify">
+            <a className="button" href={qualifyUrl}>See if you qualify</a>
+            <span>Check the requirements against your profile on PathSync. You still apply on the provider’s site yourself.</span>
+          </p>}
         </aside>
         <div className="listing-content">
           <section>
