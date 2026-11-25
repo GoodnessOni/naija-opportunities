@@ -3,8 +3,8 @@
 Code is on branch `feat/pathsync-bridge`. Steps marked **Goodness** need a sign-in, a key or an approval.
 
 ## 1. Database (Goodness approves, Claude runs in the SQL editor)
-- [ ] Apply `supabase/migrations/016_staff_audit.sql` (read-only function).
-- [ ] Apply `supabase/migrations/017_queue_assignment.sql` (one new table, two functions).
+- [x] Apply `supabase/migrations/016_staff_audit.sql` (applied 25 Nov 2026, approved by Goodness).
+- [x] Apply `supabase/migrations/017_queue_assignment.sql` (applied 25 Nov 2026; table and 3 functions verified, anon cannot run them).
 - [ ] Rerun `scripts/check-migrations.sql`; extend it with 016 and 017.
 
 ## 2. Merge and deploy to the v3 Vercel project
