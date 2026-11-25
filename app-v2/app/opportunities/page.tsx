@@ -41,9 +41,9 @@ export default async function Browse({ searchParams }: { searchParams: Promise<R
   }
 
   return (
-    <section className="browse">
+    <section className="browse browse-directory">
       <h1>Browse opportunities</h1>
-      <form action="/opportunities" className="search-form">
+      <form action="/opportunities" className="search-form directory-filters">
         <div><label htmlFor="q">Keyword</label><input id="q" name="q" defaultValue={query} maxLength={200} /></div>
         <div><label htmlFor="kind">Opportunity type</label><select id="kind" name="kind" defaultValue={kind ?? ""}>
           <option value="">All opportunities</option><option value="scholarship">Scholarships</option>

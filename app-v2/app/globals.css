@@ -124,3 +124,27 @@ input, select, textarea { border: 1px solid var(--navy); background: var(--cream
 .results-pagination a { font-weight: 600; }
 
 .footer-nav { display: flex; flex-wrap: wrap; gap: .75rem 1rem; }
+
+.home-intro {
+  margin-block: clamp(1.25rem, 4vw, 3rem) 1rem;
+  padding: clamp(1.4rem, 4.5vw, 4rem);
+  border: 1px solid #101b3e22;
+  border-radius: 1.7rem;
+  background: #fffdf6;
+}
+.home-intro h1 { max-width: 11ch; font-size: clamp(2.7rem, 6vw, 5.5rem); line-height: .96; text-wrap: balance; }
+.home-intro p { max-width: 35ch; }
+.home-photo { aspect-ratio: 5 / 4; border-radius: 1rem; }
+.home-search { display: grid; gap: .35rem; margin-top: 1.4rem; }
+.home-search > div { display: flex; gap: .45rem; }
+.home-search input { flex: 1; width: 0; min-width: 0; border-radius: .65rem; background: #fffdf6; }
+.home-intro .home-search .button { display: inline-flex; align-items: center; margin: 0; }
+.home-browse-link { display: inline-flex; gap: .4rem; margin-top: 1rem; font-weight: 600; text-underline-offset: .25em; }
+.home-categories { gap: .85rem; }
+.home-categories a { padding: 1.1rem 1.2rem; font-size: 1.1rem; }
+.home-categories a span { color: #934313; }
+.home-listings > h2 { font-size: clamp(1.9rem, 4vw, 3rem); }
+.directory-filters { background: #fffdf6; border: 1px solid #101b3e22; border-radius: 1rem; padding: 1rem; }
+.directory-filters > div { flex: 1 1 10rem; min-width: 0; }
+.directory-filters input, .directory-filters select { width: 100%; border-radius: .5rem; }
+.directory-filters .button { border-radius: .5rem; }
