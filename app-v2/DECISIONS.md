@@ -5,8 +5,8 @@ The handoff PDF mentions a local checkout at d6b448c two commits ahead of origin
 
 - **Migrations check.** No Supabase access from this session, so `scripts/check-migrations.sql` is a read-only
   catalog query listing every object migrations 001 to 015 create, with present true or false. Nothing applied.
-- **See if you qualify.** Links to `{PATHSYNC_URL}/listings/{listing_id}`. Empty `PATHSYNC_URL` means
-  localhost:3000 in dev and https://pathsync-ai.naijaopportunities.live in production. Server-side, not NEXT_PUBLIC.
+- **See if you qualify.** Links to `{PATHSYNC_URL}/listings/{listing_id}`. Empty `PATHSYNC_URL` means localhost:3000 in dev and
+  the button is hidden in production (the PathSync subdomain is created at launch). Server-side, not NEXT_PUBLIC.
 - **Shared sign-in.** Added `@supabase/ssr` and `@supabase/supabase-js` (same versions as PathSync) so both apps read
   the same `sb-<ref>-auth-token` cookie. Cookie domain `.naijaopportunities.live` only when NODE_ENV is production
   and the host is that domain or a subdomain (`lib/supabase/cookie-domain.ts`). `proxy.ts` refreshes the session

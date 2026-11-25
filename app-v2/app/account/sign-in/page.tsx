@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { PATHSYNC_DEV_URL, PATHSYNC_PRODUCTION_URL } from "../../../lib/pathsync";
+import { PATHSYNC_DEV_URL } from "../../../lib/pathsync";
 import { createUserClient } from "../../../lib/supabase/server";
 
 export const metadata = { title: "Sign in", robots: { index: false, follow: false } };
@@ -30,7 +30,7 @@ export default async function SignIn({ searchParams }: { searchParams: Promise<{
   const { next, error } = await searchParams;
   const supabase = await createUserClient();
   const user = supabase ? (await supabase.auth.getUser()).data.user : null;
-  const pathSync = process.env.PATHSYNC_URL || (process.env.NODE_ENV === "production" ? PATHSYNC_PRODUCTION_URL : PATHSYNC_DEV_URL);
+  const pathSync = process.env.PATHSYNC_URL?.trim() || (process.env.NODE_ENV === "production" ? null : PATHSYNC_DEV_URL);
   if (user) return <section className="browse"><h1>You are signed in</h1>
     <form action={signOut}><button className="button">Sign out</button></form></section>;
   return (
@@ -44,7 +44,7 @@ export default async function SignIn({ searchParams }: { searchParams: Promise<{
         <label>Password <input type="password" name="password" autoComplete="current-password" required /></label>
         <button className="button">Sign in</button>
       </form>
-      <p>No account yet? <a href={pathSync}>Create one on PathSync</a>.</p>
+      {pathSync && <p>No account yet? <a href={pathSync}>Create one on PathSync</a>.</p>}
     </section>
   );
 }

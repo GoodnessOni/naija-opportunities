@@ -4,8 +4,9 @@ import { pathSyncListingUrl } from "../lib/pathsync";
 const id = "lst_01JD2Z8Q4X7K9M3N5P6R8S0T1V";
 
 describe("pathSyncListingUrl", () => {
-  it("uses the production PathSync host in production", () => {
-    expect(pathSyncListingUrl(id, undefined, "production")).toBe(`https://pathsync-ai.naijaopportunities.live/listings/${id}`);
+  it("hides the link in production until PATHSYNC_URL is set", () => {
+    expect(pathSyncListingUrl(id, undefined, "production")).toBeNull();
+    expect(pathSyncListingUrl(id, "https://pathsync-ai.naijaopportunities.live", "production")).toBe(`https://pathsync-ai.naijaopportunities.live/listings/${id}`);
   });
   it("uses localhost in development", () => {
     expect(pathSyncListingUrl(id, "", "development")).toBe(`http://localhost:3000/listings/${id}`);
