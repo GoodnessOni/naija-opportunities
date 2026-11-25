@@ -1,6 +1,6 @@
 import { listingSchema, type Listing } from "./schema";
 
-export async function readPublicListings(filters: { kind?: Listing["kind"]; id?: string; query?: string; limit?: number; offset?: number } = {}) {
+export async function readPublicListings(filters: { kind?: Listing["kind"]; id?: string; query?: string; limit?: number; offset?: number; browse?: { provider_type?: string; location_query?: string; work_arrangement?: string; deadline_type?: string; closes_within?: number } } = {}) {
   const { SUPABASE_URL: url, SUPABASE_ANON_KEY: key } = process.env;
   if (!url || !key) {
     if (process.env.VERCEL_ENV === "production") throw new Error("Missing public listings configuration");
@@ -8,7 +8,7 @@ export async function readPublicListings(filters: { kind?: Listing["kind"]; id?:
   }
 
   const paginated = filters.offset !== undefined;
-  const rpc = paginated ? "browse_active_listings" : "active_listings";
+  const rpc = filters.browse ? "filter_active_listings" : paginated ? "browse_active_listings" : "active_listings";
   const response = await fetch(new URL(`/rest/v1/rpc/${rpc}`, url), {
     method: "POST",
     cache: "no-store",
@@ -17,6 +17,7 @@ export async function readPublicListings(filters: { kind?: Listing["kind"]; id?:
       selected_kind: filters.kind ?? null,
       ...(paginated ? { page_offset: filters.offset } : { selected_id: filters.id ?? null }),
       search_text: filters.query ?? null, page_limit: filters.limit ?? 30,
+      ...filters.browse,
     }),
   });
   if (!response.ok) throw new Error("The listing service could not be reached");

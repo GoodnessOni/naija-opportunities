@@ -30,7 +30,10 @@ export default async function Detail({ params }: { params: Promise<{ slug: strin
   const canApply = ["direct_application", "official_programme_page"].includes(application.url_kind);
   const deadlineLabel = deadline.kind === "fixed"
     ? formatFixedDeadline(deadline)
-    : deadline.kind === "rolling" ? "Rolling deadline" : null;
+    : deadline.kind === "rolling" ? "Rolling admission" : "Deadline not stated";
+  const closesToday = deadline.kind === "fixed" &&
+    formatFixedDeadline({ ...deadline, boundary: "inclusive_end_of_local_day" }) ===
+    formatFixedDeadline({ ...deadline, boundary: "inclusive_end_of_local_day", fixed_at: new Date().toISOString() });
   const description = listing.description === "See the employer's listing for the job description and application instructions."
     ? null : listing.description;
   const instructions = listing.how_to_apply === "Not stated by the source." ? null : listing.how_to_apply;
@@ -48,7 +51,13 @@ export default async function Detail({ params }: { params: Promise<{ slug: strin
       <div className="listing-layout">
         <aside className="listing-apply">
           <h2>Application</h2>
-          {deadlineLabel && <dl><dt>Deadline</dt><dd>{deadline.kind === "fixed" ? <time dateTime={deadline.fixed_at}>{deadlineLabel}</time> : deadlineLabel}</dd></dl>}
+          <dl><dt>Deadline</dt><dd>
+            {deadline.kind === "fixed" ? (
+              <><time dateTime={deadline.fixed_at}>{deadlineLabel}</time>
+                {deadline.boundary === "inclusive_end_of_local_day" && ` (${deadline.resolved_timezone})`}
+                {closesToday && " · Closes today"}</>
+            ) : deadlineLabel}
+          </dd></dl>
           <a className="button listing-apply-link" href={application.url}>
             {canApply ? (kind === "job" ? "Apply on the employer site" : "Apply on the official site") : "View source listing"}
             <span aria-hidden="true">↗</span>
