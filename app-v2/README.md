@@ -71,7 +71,7 @@ Review the excerpts in context before adding them to a listing.
 
 ## Rebuild release checks
 
-Apply migrations through 012 to the rebuild Supabase project before deploying
+Apply migrations through 015 to the rebuild Supabase project before deploying
 the branch. Enable email confirmation in Supabase Auth and allow the rebuild
 site's /submit URL as a redirect. Check that a confirmed organisation can sign
 in, submit a draft and only see its own submissions. With a staff account,
@@ -83,7 +83,7 @@ Set CONTACT_EMAIL, CONTACT_FROM_EMAIL and RESEND_API_KEY on the rebuild's Vercel
 project for contact delivery. CONTACT_FROM_EMAIL must use a verified sending
 domain. Set independent random values for ALERT_SIGNING_SECRET and CRON_SECRET.
 The digest is configured for 08:00 Africa/Lagos and matches confirmed keyword
-and category subscriptions against listings published in the previous UTC day.
+and category subscriptions with optional provider, location, work arrangement and deadline filters against listings published in the previous UTC day.
 For acceptance, confirm a subscription, check matching delivery, unsubscribe,
 and confirm no further alerts arrive. Signatures are tied to each action and
 subscription. Rotating ALERT_SIGNING_SECRET invalidates earlier emailed links.
@@ -91,3 +91,13 @@ subscription. Rotating ALERT_SIGNING_SECRET invalidates earlier emailed links.
 Check the public site with a keyboard, review the filter and pagination links,
 and check /robots.txt and /sitemap.xml. Capture the current deploy and confirm
 the previous Vercel deployment can be restored before any domain cutover.
+
+The recheck cron queues due listings across all categories at 09:00 Africa/Lagos.
+Staff review official evidence to renew freshness for sources without an
+automated verification adapter.
+
+For near-immediate alerts, migration 015 schedules a request in the rebuild project. It calls
+GET /api/alerts/digest?delivery=instant every five minutes with the same
+CRON_SECRET bearer token, then set INSTANT_ALERTS_ENABLED=true in Vercel.
+Keep the daily Vercel cron. The instant worker checks an overlapping
+15-minute window and uses a per-listing, per-subscription delivery key.

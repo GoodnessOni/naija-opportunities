@@ -1,5 +1,6 @@
 "use server";
 
+import { parseBrowseFilters } from "../../lib/listings/browse-filters";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { alertLink, sendAlertEmail, validAlertSignature } from "../../lib/alerts";
@@ -7,7 +8,7 @@ import { staffRpc } from "../../lib/listings/staff-store";
 
 const queryInput = z.object({
   email: z.email().max(254), kind: z.enum(["", "job", "internship", "scholarship"]),
-  keyword: z.string().trim().max(200),
+  keyword: z.string().trim().max(200), frequency: z.enum(["daily", "instant"]),
 });
 
 export async function subscribe(form: FormData) {
@@ -16,9 +17,10 @@ export async function subscribe(form: FormData) {
   if (form.get("website")) redirect("/alerts?status=check-email");
   const result = queryInput.safeParse(Object.fromEntries(form));
   if (!result.success) redirect("/alerts?status=invalid");
-  const { email, kind, keyword } = result.data;
-  const saved = await staffRpc("create_email_alert", {
-    address: email.toLowerCase(), category: kind, keyword_query: keyword,
+  const { email, kind, keyword, frequency } = result.data;
+  if (frequency === "instant" && process.env.INSTANT_ALERTS_ENABLED !== "true") redirect("/alerts?status=unavailable");
+  const saved = await staffRpc("create_delivery_alert", {
+    address: email.toLowerCase(), category: kind, keyword_query: keyword, saved_filters: parseBrowseFilters(Object.fromEntries(form)), delivery: frequency,
   }).then(value => ({ value }), () => null);
   if (!saved) redirect("/alerts?status=unavailable");
   if (typeof saved.value === "string") {

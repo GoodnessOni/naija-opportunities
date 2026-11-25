@@ -1,3 +1,4 @@
+import { resolveDateOnlyDeadline } from "../../../../lib/listings/deadline";
 import { createHash } from "node:crypto";
 import { z } from "zod";
 import { listingSchema } from "../../../../lib/listings/schema";
@@ -11,7 +12,9 @@ const inputSchema = z.discriminatedUnion("action", [
   z.object({ action: z.literal("create"), note, listing: submissionInput }),
   z.object({ action: z.literal("edit"), ...target, note, title: submissionInput.shape.title,
     summary: submissionInput.shape.summary, description: submissionInput.shape.description,
-    source: submissionInput.shape.source, apply: submissionInput.shape.apply }),
+    source: submissionInput.shape.source, apply: submissionInput.shape.apply,
+    criteria: submissionInput.shape.criteria, deadlineKind: z.enum(["keep", "fixed", "rolling", "unknown"]),
+    deadlineDate: submissionInput.shape.deadlineDate, timezone: submissionInput.shape.timezone }),
   z.object({ action: z.literal("withdraw"), ...target, note }),
 ]);
 
@@ -75,6 +78,13 @@ export async function POST(request: Request) {
         listing.source.retrieved_at = now.toISOString();
         if (listing.application.url !== data.apply) listing.application.url_kind = "unknown";
         listing.application.url = data.apply;
+        listing.eligibility.criteria_text = data.criteria || null;
+        listing.eligibility.criteria_stated = Boolean(data.criteria);
+        if (data.deadlineKind === "fixed") {
+          listing.deadline = resolveDateOnlyDeadline(data.deadlineDate, data.timezone || null);
+        } else if (data.deadlineKind !== "keep") {
+          listing.deadline = { kind: data.deadlineKind, fixed_at: null, stated_timezone: null, resolved_timezone: null, boundary: null };
+        }
       }
       const { content_hash, ...fields } = listing;
       void content_hash;

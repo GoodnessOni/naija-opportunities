@@ -58,12 +58,16 @@ export default function StaffEditor({ token, onSaved }: { token: string; onSaved
       {!listing && <>
         <label>Type <select name="kind"><option value="job">Job</option><option value="internship">Internship</option><option value="scholarship">Scholarship</option></select></label>
         <label>Provider <input name="provider" required maxLength={160} /></label>
-        <label>Deadline type <select name="deadlineKind"><option value="unknown">Not stated</option><option value="rolling">Rolling</option><option value="fixed">Fixed date</option></select></label>
-        <label>Deadline date <input name="deadlineDate" type="date" /></label>
-        <label>Source timezone <input name="timezone" placeholder="Africa/Lagos" maxLength={100} /></label>
         <label>Round <input name="round" maxLength={100} /></label>
-        <label>Eligibility <textarea name="criteria" maxLength={4000} /></label>
+
       </>}
+      <label>Deadline type <select name="deadlineKind" defaultValue={listing ? "keep" : "unknown"}>
+        {listing && <option value="keep">Keep existing deadline</option>}
+        <option value="unknown">Not stated</option><option value="rolling">Rolling</option><option value="fixed">Set fixed date</option>
+      </select></label>
+      <label>Deadline date <input name="deadlineDate" type="date" /></label>
+      <label>Source timezone <input name="timezone" placeholder="Africa/Lagos" maxLength={100} /></label>
+      <label>Eligibility <textarea name="criteria" defaultValue={listing?.eligibility.criteria_text ?? ""} maxLength={4000} /></label>
       <label>Title <input name="title" required defaultValue={listing?.title} maxLength={180} /></label>
       <label>Summary <textarea name="summary" required defaultValue={listing?.summary} maxLength={400} /></label>
       <label>Description <textarea name="description" required defaultValue={listing?.description} maxLength={8000} /></label>

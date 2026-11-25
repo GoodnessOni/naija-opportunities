@@ -1,3 +1,4 @@
+import { browseFilterLabel, browseFilterLabels, browseFilterOptions, parseBrowseFilters } from "../../lib/listings/browse-filters";
 import Link from "next/link";
 import { readPublicListings } from "../../lib/listings/public-store";
 
@@ -14,17 +15,8 @@ export default async function Browse({ searchParams }: { searchParams: Promise<R
   const requestedPage = Number(params.page);
   const page = Number.isSafeInteger(requestedPage) && requestedPage >= 1 && requestedPage <= 1000 ? requestedPage : 1;
   const offset = (page - 1) * pageSize;
-  const choices = {
-    provider_type: ["government", "tertiary_institution", "company", "foundation", "ngo", "multilateral", "unknown"],
-    work_arrangement: ["on_site", "remote", "hybrid", "unknown"],
-    deadline_type: ["fixed", "rolling", "unknown"],
-    closes_within: ["7", "14", "30"],
-  };
-  const selected = Object.fromEntries(Object.entries(choices).map(([key, options]) => {
-    const value = params[key];
-    return [key, typeof value === "string" && options.includes(value) ? value : ""];
-  }));
-  const location = typeof params.location_query === "string" ? params.location_query.trim().slice(0, 100) : "";
+  const selected = parseBrowseFilters(params);
+  const location = selected.location_query ?? "";
   const records = await readPublicListings({
     kind, query, limit: pageSize + 1, offset,
     browse: {
@@ -58,12 +50,12 @@ export default async function Browse({ searchParams }: { searchParams: Promise<R
           <option value="internship">Internships</option><option value="job">Jobs</option>
         </select></div>
         <div><label htmlFor="location_query">Country or locality</label><input id="location_query" name="location_query" defaultValue={location} maxLength={100} /></div>
-        {Object.entries(choices).map(([key, options]) => {
-          const labels: Record<string, string> = { provider_type: "Provider type", work_arrangement: "Work arrangement", deadline_type: "Deadline type", closes_within: "Closes within" };
-          return <div key={key}><label htmlFor={key}>{labels[key]}</label>
-            <select id={key} name={key} defaultValue={selected[key]}>
+        {Object.entries(browseFilterOptions).map(([key, options]) => {
+          const name = key as keyof typeof browseFilterOptions;
+          return <div key={key}><label htmlFor={key}>{browseFilterLabels[name]}</label>
+            <select id={key} name={key} defaultValue={selected[name] ?? ""}>
               <option value="">Any</option>
-              {options.map(option => <option key={option} value={option}>{key === "closes_within" ? `${option} days` : option.replaceAll("_", " ").replace(/^./, letter => letter.toUpperCase())}</option>)}
+              {options.map(option => <option key={option} value={option}>{browseFilterLabel(key, option)}</option>)}
             </select>
           </div>;
         })}
@@ -71,7 +63,7 @@ export default async function Browse({ searchParams }: { searchParams: Promise<R
       </form>
       <p>{results.length ? `Showing ${offset + 1}–${offset + results.length}` : "0 results"}</p>
       {results.length === 0 && <p>No open opportunities match these filters. <Link href="/opportunities">Clear filters</Link>.</p>}
-      <Link href={`/alerts?${new URLSearchParams({ q: query, kind: kind ?? "" })}`}>Get email alerts for this keyword and category</Link>
+      <Link href={`/alerts?${new URLSearchParams({ q: query, kind: kind ?? "", ...selected })}`}>Get email alerts for this search</Link>
       <OpportunityCards listings={results} heading="h2" />
       {(page > 1 || hasNext) && (
         <nav aria-label="Results pages" className="results-pagination">
