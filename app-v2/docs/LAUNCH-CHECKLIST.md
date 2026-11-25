@@ -8,7 +8,7 @@ Code is on branch `feat/pathsync-bridge`. Steps marked **Goodness** need a sign-
 - [ ] Rerun `scripts/check-migrations.sql`; extend it with 016 and 017.
 
 ## 2. Merge and deploy to the v3 Vercel project
-- [ ] **Goodness:** approve merging `feat/pathsync-bridge` into `v2/rebuild` (check nobody else has pending work there).
+- [x] Merged `feat/pathsync-bridge` into `v2/rebuild` (fast-forward to 19c36bb, 25 Nov 2026, approved by Goodness).
 - [ ] Vercel deploys v3 at naija-opportunities-v3.vercel.app. Note the deployed commit here: ________
 
 ## 3. Vercel variables, NaijaOpportunities project (Goodness pastes values)
