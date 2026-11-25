@@ -2,6 +2,20 @@ import { formatFixedDeadline } from "../../../lib/listings/deadline";
 import { descriptionBlocks } from "../../../lib/listings/description-blocks";
 import Link from "next/link";
 import { pathSyncListingUrl } from "../../../lib/pathsync";
+import type { ActivityStatus } from "../../../lib/activity";
+import { createUserClient } from "../../../lib/supabase/server";
+import ActivityPanel from "./activity-panel";
+
+/** The visitor's own record only (RLS: owner-only). Null when auth is not configured. */
+async function readOwnActivity(listingId: string): Promise<{ signedIn: boolean; status: ActivityStatus | null } | null> {
+  const supabase = await createUserClient();
+  if (!supabase) return null;
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { signedIn: false, status: null };
+  const { data } = await supabase.schema("shared").from("opportunity_activity")
+    .select("status").eq("listing_id", listingId).maybeSingle();
+  return { signedIn: true, status: (data?.status as ActivityStatus | undefined) ?? null };
+}
 import { notFound } from "next/navigation";
 import { cache } from "react";
 import { readPublicListings } from "../../../lib/listings/public-store";
@@ -23,8 +37,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 }
 
 export default async function Detail({ params }: { params: Promise<{ slug: string }> }) {
-  const listing = await findListing((await params).slug);
+  const { slug } = await params;
+  const listing = await findListing(slug);
   if (!listing) notFound();
+  const activity = await readOwnActivity(listing.listing_id);
   const { deadline, application, provider, kind } = listing;
   const categories = { job: "Jobs", internship: "Internships", scholarship: "Scholarships" };
   const category = categories[kind];
@@ -72,6 +88,8 @@ export default async function Detail({ params }: { params: Promise<{ slug: strin
             <a className="button" href={qualifyUrl}>See if you qualify</a>
             <span>Check the requirements against your profile on PathSync. You still apply on the provider’s site yourself.</span>
           </p>}
+          {activity && <ActivityPanel listingId={listing.listing_id} status={activity.status}
+            signInHref={activity.signedIn ? null : `/account/sign-in?next=${encodeURIComponent(`/opportunities/${slug}`)}`} />}
         </aside>
         <div className="listing-content">
           <section>
