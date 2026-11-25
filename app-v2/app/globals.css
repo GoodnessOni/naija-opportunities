@@ -119,3 +119,6 @@ input, select, textarea { border: 1px solid var(--navy); background: var(--cream
 @media (min-width: 52rem) {
   .home-intro { grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); }
 }
+
+.results-pagination { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; }
+.results-pagination a { font-weight: 600; }

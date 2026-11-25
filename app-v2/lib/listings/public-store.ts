@@ -1,18 +1,21 @@
 import { listingSchema, type Listing } from "./schema";
 
-export async function readPublicListings(filters: { kind?: Listing["kind"]; id?: string; query?: string; limit?: number } = {}) {
+export async function readPublicListings(filters: { kind?: Listing["kind"]; id?: string; query?: string; limit?: number; offset?: number } = {}) {
   const { SUPABASE_URL: url, SUPABASE_ANON_KEY: key } = process.env;
   if (!url || !key) {
     if (process.env.VERCEL_ENV === "production") throw new Error("Missing public listings configuration");
     return [];
   }
 
-  const response = await fetch(new URL("/rest/v1/rpc/active_listings", url), {
+  const paginated = filters.offset !== undefined;
+  const rpc = paginated ? "browse_active_listings" : "active_listings";
+  const response = await fetch(new URL(`/rest/v1/rpc/${rpc}`, url), {
     method: "POST",
     cache: "no-store",
     headers: { apikey: key, ...(key.startsWith("sb_") ? {} : { Authorization: `Bearer ${key}` }), "Content-Type": "application/json" },
     body: JSON.stringify({
-      selected_kind: filters.kind ?? null, selected_id: filters.id ?? null,
+      selected_kind: filters.kind ?? null,
+      ...(paginated ? { page_offset: filters.offset } : { selected_id: filters.id ?? null }),
       search_text: filters.query ?? null, page_limit: filters.limit ?? 30,
     }),
   });
