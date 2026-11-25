@@ -20,3 +20,15 @@ export async function POST(request: Request) {
     return Response.json({ error: "submission_unavailable" }, { status: 503 });
   }
 }
+
+export async function GET(request: Request) {
+  try {
+    const user = await authenticateUser(request);
+    if (!user.email_confirmed_at) return Response.json({ error: "confirm_email" }, { status: 403 });
+    const submissions = await staffRpc("organisation_submission_status", { owner_user: user.id });
+    return Response.json({ submissions }, { headers: { "Cache-Control": "no-store" } });
+  } catch (error) {
+    if (error instanceof StaffRequestError) return Response.json({ error: error.code }, { status: error.status });
+    return Response.json({ error: "submission_unavailable" }, { status: 503 });
+  }
+}

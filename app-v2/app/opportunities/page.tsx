@@ -71,6 +71,7 @@ export default async function Browse({ searchParams }: { searchParams: Promise<R
       </form>
       <p>{results.length ? `Showing ${offset + 1}–${offset + results.length}` : "0 results"}</p>
       {results.length === 0 && <p>No open opportunities match these filters. <Link href="/opportunities">Clear filters</Link>.</p>}
+      <Link href={`/alerts?${new URLSearchParams({ q: query, kind: kind ?? "" })}`}>Get email alerts for this keyword and category</Link>
       <OpportunityCards listings={results} heading="h2" />
       {(page > 1 || hasNext) && (
         <nav aria-label="Results pages" className="results-pagination">

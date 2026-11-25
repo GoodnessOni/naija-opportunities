@@ -21,7 +21,8 @@ async function queue(id: string) {
 export async function GET(request: Request) {
   try {
     const staff = await authenticateStaff(request);
-    return Response.json({ listings: await queue(staff.id) }, { headers: { "Cache-Control": "no-store" } });
+    const [listings, overview] = await Promise.all([queue(staff.id), staffRpc("staff_overview", { staff_user: staff.id })]);
+    return Response.json({ listings, overview }, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
     return errorResponse(error);
   }

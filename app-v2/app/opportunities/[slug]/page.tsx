@@ -51,6 +51,9 @@ export default async function Detail({ params }: { params: Promise<{ slug: strin
       <div className="listing-layout">
         <aside className="listing-apply">
           <h2>Application</h2>
+          {listing.verification.last_success_at && <p>Checked against the official source on{" "}
+            <time dateTime={listing.verification.last_success_at}>{new Intl.DateTimeFormat("en-GB", { dateStyle: "long", timeZone: "Africa/Lagos" }).format(new Date(listing.verification.last_success_at))}</time>
+          </p>}
           <dl><dt>Deadline</dt><dd>
             {deadline.kind === "fixed" ? (
               <><time dateTime={deadline.fixed_at}>{deadlineLabel}</time>

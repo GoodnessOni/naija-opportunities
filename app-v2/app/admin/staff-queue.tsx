@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState, type FormEvent } from "react";
+import StaffEditor from "./staff-editor";
 import type { Listing } from "../../lib/listings/schema";
 
 const sessionKey = "naijaopportunities.staff.access";
@@ -8,6 +9,7 @@ const sessionKey = "naijaopportunities.staff.access";
 export default function StaffQueue() {
   const [token, setToken] = useState("");
   const [listings, setListings] = useState<Listing[]>([]);
+  const [overview, setOverview] = useState<{ pending: number; ambiguous: number; stale: number; closingSoon: number; published: number }>();
   const [selected, setSelected] = useState<Listing | null>(null);
   const [outcome, setOutcome] = useState("confirmed_open");
   const [notice, setNotice] = useState("");
@@ -24,8 +26,9 @@ export default function StaffQueue() {
       }
       throw new Error(response.status === 403 ? "This account does not have staff access." : "The review queue is unavailable.");
     }
-    const result: { listings: Listing[] } = await response.json();
+    const result: { listings: Listing[]; overview: typeof overview } = await response.json();
     setListings(result.listings);
+    setOverview(result.overview);
   }, []);
 
   useEffect(() => {
@@ -105,6 +108,14 @@ export default function StaffQueue() {
     </form> : <>
       <button className="button-outline" disabled={busy} onClick={() => refresh(token).catch(error => setNotice(error.message))}>Refresh queue</button>
       <button className="button-outline" disabled={busy} onClick={() => { sessionStorage.removeItem(sessionKey); setToken(""); setSelected(null); setListings([]); }}>Sign out</button>
+      {overview && <dl className="search-form">
+        <div><dt>Pending</dt><dd>{overview.pending}</dd></div>
+        <div><dt>Ambiguous</dt><dd>{overview.ambiguous}</dd></div>
+        <div><dt>Stale</dt><dd>{overview.stale}</dd></div>
+        <div><dt>Closing in seven days</dt><dd>{overview.closingSoon}</dd></div>
+        <div><dt>Published</dt><dd>{overview.published}</dd></div>
+      </dl>}
+      <StaffEditor token={token} onSaved={() => refresh(token)} />
       <ul className="listing-list">
         {listings.map(listing => <li key={listing.listing_id}>
           <h2>{listing.title}</h2><p>{listing.provider.name}</p>
