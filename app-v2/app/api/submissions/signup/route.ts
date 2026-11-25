@@ -1,9 +1,12 @@
+import { limitRequest } from "../../../../lib/rate-limit";
 import { z } from "zod";
 import { siteUrl } from "../../../../lib/site-url";
 
 const credentials = z.object({ email: z.email().max(254), password: z.string().min(12).max(72) });
 
 export async function POST(request: Request) {
+  const limited = limitRequest(request, "org-signup", 5);
+  if (limited) return limited;
   const input = credentials.safeParse(await request.json().catch(() => null));
   if (!input.success) return Response.json({ error: "invalid_credentials" }, { status: 400 });
   const { SUPABASE_URL, SUPABASE_ANON_KEY } = process.env;

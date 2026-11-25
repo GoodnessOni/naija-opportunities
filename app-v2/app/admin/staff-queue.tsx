@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import StaffEditor from "./staff-editor";
 import type { Listing } from "../../lib/listings/schema";
+import { filterQueue, needsOfficialUrl, type QueueFilters } from "../../lib/listings/queue-filters";
 
 const sessionKey = "naijaopportunities.staff.access";
 
@@ -14,6 +15,9 @@ export default function StaffQueue() {
   const [outcome, setOutcome] = useState("confirmed_open");
   const [notice, setNotice] = useState("");
   const [busy, setBusy] = useState(false);
+  const [assignments, setAssignments] = useState<Record<string, string>>({});
+  const [reviewer, setReviewer] = useState("");
+  const [filters, setFilters] = useState<QueueFilters>({ kind: "all", state: "all", owner: "all" });
 
   const refresh = useCallback(async (accessToken: string) => {
     const response = await fetch("/api/staff/review", { headers: { Authorization: `Bearer ${accessToken}` } });
@@ -26,8 +30,10 @@ export default function StaffQueue() {
       }
       throw new Error(response.status === 403 ? "This account does not have staff access." : "The review queue is unavailable.");
     }
-    const result: { listings: Listing[]; overview: typeof overview } = await response.json();
+    const result: { listings: Listing[]; overview: typeof overview; assignments?: Record<string, string>; reviewer?: string } = await response.json();
     setListings(result.listings);
+    setAssignments(result.assignments ?? {});
+    setReviewer(result.reviewer ?? "");
     setOverview(result.overview);
   }, []);
 
@@ -99,6 +105,28 @@ export default function StaffQueue() {
     }
   }
 
+  async function assign(listingId: string, reviewerId: string | null) {
+    setBusy(true);
+    setNotice("");
+    try {
+      const response = await fetch("/api/staff/assign", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ listing_id: listingId, reviewer_id: reviewerId }),
+      });
+      if (!response.ok) throw new Error("Could not change the assignment.");
+      await refresh(token);
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : "Could not change the assignment.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  const visible = filterQueue(listings, filters, assignments, reviewer);
+  const setFilter = (key: keyof QueueFilters) => (event: { target: { value: string } }) =>
+    setFilters(current => ({ ...current, [key]: event.target.value }));
+
   return <>
     <p role="status">{notice}</p>
     {!token ? <form className="search-form" onSubmit={signIn}>
@@ -116,9 +144,26 @@ export default function StaffQueue() {
         <div><dt>Published</dt><dd>{overview.published}</dd></div>
       </dl>}
       <StaffEditor token={token} onSaved={() => refresh(token)} />
+      <fieldset className="search-form queue-filters"><legend>Filter the queue</legend>
+        <div><label htmlFor="filter-kind">Type</label><select id="filter-kind" value={filters.kind} onChange={setFilter("kind")}>
+          <option value="all">All types</option><option value="scholarship">Scholarships</option>
+          <option value="internship">Internships</option><option value="job">Jobs</option></select></div>
+        <div><label htmlFor="filter-state">State</label><select id="filter-state" value={filters.state} onChange={setFilter("state")}>
+          <option value="all">All states</option><option value="draft">New drafts</option><option value="due">Due for recheck</option>
+          <option value="inconclusive">Inconclusive or failed check</option><option value="needs_official_url">Needs official URL</option></select></div>
+        <div><label htmlFor="filter-owner">Assigned</label><select id="filter-owner" value={filters.owner} onChange={setFilter("owner")}>
+          <option value="all">Anyone</option><option value="mine">Assigned to me</option><option value="unassigned">Unassigned</option></select></div>
+      </fieldset>
+      <p>{visible.length} of {listings.length} shown</p>
       <ul className="listing-list">
-        {listings.map(listing => <li key={listing.listing_id}>
+        {visible.map(listing => <li key={listing.listing_id}>
           <h2>{listing.title}</h2><p>{listing.provider.name}</p>
+          {needsOfficialUrl(listing) && <p className="queue-tag">Needs official URL</p>}
+          <p>{assignments[listing.listing_id] ? `Assigned to ${assignments[listing.listing_id]}` : "Unassigned"}</p>
+          {reviewer && assignments[listing.listing_id] !== reviewer &&
+            <button className="button-outline" disabled={busy} onClick={() => assign(listing.listing_id, reviewer)}>Assign to me</button>}
+          {assignments[listing.listing_id] &&
+            <button className="button-outline" disabled={busy} onClick={() => assign(listing.listing_id, null)}>Unassign</button>}
           <button className="button-outline" disabled={busy} onClick={() => { setSelected(listing); setOutcome("confirmed_open"); }}>Review listing</button>
         </li>)}
       </ul>

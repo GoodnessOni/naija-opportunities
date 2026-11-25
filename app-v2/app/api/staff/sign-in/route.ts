@@ -1,8 +1,11 @@
+import { limitRequest } from "../../../../lib/rate-limit";
 import { z } from "zod";
 
 const credentials = z.strictObject({ email: z.email(), password: z.string().min(1).max(256) });
 
 export async function POST(request: Request) {
+  const limited = limitRequest(request, "staff-sign-in", 10);
+  if (limited) return limited;
   const input = credentials.safeParse(await request.json().catch(() => null));
   if (!input.success) return Response.json({ error: "invalid_credentials" }, { status: 400 });
   const url = process.env.SUPABASE_URL;

@@ -21,3 +21,19 @@ The handoff PDF mentions a local checkout at d6b448c two commits ahead of origin
   record, and 404 with only the reason code for withdrawn, stale, expired_deadline, closed and not_found.
 - **PathSync fixtures.** `tests/fixtures/contract.ts` (five synthetic records validated by the schema) and
   `docs/pathsync-contract-fixtures.json` generated from it by a file snapshot test (`npx vitest -u` to refresh).
+
+## Launch gaps (items 5 to 8)
+
+- **Audit log.** `016_staff_audit.sql` adds a read-only `staff_audit` function over `staff_changes` (created, edited,
+  withdrawn, with note) and `verification_attempts` (verified open or closed, inconclusive, failed). Staff see it at
+  /admin/audit, newest first, 100 per page. Not applied to the live database yet.
+- **Rechecks and tombstones.** Already correct, no change: failed or inconclusive checks keep the last successful
+  window (tests/review.test.ts), closed evidence hides at once, and withdrawn rows are never deleted while
+  `dedupe_key` is unique, so the same round cannot be imported twice. Nothing purges tombstones, which keeps them
+  at least the 730 days the brief requires.
+- **Staff workload.** `017_queue_assignment.sql` adds `listings.queue_assignments` plus staff-only assign
+  functions. The queue has filters (type, state, assigned) and a "Needs official URL" tag when the application link
+  is not an official page or the source is not official. The queue still loads if 017 is not applied yet.
+- **Security.** Headers in next.config.ts (HSTS, nosniff, no framing, referrer and permissions policy). A full
+  script CSP is left out until it is tested against the Next runtime. Per-instance rate limits on staff sign-in
+  (10 per 10 minutes), student sign-in (10), organisation sign-up (5) and submissions (20).

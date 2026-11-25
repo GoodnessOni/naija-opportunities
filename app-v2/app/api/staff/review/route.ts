@@ -18,11 +18,24 @@ async function queue(id: string) {
   return listingSchema.array().parse(await staffRpc("staff_review_queue", { staff_user: id }));
 }
 
+/** listing_id to reviewer_id. Empty when migration 017 is not applied yet, so the queue still loads. */
+async function readAssignments(id: string): Promise<Record<string, string>> {
+  try {
+    const rows = z.object({ listing_id: z.string(), reviewer_id: z.string() }).array()
+      .parse(await staffRpc("staff_queue_assignments", { staff_user: id }));
+    return Object.fromEntries(rows.map(row => [row.listing_id, row.reviewer_id]));
+  } catch {
+    return {};
+  }
+}
+
 export async function GET(request: Request) {
   try {
     const staff = await authenticateStaff(request);
-    const [listings, overview] = await Promise.all([queue(staff.id), staffRpc("staff_overview", { staff_user: staff.id })]);
-    return Response.json({ listings, overview }, { headers: { "Cache-Control": "no-store" } });
+    const [listings, overview, assignments] = await Promise.all([
+      queue(staff.id), staffRpc("staff_overview", { staff_user: staff.id }), readAssignments(staff.id),
+    ]);
+    return Response.json({ listings, overview, assignments, reviewer: staff.reviewer }, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
     return errorResponse(error);
   }

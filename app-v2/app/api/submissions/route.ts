@@ -1,8 +1,11 @@
+import { limitRequest } from "../../../lib/rate-limit";
 import { z } from "zod";
 import { authenticateUser, staffRpc, StaffRequestError } from "../../../lib/listings/staff-store";
 import { makeSubmission, submissionInput } from "../../../lib/listings/submission";
 
 export async function POST(request: Request) {
+  const limited = limitRequest(request, "submission", 20);
+  if (limited) return limited;
   try {
     const user = await authenticateUser(request);
     if (!user.email_confirmed_at) return Response.json({ error: "confirm_email" }, { status: 403 });
