@@ -37,3 +37,16 @@ The handoff PDF mentions a local checkout at d6b448c two commits ahead of origin
 - **Security.** Headers in next.config.ts (HSTS, nosniff, no framing, referrer and permissions policy). A full
   script CSP is left out until it is tested against the Next runtime. Per-instance rate limits on staff sign-in
   (10 per 10 minutes), student sign-in (10), organisation sign-up (5) and submissions (20).
+
+## Work location country for Greenhouse jobs
+
+- **Why.** Greenhouse drafts stored location.country as ZZ even when the employer said "Lagos, Nigeria". PathSync's
+  home-country rule reads this field.
+- **Rule.** `lib/listings/location-country.ts` maps the employer's location text to one ISO alpha-2 code when every
+  part names the same country ("Lagos, Nigeria", "Remote, Nigeria", "Abuja" give NG). Bare "Lagos", "Remote",
+  regions such as EMEA, unknown places and multi-country lists give ZZ. It is a location fact only and never
+  touches eligibility.citizenship or provider.country. `makeGreenhouseDraft` applies it and recomputes content_hash.
+- **Live records.** `scripts/location-country-dry-run.mjs` is read-only and reports what would change. After
+  approval, `import-greenhouse.mjs <board> "<employer>" --refresh-only` re-syncs through the existing
+  refresh_verified_greenhouse_job (revision + 1, new content_hash). That path also renews the verification window,
+  as every Greenhouse refresh does. Not run against the live database yet.
