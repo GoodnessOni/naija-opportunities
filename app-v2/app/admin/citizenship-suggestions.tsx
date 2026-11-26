@@ -65,7 +65,7 @@ export default function CitizenshipSuggestions({ token }: { token: string }) {
             return next;
           })} /> {item.title} ({item.provider})
         </label>
-        <p>Suggested: {label(item.suggestion)}. {item.reason === "negation" ? "Has a limit or exclusion." : "Matches conflict."}</p>
+        <p>Suggested: {label(item.suggestion)}. {item.reason === "negation" ? "Has a limit or exclusion." : item.reason === "region" ? "Names a region." : "Matches conflict."}</p>
         <blockquote>{item.evidence}</blockquote>
       </li>)}
     </ul>

@@ -10,7 +10,7 @@ import { listingSchema, type Listing } from "./schema.ts";
 type Citizenship = Listing["eligibility"]["citizenship"];
 export type CitizenshipResult =
   | { status: "match"; citizenship: Citizenship; evidence: string }
-  | { status: "unclear"; reason: "negation" | "conflict"; suggestion: Citizenship | null; evidence: string }
+  | { status: "unclear"; reason: "negation" | "conflict" | "region"; suggestion: Citizenship | null; evidence: string }
   | { status: "none" };
 
 const NATIONALITIES: Record<string, string> = {
@@ -20,23 +20,46 @@ const NATIONALITIES: Record<string, string> = {
   senegalese: "SN", egyptian: "EG", egyptians: "EG", zambian: "ZM", zambians: "ZM", zimbabwean: "ZW", zimbabweans: "ZW",
   british: "GB", american: "US", americans: "US", canadian: "CA", canadians: "CA", indian: "IN", indians: "IN",
 };
+const COUNTRIES: Record<string, string> = {
+  nigeria: "NG", ghana: "GH", kenya: "KE", "south africa": "ZA", uganda: "UG", rwanda: "RW", tanzania: "TZ",
+  ethiopia: "ET", cameroon: "CM", senegal: "SN", egypt: "EG", zambia: "ZM", zimbabwe: "ZW",
+};
 const NAMES = Object.keys(NATIONALITIES).sort((a, b) => b.length - a.length).join("|");
-const PEOPLE = "students|citizens|nationals|applicants|residents|graduates|youths?";
+const PLACES = Object.keys(COUNTRIES).sort((a, b) => b.length - a.length).join("|");
+const PEOPLE = "students?|citizens?|nationals?|applicants?|candidates?|residents?|graduates?|undergraduates?|postgraduates?|" +
+  "youths?|young people|women|men|professionals|engineers|developers|entrepreneurs|founders|researchers|scholars|" +
+  "talents?|individuals|persons|people|corps members";
+const PERSON = "applicants?|candidates?|students?|graduates?|undergraduates?|citizens?|nationals?|youths?|individuals|people|talents?";
+const codesOf = (text: string, map: Record<string, string>, names: string) =>
+  [...text.matchAll(new RegExp(String.raw`\b(${names})\b`, "gi"))].map(name => map[name[1].toLowerCase()]);
+const LIST = (names: string) => String.raw`(?:${names})(?:\s*(?:,|and|or|&)\s*(?:${names}))*`;
 
 const rules: { pattern: RegExp; codes: (match: RegExpMatchArray) => string[] }[] = [
   { pattern: /\bnigerians only\b/i, codes: () => ["NG"] },
   { pattern: /\bopen to nigerians\b/i, codes: () => ["NG"] },
-  { pattern: /\bopen to all nationalities\b/i, codes: () => ["*"] },
+  // Nigeria-only national schemes: SIWES (Nigerian tertiary students) and NYSC (Nigerian graduates).
+  { pattern: /\b(siwes|nysc)\b/i, codes: () => ["NG"] },
+  { pattern: /\b(?:open to )?(?:all|any) nationalit(?:y|ies)\b/i, codes: () => ["*"] },
+  { pattern: /\bregardless of (?:nationality|citizenship|country of origin)\b/i, codes: () => ["*"] },
   { pattern: /\ball countries\b/i, codes: () => ["*"] },
-  { pattern: /\bapplicants from any country\b/i, codes: () => ["*"] },
-  { pattern: new RegExp(`\\b(${NAMES})(?:\\s*(?:,|and|or|&)\\s*(${NAMES}))*\\s+(?:${PEOPLE})\\b`, "gi"), codes: match =>
-    [...match[0].matchAll(new RegExp(`\\b(${NAMES})\\b`, "gi"))].map(name => NATIONALITIES[name[1].toLowerCase()]) },
+  { pattern: /\b(?:applicants|candidates|students) from any country\b/i, codes: () => ["*"] },
+  { pattern: new RegExp(String.raw`\b${LIST(NAMES)}\s+(?:${PEOPLE})\b`, "i"), codes: match => codesOf(match[0], NATIONALITIES, NAMES) },
+  { pattern: new RegExp(String.raw`\b(?:${PERSON})\s+(?:from|of)\s+${LIST(PLACES)}\b`, "i"), codes: match => codesOf(match[0], COUNTRIES, PLACES) },
+  { pattern: new RegExp(String.raw`\b(?:citizens?|nationals?|citizenship) of\s+${LIST(PLACES)}\b`, "i"), codes: match => codesOf(match[0], COUNTRIES, PLACES) },
 ];
+// A region is too wide for the 20-country contract field, so it goes to staff review.
+const REGION = /\b(african countries|african nationals|african citizens|citizens of (?:an?|any) african|sub-saharan africa(?:n)?\s+(?:countries|nationals|citizens)|africans)\b/i;
 const NEGATION = /\b(not open to|except|excluding|non-nigerians?|not eligible|ineligible|cannot apply|may not apply)\b/i;
+const MENTION = /\b(nationalit\w*|citizen\w*|nationals?|countr\w*|residen\w*|international|nigerians?|nigeria|africa\w*|siwes|nysc)\b/i;
+
+/** Sentences that mention nationality, country, citizen, resident or "international"; for dry-run explanations. */
+export function citizenshipMentions(record: Listing): string[] {
+  return sentences(record).filter(sentence => MENTION.test(sentence));
+}
 
 function sentences(record: Listing): string[] {
-  const { eligibility, summary, description } = record;
-  return [eligibility.education.source_wording, eligibility.criteria_text, summary, description]
+  const { eligibility, title, summary, description } = record;
+  return [title, eligibility.education.source_wording, eligibility.criteria_text, summary, description]
     .filter((value): value is string => Boolean(value) && value !== "[withdrawn]")
     .flatMap(value => value.split(/(?<=[.!?])\s+|\n+/))
     .map(value => value.trim()).filter(Boolean);
@@ -68,6 +91,10 @@ export function extractCitizenship(record: Listing): CitizenshipResult {
     }
   }
   const quote = (values: string[]) => [...new Set(values)].join(" | ").slice(0, 1000);
+  const regional = sentences(record).filter(sentence => REGION.test(sentence) && !negated.includes(sentence));
+  if (regional.length && !negated.length) {
+    return { status: "unclear", reason: "region", suggestion: null, evidence: quote([...regional, ...found.map(item => item.sentence)]) };
+  }
   if (negated.length) {
     return { status: "unclear", reason: "negation", suggestion: suggest(found), evidence: quote([...negated, ...found.map(item => item.sentence)]) };
   }

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { applyCitizenship, contentHash, extractCitizenship } from "../lib/listings/citizenship";
+import { applyCitizenship, citizenshipMentions, contentHash, extractCitizenship } from "../lib/listings/citizenship";
 import { listingSchema, type Listing } from "../lib/listings/schema";
 import { fixture } from "./fixtures/listing";
 
@@ -61,6 +61,51 @@ describe("citizenship extractor", () => {
     expect(extractCitizenship(withText("Open to Nigerian students. Non-Nigerian students are not eligible."))).toMatchObject({
       status: "unclear", suggestion: { requirement: "explicit", countries: ["NG"] },
     });
+  });
+
+  it.each([
+    "SIWES placement for eligible Nigerian students.",
+    "Six-month SIWES placement in Lagos.",
+    "Open to NYSC corps members.",
+    "Nigerian undergraduates in 300 level may apply.",
+    "Applicants from Nigeria are invited to apply.",
+    "Applicants must be citizens of Nigeria.",
+    "Young Nigerian women in technology.",
+  ])("reads NG from the wider pattern: %s", text => {
+    expect(extractCitizenship(withText(text))).toMatchObject({ status: "match", citizenship: { requirement: "explicit", countries: ["NG"] } });
+  });
+
+  it.each([
+    "Applicants of all nationalities are welcome.",
+    "Any nationality may apply.",
+    "Selection is regardless of nationality.",
+  ])("reads unconstrained from the wider pattern: %s", text => {
+    expect(extractCitizenship(withText(text))).toMatchObject({ status: "match", citizenship: { countries: ["*"] } });
+  });
+
+  it("reads several countries named after from", () => {
+    expect(extractCitizenship(withText("Open to candidates from Ghana and Kenya."))).toMatchObject({ citizenship: { countries: ["GH", "KE"] } });
+  });
+
+  it("reads the title", () => {
+    expect(extractCitizenship({ ...base, title: "SIWES Internship 2027" })).toMatchObject({ status: "match", citizenship: { countries: ["NG"] } });
+  });
+
+  it("sends African regions to review without a suggestion", () => {
+    expect(extractCitizenship(withText("Open to citizens of African countries."))).toMatchObject({ status: "unclear", reason: "region", suggestion: null });
+  });
+
+  it("keeps the negation guard on the wider patterns", () => {
+    expect(extractCitizenship(withText("Open to all nationalities except applicants from Nigeria."))).toMatchObject({ status: "unclear", reason: "negation" });
+    expect(extractCitizenship(withText("NYSC members are not eligible for this citizen scheme."))).toMatchObject({ status: "unclear", reason: "negation" });
+  });
+
+  it("lists mention sentences for the dry-run explanation", () => {
+    expect(citizenshipMentions(withText("A great role. International exposure. Based in Lagos."))).toEqual(["International exposure."]);
+  });
+
+  it("does not read a job location as citizenship", () => {
+    expect(extractCitizenship(withText("The role is based in Nigeria. Remote work from Lagos is possible."))).toEqual({ status: "none" });
   });
 
   it("ignores the provider country and the word international", () => {

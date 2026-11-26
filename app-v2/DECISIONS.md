@@ -53,5 +53,12 @@ The handoff PDF mentions a local checkout at d6b448c two commits ahead of origin
   reviewed_by automation, reviewer_id null, with the matched sentence. The listing record itself changes only
   citizenship, revision (+1), updated_at and content_hash; the SQL rejects any other difference. Freshness and
   verification are never touched.
+- **Widened after the first dry run** (74 live: 1 NG, 73 no rule). The title is now read too. Added: SIWES and NYSC
+  (Nigeria-only national schemes) give NG; "Nigerian undergraduates/candidates/women/..." and "applicants from
+  Nigeria", "citizens of Nigeria" (and the same for the other listed countries); "all/any nationalities",
+  "regardless of nationality" give `["*"]`. "African countries" and similar regions are too wide for the
+  20-country field, so they go to staff review with no suggestion. A job location ("based in Nigeria") is still
+  not a rule. `--explain` prints each no-rule listing's id, title and the sentences that mention nationality,
+  country, citizen, resident or "international".
 - **Running it.** `node --env-file=.env.local scripts/fill-citizenship.mjs` is a dry run over the active feed and
   prints counts. `--apply` writes, and needs 018 applied first. Neither has been run against the live database yet.
