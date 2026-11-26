@@ -37,3 +37,21 @@ The handoff PDF mentions a local checkout at d6b448c two commits ahead of origin
 - **Security.** Headers in next.config.ts (HSTS, nosniff, no framing, referrer and permissions policy). A full
   script CSP is left out until it is tested against the Next runtime. Per-instance rate limits on staff sign-in
   (10 per 10 minutes), student sign-in (10), organisation sign-up (5) and submissions (20).
+
+## Citizenship fill-in (migration 018)
+
+- **Why.** Every live listing had citizenship "unknown", so PathSync listed all of them under "Check these".
+- **Rules, no language model.** `lib/listings/citizenship.ts` reads education source wording, criteria text, summary
+  and description, sentence by sentence, for exact phrases only: "Nigerian students/citizens/nationals", "Nigerians
+  only", "open to Nigerians" give `["NG"]`; "open to all nationalities", "all countries", "applicants from any
+  country" give `["*"]`; other named nationalities give their ISO codes. The provider's country and the bare word
+  "international" are never read as a rule.
+- **Left unknown, sent to staff.** A sentence with a limit ("not open to", "except", "excluding", "non-Nigerian")
+  or matches that disagree. The staff queue shows these with the suggested rule and the evidence sentence, all
+  ticked, with one "Approve all" button. Staff approval is logged as human_review by that reviewer.
+- **Clear matches are automatic.** Logged in `listings.citizenship_decisions` as method automated_review,
+  reviewed_by automation, reviewer_id null, with the matched sentence. The listing record itself changes only
+  citizenship, revision (+1), updated_at and content_hash; the SQL rejects any other difference. Freshness and
+  verification are never touched.
+- **Running it.** `node --env-file=.env.local scripts/fill-citizenship.mjs` is a dry run over the active feed and
+  prints counts. `--apply` writes, and needs 018 applied first. Neither has been run against the live database yet.

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import StaffEditor from "./staff-editor";
+import CitizenshipSuggestions from "./citizenship-suggestions";
 import type { Listing } from "../../lib/listings/schema";
 import { filterQueue, needsOfficialUrl, type QueueFilters } from "../../lib/listings/queue-filters";
 
@@ -144,6 +145,7 @@ export default function StaffQueue() {
         <div><dt>Published</dt><dd>{overview.published}</dd></div>
       </dl>}
       <StaffEditor token={token} onSaved={() => refresh(token)} />
+      <CitizenshipSuggestions token={token} />
       <fieldset className="search-form queue-filters"><legend>Filter the queue</legend>
         <div><label htmlFor="filter-kind">Type</label><select id="filter-kind" value={filters.kind} onChange={setFilter("kind")}>
           <option value="all">All types</option><option value="scholarship">Scholarships</option>
