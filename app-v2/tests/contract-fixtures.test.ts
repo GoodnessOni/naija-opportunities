@@ -62,3 +62,12 @@ describe("PathSync fixture handoff file", () => {
     await expect(JSON.stringify(handoff, null, 2) + "\n").toMatchFileSnapshot("../docs/pathsync-contract-fixtures.json");
   });
 });
+
+describe("FEED_API_KEY_HASHES parsing", () => {
+  it("accepts a digest pasted with spaces, a newline or upper case", async () => {
+    const key = "partner-test-key";
+    process.env.FEED_API_KEY_HASHES = ` ${createHash("sha256").update(key).digest("hex").toUpperCase()} \n`;
+    const { authorizedPartner } = await import("../lib/listings/partner-feed");
+    expect(authorizedPartner(new Request("http://x", { headers: { authorization: `Bearer ${key}` } }))).toBe(true);
+  });
+});

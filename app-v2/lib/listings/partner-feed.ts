@@ -9,7 +9,7 @@ const cursorSchema = z.strictObject({ id: partnerListingId, time });
 export function authorizedPartner(request: Request) {
   const header = request.headers.get("authorization");
   if (!header?.startsWith("Bearer ")) return false;
-  const digests = (process.env.FEED_API_KEY_HASHES ?? "").split(",").filter(key => /^[a-f0-9]{64}$/.test(key));
+  const digests = (process.env.FEED_API_KEY_HASHES ?? "").split(",").map(key => key.trim().toLowerCase()).filter(key => /^[a-f0-9]{64}$/.test(key));
   const supplied = createHash("sha256").update(header.slice(7)).digest();
   return digests.some(digest => timingSafeEqual(supplied, Buffer.from(digest, "hex")));
 }
