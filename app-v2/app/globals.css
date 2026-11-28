@@ -186,3 +186,4 @@ input:focus, select:focus, textarea:focus { border-color: var(--navy); }
 @media (min-width: 52rem) { .directory-filters { grid-template-columns: repeat(4, minmax(0, 1fr)); } .directory-filters > div:nth-child(-n+3), .directory-filters > .button { grid-column: auto; } .directory-filters > div:first-child { grid-column: span 2; } }
 .directory-filters .button { width: 100%; }
 .browse > p[role="alert"] { padding: .75rem 1rem; border-radius: .65rem; background: #ffe8c3; }
+p.listing-activity { display: block; }
