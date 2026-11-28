@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 export default async function Home() {
   const [listings, closing] = await Promise.all([
     readPublicListings({ limit: 6 }).catch(() => null),
-    readPublicListings({ limit: 24, browse: { deadline_type: "fixed", closes_within: 30 } }).catch(() => null),
+    readPublicListings({ limit: 24, offset: 0, browse: { deadline_type: "fixed", closes_within: 30 } }).catch(() => null),
   ]);
   const closingSoon = (closing ?? [])
     .flatMap(listing => listing.deadline.kind === "fixed" ? [{ listing, at: listing.deadline.fixed_at }] : [])
@@ -39,7 +39,7 @@ export default async function Home() {
                 <span>{listing.title}</span>
               </Link>
             </li>)}
-          </ol> : <p>No listed deadlines in the next 30 days.</p>}
+          </ol> : <p>{closing === null ? "Deadlines are unavailable right now." : "No listed deadlines in the next 30 days."}</p>}
           <Link className="home-closing-more" href="/opportunities?closes_within=30">All deadlines in the next 30 days</Link>
         </section>
       </section>
