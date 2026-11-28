@@ -2,6 +2,7 @@ import { createHash, randomBytes } from "node:crypto";
 import { z } from "zod";
 import { resolveDateOnlyDeadline } from "./deadline.ts";
 import { listingSchema } from "./schema.ts";
+import { countryFromLocation } from "./location-country.ts";
 
 export const submissionInput = z.strictObject({
   kind: z.enum(["job", "internship", "scholarship"]),
@@ -79,5 +80,10 @@ export function makeGreenhouseDraft(
     timezone: "",
     round: candidate.source_key,
   });
-  return makeSubmission(input, clock, candidate.source_key);
+  const draft = makeSubmission(input, clock, candidate.source_key);
+  // Work location only. Never citizenship: PathSync's home-country rule reads this field.
+  draft.location.country = countryFromLocation(candidate.location);
+  const { content_hash, ...fields } = draft;
+  void content_hash;
+  return listingSchema.parse({ ...fields, content_hash: createHash("sha256").update(JSON.stringify(fields)).digest("hex") });
 }
