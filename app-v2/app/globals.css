@@ -62,15 +62,22 @@ h1 { font-size: clamp(2.65rem, 9vw, 6rem); letter-spacing: -.055em; max-width: 1
 .skip-link { position: fixed; inset: .5rem auto auto .5rem; transform: translateY(-200%); }
 .skip-link:focus { transform: translateY(0); }
 .button, .skip-link { padding: .65rem 1rem; background: var(--navy); color: var(--cream); }
+.button { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; min-height: 2.75rem; border: 1px solid var(--navy); border-radius: .65rem; font: inherit; font-weight: 600; cursor: pointer; }
+.button:hover { background: #273962; }
+.button:disabled { opacity: .6; cursor: progress; }
 .button-accent { background: var(--orange); color: var(--navy); }
 label { display: block; font-weight: 600; }
-input, select, textarea { border: 1px solid var(--navy); background: var(--cream); padding: .6rem; }
+input, select, textarea { border: 1px solid #101b3e80; border-radius: .6rem; background: #fffdf6; padding: .6rem .75rem; font: inherit; }
+input:focus, select:focus, textarea:focus { border-color: var(--navy); }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto; transition: none; animation: none; }
 }
-.review-form { display: grid; gap: .8rem; margin-block: 2rem; max-width: 42rem; }
-.review-form textarea { width: 100%; min-height: 4.5rem; }
-.review-form button { justify-self: start; }
+.review-form, .stack { display: grid; gap: 1rem; margin-block: 1.5rem 2rem; max-width: 36rem; padding: clamp(1rem, 4vw, 1.75rem); background: #fffdf6; border: 1px solid #101b3e22; border-radius: 1rem; }
+.review-form label, .stack label { display: grid; gap: .35rem; }
+.review-form label:has(> input[type="checkbox"]), .stack label:has(> input[type="checkbox"]) { display: flex; align-items: flex-start; gap: .5rem; font-weight: 500; }
+.review-form :is(input:not([type="checkbox"]):not([type="radio"]), select, textarea), .stack :is(input:not([type="checkbox"]):not([type="radio"]), select, textarea) { display: block; width: 100%; min-height: 2.75rem; }
+.review-form textarea { min-height: 7rem; }
+.review-form button, .stack button { justify-self: start; }
 .site-footer { display: flex; justify-content: space-between; flex-wrap: wrap; gap: .75rem; }
 .site-footer a { text-decoration: underline; }
 
@@ -168,3 +175,14 @@ input, select, textarea { border: 1px solid var(--navy); background: var(--cream
 .directory-filters > div { flex: 1 1 10rem; min-width: 0; }
 .directory-filters input, .directory-filters select { width: 100%; border-radius: .5rem; }
 .directory-filters .button { border-radius: .5rem; }
+.site-header-inner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .5rem 1.5rem; }
+.site-nav { display: flex; gap: .25rem 1.1rem; overflow-x: auto; font-weight: 600; font-size: .95rem; scrollbar-width: none; }
+.site-nav a { padding-block: .35rem; white-space: nowrap; text-underline-offset: .3em; }
+.site-nav a:hover { text-decoration: underline; }
+@media (max-width: 40rem) { .site-nav { width: 100%; justify-content: space-between; gap: .75rem; font-size: .875rem; } }
+.directory-filters { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: end; gap: .85rem; }
+.directory-filters > div:nth-child(-n+3), .directory-filters > .button { grid-column: 1 / -1; }
+.directory-filters label { font-size: .875rem; }
+@media (min-width: 52rem) { .directory-filters { grid-template-columns: repeat(4, minmax(0, 1fr)); } .directory-filters > div:nth-child(-n+3), .directory-filters > .button { grid-column: auto; } .directory-filters > div:first-child { grid-column: span 2; } }
+.directory-filters .button { width: 100%; }
+.browse > p[role="alert"] { padding: .75rem 1rem; border-radius: .65rem; background: #ffe8c3; }

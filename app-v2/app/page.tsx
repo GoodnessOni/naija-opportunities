@@ -19,7 +19,7 @@ export default async function Home() {
     <>
       <section className="intro home-intro">
         <div>
-          <h1>Verified opportunities for Nigerian students and graduates.</h1>
+          <h1>Verified opportunities for Nigerian students.</h1>
           <p>Scholarships, internships and jobs, each checked against the official source before it is listed.</p>
           <form action="/opportunities" className="home-search">
             <label htmlFor="home-keyword">Search opportunities</label>
