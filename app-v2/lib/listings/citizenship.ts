@@ -138,3 +138,13 @@ export function revertCitizenship(record: Listing, clock: Date): Listing {
   updated.content_hash = contentHash(updated);
   return listingSchema.parse(updated);
 }
+
+const LISTING_ID = /^lst_[0-9A-HJKMNP-TV-Z]{26}$/;
+
+/** Arguments for scripts/revert-citizenship.mjs, or null when they are incomplete. */
+export function parseRevertArgs(args: string[]) {
+  const apply = args.includes("--apply");
+  const [listingId, reviewer, reason, ...rest] = args.filter(arg => arg !== "--apply");
+  if (!LISTING_ID.test(listingId ?? "") || !/^[a-z0-9]+(?:[-_][a-z0-9]+)*$/.test(reviewer ?? "") || !reason?.trim() || rest.length) return null;
+  return { apply, listingId, reviewer, reason: reason.trim() };
+}

@@ -1,5 +1,6 @@
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { applyCitizenship, citizenshipMentions, contentHash, extractCitizenship, revertCitizenship } from "../lib/listings/citizenship";
+import { applyCitizenship, citizenshipMentions, contentHash, extractCitizenship, parseRevertArgs, revertCitizenship } from "../lib/listings/citizenship";
 import { listingSchema, type Listing } from "../lib/listings/schema";
 import { fixture } from "./fixtures/listing";
 
@@ -155,6 +156,22 @@ describe("applying a citizenship decision", () => {
     expect(reverted.content_hash).toBe(contentHash(reverted));
     expect(reverted.verification).toEqual(set.verification);
     expect(() => revertCitizenship(reverted, later)).toThrow(RangeError);
+  });
+
+  it("parses the revert script arguments", () => {
+    const id = "lst_VDK1Q876PKR48S015N411W80MC";
+    expect(parseRevertArgs([id, "engrog", " NYSC listed as one group "])).toEqual({ apply: false, listingId: id, reviewer: "engrog", reason: "NYSC listed as one group" });
+    expect(parseRevertArgs([id, "engrog", "reason", "--apply"])).toMatchObject({ apply: true });
+    expect(parseRevertArgs(["lst_bad", "engrog", "reason"])).toBeNull();
+    expect(parseRevertArgs([id, "engrog", "  "])).toBeNull();
+    expect(parseRevertArgs([id, "Eng Rog", "reason"])).toBeNull();
+  });
+
+  it("the revert script reads by id, not the active feed, and never calls process.exit", () => {
+    const script = readFileSync(new URL("../scripts/revert-citizenship.mjs", import.meta.url), "utf8");
+    expect(script).toContain('rpc("citizenship_listing"');
+    expect(script).not.toContain("partner_listings");
+    expect(script).not.toMatch(/process\.exit\(/);
   });
 
   it("refuses a listing that already has a citizenship rule", () => {

@@ -1,16 +1,11 @@
-import { revertCitizenship } from "../lib/listings/citizenship.ts";
+import { parseRevertArgs, revertCitizenship } from "../lib/listings/citizenship.ts";
 import { listingSchema } from "../lib/listings/schema.ts";
 
-// One-off, reviewed undo of a wrong automated citizenship decision. Needs migration 019.
+// One-off, reviewed undo of a wrong automated citizenship decision. Needs migrations 019 and 020.
+// Reads any non-synthetic, non-withdrawn listing by id (not only the active feed).
 // Default is a dry run: prints the listing and what would change. --apply writes.
-const args = process.argv.slice(2);
-const apply = args.includes("--apply");
-const [listingId, reviewer, reason] = args.filter(arg => arg !== "--apply");
+// Sets process.exitCode instead of calling process.exit, so open fetch handles close cleanly on Windows.
 const { SUPABASE_URL: url, SUPABASE_SERVICE_ROLE_KEY: key } = process.env;
-if (!url || !key || !/^lst_[0-9A-HJKMNP-TV-Z]{26}$/.test(listingId ?? "") || !reviewer || !reason?.trim()) {
-  console.error('Usage: node scripts/revert-citizenship.mjs <listing_id> <reviewer_id> "<reason>" [--apply]');
-  process.exit(1);
-}
 
 async function rpc(name, body) {
   const response = await fetch(new URL(`/rest/v1/rpc/${name}`, url), {
@@ -18,22 +13,42 @@ async function rpc(name, body) {
     headers: { apikey: key, ...(key.startsWith("sb_") ? {} : { Authorization: `Bearer ${key}` }), "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
+  const text = await response.text();
   if (!response.ok) throw new Error(`${name} failed with ${response.status}`);
-  return response.json();
+  return text ? JSON.parse(text) : null;
 }
 
-const [row] = await rpc("partner_listings", { evaluated_at: new Date().toISOString(), after_id: null, selected_id: listingId, page_limit: 1 });
-if (!row?.record) {
-  console.error(`Listing not on the active feed (${row?.reason ?? "not found"}).`);
-  process.exit(1);
-}
-const record = listingSchema.parse(row.record);
-const updated = revertCitizenship(record, new Date());
-const summary = { listing_id: listingId, title: record.title, from: record.eligibility.citizenship, to: updated.eligibility.citizenship, revision: `${record.revision} -> ${updated.revision}` };
-if (!apply) {
-  console.log(JSON.stringify({ mode: "dry_run", ...summary }, null, 2));
-} else {
-  const saved = await rpc("revert_citizenship_automation", { prior_revision: record.revision, updated_record: updated, reviewer, reason: reason.trim() });
+async function main() {
+  const args = parseRevertArgs(process.argv.slice(2));
+  if (!url || !key || !args) {
+    console.error('Usage: node scripts/revert-citizenship.mjs <listing_id> <reviewer_id> "<reason>" [--apply]');
+    return 1;
+  }
+  const found = await rpc("citizenship_listing", { target_id: args.listingId });
+  if (!found) {
+    console.error("Listing not found, synthetic or withdrawn.");
+    return 1;
+  }
+  const record = listingSchema.parse(found);
+  const updated = revertCitizenship(record, new Date());
+  const summary = {
+    listing_id: args.listingId, title: record.title, from: record.eligibility.citizenship,
+    to: updated.eligibility.citizenship, revision: `${record.revision} -> ${updated.revision}`,
+  };
+  if (!args.apply) {
+    console.log(JSON.stringify({ mode: "dry_run", ...summary }, null, 2));
+    return 0;
+  }
+  const saved = await rpc("revert_citizenship_automation", {
+    prior_revision: record.revision, updated_record: updated, reviewer: args.reviewer, reason: args.reason,
+  });
   console.log(JSON.stringify({ mode: "apply", saved: saved === true, ...summary }, null, 2));
-  if (saved !== true) process.exitCode = 1;
+  return saved === true ? 0 : 1;
+}
+
+try {
+  process.exitCode = await main();
+} catch (error) {
+  console.error(error instanceof Error ? error.message : String(error));
+  process.exitCode = 1;
 }

@@ -85,3 +85,7 @@ The handoff PDF mentions a local checkout at d6b448c two commits ahead of origin
   when the latest decision on that listing is the automated one at that revision, sets citizenship back to unknown,
   bumps revision, updated_at and content_hash, and logs a human_review decision with the staff reviewer and reason.
   `scripts/revert-citizenship.mjs <listing_id> <reviewer_id> "<reason>"` is a dry run; `--apply` writes.
+- **Revert reads by id.** The first revert attempt failed because the script read the active feed and the listing
+  was not on it. `020_citizenship_listing_lookup.sql` adds a read-only, service-role-only `citizenship_listing(id)`
+  for any non-synthetic, non-withdrawn listing (the same scope fill-citizenship writes to). The script now uses it
+  and sets process.exitCode instead of calling process.exit, which caused a libuv assertion on Windows.
