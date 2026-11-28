@@ -37,8 +37,13 @@ const LIST = (names: string) => String.raw`(?:${names})(?:\s*(?:,|and|or|&)\s*(?
 const rules: { pattern: RegExp; codes: (match: RegExpMatchArray) => string[] }[] = [
   { pattern: /\bnigerians only\b/i, codes: () => ["NG"] },
   { pattern: /\bopen to nigerians\b/i, codes: () => ["NG"] },
-  // Nigeria-only national schemes: SIWES (Nigerian tertiary students) and NYSC (Nigerian graduates).
-  { pattern: /\b(siwes|nysc)\b/i, codes: () => ["NG"] },
+  // SIWES is a Nigeria-only student scheme, so a SIWES placement is NG.
+  { pattern: /\bsiwes\b/i, codes: () => ["NG"] },
+  // NYSC only when it is required, not when corps members are one of several allowed groups.
+  { pattern: /\b(?:must|should|need to|required to) (?:have )?(?:completed|finished|done) (?:the )?nysc\b/i, codes: () => ["NG"] },
+  { pattern: /\b(?:completed|completion of) (?:the )?nysc\b/i, codes: () => ["NG"] },
+  { pattern: /\bnysc (?:discharge |exemption )?(?:certificate|certification) (?:is )?(?:required|mandatory|compulsory)\b/i, codes: () => ["NG"] },
+  { pattern: /\b(?:valid |original )?nysc (?:discharge|exemption) certificate\b/i, codes: () => ["NG"] },
   { pattern: /\b(?:open to )?(?:all|any) nationalit(?:y|ies)\b/i, codes: () => ["*"] },
   { pattern: /\bregardless of (?:nationality|citizenship|country of origin)\b/i, codes: () => ["*"] },
   { pattern: /\ball countries\b/i, codes: () => ["*"] },
@@ -117,6 +122,17 @@ export function applyCitizenship(record: Listing, citizenship: Citizenship, cloc
   if (record.eligibility.citizenship.requirement !== "unknown") throw new RangeError("Citizenship is already set");
   const updated = structuredClone(record);
   updated.eligibility.citizenship = citizenship;
+  updated.revision++;
+  updated.timestamps.updated_at = clock.toISOString();
+  updated.content_hash = contentHash(updated);
+  return listingSchema.parse(updated);
+}
+
+/** Undoes a wrong automated decision: citizenship back to unknown, revision, updated_at and content_hash bumped. */
+export function revertCitizenship(record: Listing, clock: Date): Listing {
+  if (record.eligibility.citizenship.requirement === "unknown") throw new RangeError("Citizenship is already unknown");
+  const updated = structuredClone(record);
+  updated.eligibility.citizenship = { requirement: "unknown", countries: [] };
   updated.revision++;
   updated.timestamps.updated_at = clock.toISOString();
   updated.content_hash = contentHash(updated);

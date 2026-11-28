@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { applyCitizenship, citizenshipMentions, contentHash, extractCitizenship } from "../lib/listings/citizenship";
+import { applyCitizenship, citizenshipMentions, contentHash, extractCitizenship, revertCitizenship } from "../lib/listings/citizenship";
 import { listingSchema, type Listing } from "../lib/listings/schema";
 import { fixture } from "./fixtures/listing";
 
@@ -66,7 +66,10 @@ describe("citizenship extractor", () => {
   it.each([
     "SIWES placement for eligible Nigerian students.",
     "Six-month SIWES placement in Lagos.",
-    "Open to NYSC corps members.",
+    "Must have completed NYSC or possess a valid exemption.",
+    "Requirements: BSc in Accounting, completed NYSC, two years of experience.",
+    "NYSC discharge certificate is required.",
+    "Attach your valid NYSC exemption certificate.",
     "Nigerian undergraduates in 300 level may apply.",
     "Applicants from Nigeria are invited to apply.",
     "Applicants must be citizens of Nigeria.",
@@ -104,6 +107,14 @@ describe("citizenship extractor", () => {
     expect(citizenshipMentions(withText("A great role. International exposure. Based in Lagos."))).toEqual(["International exposure."]);
   });
 
+  it.each([
+    "The programme lists recent tertiary graduates and current NYSC corps members.",
+    "Open to NYSC corps members.",
+    "Ideal for NYSC members, fresh graduates or final-year students.",
+  ])("does not treat NYSC as one allowed group as citizenship: %s", text => {
+    expect(extractCitizenship(withText(text))).toEqual({ status: "none" });
+  });
+
   it("does not read a job location as citizenship", () => {
     expect(extractCitizenship(withText("The role is based in Nigeria. Remote work from Lagos is possible."))).toEqual({ status: "none" });
   });
@@ -133,6 +144,17 @@ describe("applying a citizenship decision", () => {
       revision: 0, content_hash: "", timestamps: { ...record.timestamps, updated_at: "" } });
     expect(strip(updated)).toEqual(strip(base));
     expect(base.eligibility.citizenship.requirement).toBe("unknown");
+  });
+
+  it("reverts a wrong decision to unknown, bumping revision and hash only", () => {
+    const set = applyCitizenship(base, { requirement: "explicit", countries: ["NG"] }, clock);
+    const later = new Date("2027-03-26T09:00:00Z");
+    const reverted = revertCitizenship(set, later);
+    expect(reverted.eligibility.citizenship).toEqual({ requirement: "unknown", countries: [] });
+    expect(reverted.revision).toBe(set.revision + 1);
+    expect(reverted.content_hash).toBe(contentHash(reverted));
+    expect(reverted.verification).toEqual(set.verification);
+    expect(() => revertCitizenship(reverted, later)).toThrow(RangeError);
   });
 
   it("refuses a listing that already has a citizenship rule", () => {

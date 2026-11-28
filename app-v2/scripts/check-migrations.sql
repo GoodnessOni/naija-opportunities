@@ -1,4 +1,4 @@
--- Read-only check: which of migrations 001 to 018 are present in the connected Supabase project.
+-- Read-only check: which of migrations 001 to 019 are present in the connected Supabase project.
 -- It only reads catalog tables. It creates, changes and deletes nothing. Paste into the SQL editor and run.
 with expected(migration, kind, name) as (values
   ('001', 'table', 'listings.listings'),
@@ -47,7 +47,8 @@ with expected(migration, kind, name) as (values
   ('018', 'function', 'listings.write_citizenship'),
   ('018', 'function', 'public.apply_citizenship_automation'),
   ('018', 'function', 'public.staff_apply_citizenship'),
-  ('018', 'function', 'public.citizenship_candidates')
+  ('018', 'function', 'public.citizenship_candidates'),
+  ('019', 'function', 'public.revert_citizenship_automation')
 )
 select migration, kind, name,
   case kind

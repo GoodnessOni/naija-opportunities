@@ -74,3 +74,14 @@ The handoff PDF mentions a local checkout at d6b448c two commits ahead of origin
   approval, `import-greenhouse.mjs <board> "<employer>" --refresh-only` re-syncs through the existing
   refresh_verified_greenhouse_job (revision + 1, new content_hash). That path also renews the verification window,
   as every Greenhouse refresh does. Not run against the live database yet.
+
+## NYSC rule tightened, and undoing a wrong automated decision (migration 019)
+
+- **False positive.** The first --apply set "Operations Intern" to NG from "recent tertiary graduates and current
+  NYSC corps members": NYSC was one allowed group, not a requirement. NYSC now gives NG only when it is required
+  ("must have completed NYSC", "completed NYSC" in a requirements list, "NYSC discharge or exemption certificate").
+  A bare mention of NYSC corps members matches nothing. SIWES is unchanged.
+- **Undo.** `019_citizenship_revert.sql` adds a service-role-only `revert_citizenship_automation`. It works only
+  when the latest decision on that listing is the automated one at that revision, sets citizenship back to unknown,
+  bumps revision, updated_at and content_hash, and logs a human_review decision with the staff reviewer and reason.
+  `scripts/revert-citizenship.mjs <listing_id> <reviewer_id> "<reason>"` is a dry run; `--apply` writes.
