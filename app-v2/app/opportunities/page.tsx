@@ -61,7 +61,7 @@ export default async function Browse({ searchParams }: { searchParams: Promise<R
         })}
         <button className="button">Search</button>
       </form>
-      <p>{results.length ? `Showing ${offset + 1}–${offset + results.length}` : "0 results"}</p>
+      <p>{results.length ? `Showing ${offset + 1} to ${offset + results.length}` : "0 results"}</p>
       {results.length === 0 && <p>No open opportunities match these filters. <Link href="/opportunities">Clear filters</Link>.</p>}
       <Link href={`/alerts?${new URLSearchParams({ q: query, kind: kind ?? "", ...selected })}`}>Get email alerts for this search</Link>
       <OpportunityCards listings={results} heading="h2" />

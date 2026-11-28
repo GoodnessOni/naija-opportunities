@@ -18,8 +18,15 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body>
         <a className="skip-link" href="#main">Skip to content</a>
         <header className="site-header">
-          <div className="shell">
+          <div className="shell site-header-inner">
             <Link href="/" className="wordmark"><span aria-hidden="true" />NaijaOpportunities</Link>
+            <nav aria-label="Main" className="site-nav">
+              <Link href="/scholarships">Scholarships</Link>
+              <Link href="/internships">Internships</Link>
+              <Link href="/jobs">Jobs</Link>
+              <Link href="/alerts">Alerts</Link>
+              <Link href="/account/sign-in">Sign in</Link>
+            </nav>
           </div>
         </header>
         <main id="main" className="shell" tabIndex={-1}>{children}</main>

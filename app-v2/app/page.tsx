@@ -1,19 +1,26 @@
-import Image from "next/image";
 import Link from "next/link";
-import { readPublicListings } from "../lib/listings/public-store";
+import { listingHref, readPublicListings } from "../lib/listings/public-store";
 import { OpportunityCards } from "./opportunity-cards";
 
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  const listings = await readPublicListings({ limit: 6 }).catch(() => null);
+  const [listings, closing] = await Promise.all([
+    readPublicListings({ limit: 6 }).catch(() => null),
+    readPublicListings({ limit: 24, offset: 0, browse: { deadline_type: "fixed", closes_within: 30 } }).catch(() => null),
+  ]);
+  const closingSoon = (closing ?? [])
+    .flatMap(listing => listing.deadline.kind === "fixed" ? [{ listing, at: listing.deadline.fixed_at }] : [])
+    .sort((a, b) => a.at.localeCompare(b.at))
+    .slice(0, 4);
+  const day = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", timeZone: "Africa/Lagos" });
 
   return (
     <>
       <section className="intro home-intro">
         <div>
-          <h1>Find your next opportunity.</h1>
-          <p>Scholarships, internships, jobs, and more, right at your doorstep.</p>
+          <h1>Verified opportunities for Nigerian students.</h1>
+          <p>Scholarships, internships and jobs, each checked against the official source before it is listed.</p>
           <form action="/opportunities" className="home-search">
             <label htmlFor="home-keyword">Search opportunities</label>
             <div>
@@ -23,9 +30,18 @@ export default async function Home() {
           </form>
           <Link className="home-browse-link" href="/opportunities">Browse all opportunities <span aria-hidden="true">{"\u2197"}</span></Link>
         </div>
-        <div className="home-photo">
-          <Image src="/study-hall.webp" alt="" fill sizes="(max-width: 832px) 100vw, 45vw" />
-        </div>
+        <section className="home-closing" aria-labelledby="closing-soon">
+          <h2 id="closing-soon">Closing soon</h2>
+          {closingSoon.length ? <ol>
+            {closingSoon.map(({ listing, at }) => <li key={listing.listing_id}>
+              <Link href={listingHref(listing)}>
+                <time dateTime={at}>{day.format(new Date(at))}</time>
+                <span>{listing.title}</span>
+              </Link>
+            </li>)}
+          </ol> : <p>{closing === null ? "Deadlines are unavailable right now." : "No listed deadlines in the next 30 days."}</p>}
+          <Link className="home-closing-more" href="/opportunities?closes_within=30">All deadlines in the next 30 days</Link>
+        </section>
       </section>
       <nav className="home-categories" aria-label="Opportunity categories">
         <Link href="/scholarships">Scholarships <span aria-hidden="true">{"\u2197"}</span></Link>
