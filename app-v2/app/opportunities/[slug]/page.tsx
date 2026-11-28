@@ -79,17 +79,19 @@ export default async function Detail({ params }: { params: Promise<{ slug: strin
                 {closesToday && " · Closes today"}</>
             ) : deadlineLabel}
           </dd></dl>
-          <a className="button listing-apply-link" href={application.url}>
-            {canApply ? (kind === "job" ? "Apply on the employer site" : "Apply on the official site") : "View source listing"}
-            <span aria-hidden="true">↗</span>
-          </a>
-          {listing.source.url !== application.url && <a href={listing.source.url}>View original listing</a>}
-          {qualifyUrl && <p className="listing-qualify">
-            <a className="button" href={qualifyUrl}>See if you qualify</a>
-            <span>Check the requirements against your profile on PathSync. You still apply on the provider’s site yourself.</span>
-          </p>}
-          {activity && <ActivityPanel listingId={listing.listing_id} status={activity.status}
-            signInHref={activity.signedIn ? null : `/account/sign-in?next=${encodeURIComponent(`/opportunities/${slug}`)}`} />}
+          <div className="listing-actions">
+            <a className="button listing-apply-link" href={application.url}>
+              {canApply ? (kind === "job" ? "Apply on the employer site" : "Apply on the official site") : "View source listing"}
+              <span aria-hidden="true">↗</span>
+            </a>
+            {listing.source.url !== application.url && <a className="listing-source-link" href={listing.source.url}>View original listing</a>}
+            {qualifyUrl && <div className="listing-qualify">
+              <a className="button button-secondary" href={qualifyUrl}>See if you qualify</a>
+              <p>Check the requirements against your profile on PathSync. You still apply on the provider’s site yourself.</p>
+            </div>}
+            {activity && <ActivityPanel listingId={listing.listing_id} status={activity.status}
+              signInHref={activity.signedIn ? null : `/account/sign-in?next=${encodeURIComponent(`/opportunities/${slug}`)}`} />}
+          </div>
         </aside>
         <div className="listing-content">
           <section>
